@@ -12,7 +12,7 @@ from kaiwu_agent.utils.common_func import create_cls, attached
 
 
 SampleData = create_cls("SampleData", rewards=None)
-ObsData = create_cls("ObsData", feature=None)
+ObsData = create_cls("ObsData", feature=None, legal_actions=None)
 ActData = create_cls("ActData", act=None)
 
 @attached
@@ -27,16 +27,15 @@ def sample_process(list_game_data, gamma):
         
     return SampleData(rewards=rewards)
 
-def reward_shaping(frame_no, score, terminated, truncated, obs, _obs):
+def reward_shaping(frame_no, score, terminated, truncated, obs, _obs, step):
     reward = 0
     # 靠近终点的奖励:
-    end_treasure_dists = obs["feature"]
     _end_treasure_dists = _obs["feature"]
-    end_dist, _end_dist = end_treasure_dists[0], _end_treasure_dists[0]
-    if end_dist > _end_dist:
-        reward += 1
+    _end_dist = _end_treasure_dists[0]
+    reward += - _end_dist
     # 抵达终点的奖励
     if terminated:
         reward += score
-
+    # 耗时惩罚
+    reward += - 0.01 * step
     return reward

@@ -158,7 +158,7 @@ class Model(nn.Module):
         self.policy = ActorCritic(input_dim, output_dim, lstm_num_layers, lstm_hidden_dim)
         # 优化器（分别为Actor和Critic设置学习率）
         self.optimizer = torch.optim.Adam([
-            {'params': self.policy.actor.parameters(), 'lr': lr_critic},
+            {'params': self.policy.actor.parameters(), 'lr': lr_actor},
             {'params': self.policy.critic.parameters(), 'lr': lr_critic},
             {'params': self.policy.dual_lstm.parameters(), 'lr': lr_lstm}
         ])
