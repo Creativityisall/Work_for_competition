@@ -20,10 +20,10 @@ class Config:
     GAMMA = 0.95
     EPSILON = 0.1
     K_STEPS = 6
-    LR_ACTOR = 1e-3
-    LR_CRITIC = 1e-3
-    LR_LSTM = 1e-3
-    LOSS_WEIGHT = {'actor': 0.5, 'critic': 0.5, 'entropy': 0.2}
+    LR_ACTOR = 1e-4
+    LR_CRITIC = 1e-4
+    LR_LSTM = 1e-4
+    LOSS_WEIGHT = {'actor': 0.5, 'critic': 0.5, 'entropy': 0.8}
 
     # dimensionality of the sample
     # 样本维度
