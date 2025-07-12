@@ -22,6 +22,7 @@ from kaiwu_agent.agent.base_agent import (
 )
 from agent_diy.conf.conf import Config
 from agent_diy.model.model import Model
+import torch
 
 ObsData = create_cls("ObsData", feature=None, legal_actions=None)
 ActData = create_cls("ActData", act=None)
@@ -45,6 +46,11 @@ class Agent(BaseAgent):
         )
         self.gamma = Config.GAMMA
 
+    def reset(self):
+        """重置智能体内部模型的状态"""
+        if hasattr(self.model, 'reset'):
+            self.model.reset()
+
     @predict_wrapper
     def predict(self, list_obs_data):
         state = list_obs_data[0].feature
@@ -53,9 +59,15 @@ class Agent(BaseAgent):
 
     @exploit_wrapper
     def exploit(self, list_obs_data):
-        state = list_obs_data[0].feature
-        act = self.model.exploit(state)
-        return [ActData(act=act)]
+        obs_data=self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
+        state = obs_data.feature
+        action = self.model.exploit(state)
+        ##
+        ##action = torch.tensor([2])
+        ##return [ActData(act=action.detach())]
+        ##
+        act = action.detach().cpu().item()
+        return act
 
     @learn_wrapper
     def learn(self, list_sample_data):
@@ -112,4 +124,8 @@ class Agent(BaseAgent):
 
     @load_model_wrapper
     def load_model(self, path=None, id="1"):
-        self.model.load_model(path, id)
+        model_filename = f"model.ckpt-{id}.pt"
+        full_model_path = os.path.join(path, model_filename)
+
+        self.model.load_model(full_model_path)
+        self.reset()
