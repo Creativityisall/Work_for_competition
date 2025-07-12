@@ -19,10 +19,9 @@ class DualLSTM(nn.Module):
     """
     双LSTM网络，分别处理状态特征和动作历史
     """
-
     def __init__(self, input_dim, output_dim, num_layers=1, hidden_dim=64):
         super(DualLSTM, self).__init__()
-
+        
         # 状态LSTM - 处理环境状态
         self.state_lstm = nn.LSTM(
             input_size=input_dim,
@@ -30,7 +29,7 @@ class DualLSTM(nn.Module):
             num_layers=num_layers,
             batch_first=True
         )
-
+        
         # 动作LSTM - 处理历史动作
         self.action_lstm = nn.LSTM(
             input_size=output_dim,
@@ -38,7 +37,7 @@ class DualLSTM(nn.Module):
             num_layers=num_layers,
             batch_first=True
         )
-
+        
         # 融合层 - 将两个LSTM的输出融合
         self.fusion = nn.Sequential(
             nn.Linear(hidden_dim * 2, hidden_dim),
@@ -46,108 +45,108 @@ class DualLSTM(nn.Module):
             nn.Linear(hidden_dim, hidden_dim),
             nn.Tanh()
         )
-
+        
         self.hidden_dim = hidden_dim
-
+        
     def forward(self, state_seq, action_seq):
         # 初始化隐藏状态
         state_h0, state_c0 = self._init_hidden(state_seq.size(0))
         action_h0, action_c0 = self._init_hidden(action_seq.size(0))
-
+        
         # 通过状态LSTM
         state_out, _ = self.state_lstm(state_seq, (state_h0, state_c0))
         state_out = state_out[:, -1, :]  # 取最后一个时间步的输出
-
+        
         # 通过动作LSTM
         action_out, _ = self.action_lstm(action_seq, (action_h0, action_c0))
         action_out = action_out[:, -1, :]  # 取最后一个时间步的输出
-
+        
         # 融合两个LSTM的输出
         combined = torch.cat([state_out, action_out], dim=1)
         fused_output = self.fusion(combined)
-
+        
         return fused_output
-
+    
     def _init_hidden(self, batch_size):
         # 初始化LSTM的隐藏状态
         return (torch.zeros(1, batch_size, self.hidden_dim),
                 torch.zeros(1, batch_size, self.hidden_dim))
 
-
 class ActorCritic(nn.Module):
     """
     基于Dual LSTM的Actor-Critic网络
     """
-
     def __init__(self, input_dim, output_dim, num_layers=1, hidden_dim=64):
         super(ActorCritic, self).__init__()
-
+        
         self.dual_lstm = DualLSTM(input_dim, output_dim, num_layers, hidden_dim)
-
+        
         # Actor网络 - 输出动作概率分布
         self.actor = nn.Sequential(
             nn.Linear(hidden_dim, output_dim),
             nn.Softmax()
         )
-
+        
         # Critic网络 - 输出状态价值
         self.critic = nn.Sequential(
             nn.Linear(hidden_dim, 1)
         )
-
+        
     def forward(self, state_seq, action_seq):
         # 通过Dual LSTM获取特征表示
         features = self.dual_lstm(state_seq, action_seq)
-
+        
         # 获取动作概率分布
         action_probs = self.actor(features)
-
+        
         # 获取状态价值
         state_value = self.critic(features)
-
+        
         return action_probs, state_value
-
+    
     def act(self, state_seq, action_seq):
         # 根据当前状态选择动作
         action_probs, _ = self.forward(state_seq, action_seq)
         dist = Categorical(action_probs)
         action = dist.sample()
         action_logprob = dist.log_prob(action)
-
+        #print("action",action)
         return action.detach(), action_logprob.detach()
-
+    
     def evaluate(self, state_seq, action_seq, action):
         # 评估动作的价值和概率
         action_probs, state_value = self.forward(state_seq, action_seq)
         dist = Categorical(action_probs)
-
+        
         action_logprobs = dist.log_prob(action)
         dist_entropy = dist.entropy()
-
+        
         return action_logprobs, state_value, dist_entropy
 
     def exploit(self, state_seq, action_seq):
         # 选择最优动作
         action_probs, _ = self.forward(state_seq, action_seq)
         action = torch.argmax(action_probs, dim=-1)
-
+        ###############注意
+        #dist = Categorical(action_probs)
+        #action = dist.sample()
+        ###############
         return action
-
 
 class Model(nn.Module):
     def __init__(
-            self,
-            input_dim,
-            output_dim,
-            seq_length=64,
-            lr_actor=1e-3,
-            lr_critic=1e-3,
-            lr_lstm=1e-3,
-            eps_clip=0.2,
-            K_epochs=100,
-            loss_weight={'actor': 0.5, 'critic': 0.5, 'entropy': 0.3},
-            lstm_hidden_dim=64,  # LSTM隐藏层维度
-            lstm_num_layers=1  # LSTM层数
+        self, 
+        input_dim, 
+        output_dim,
+        seq_length=64,
+        lr_actor=1e-4,
+        lr_critic=1e-4,
+        lr_lstm=1e-4,
+        eps_clip=0.2,
+        K_epochs=5,
+        loss_weight={'actor': 0.5, 'critic': 0.5, 'entropy': 0.8},
+        lstm_hidden_dim=64,  # LSTM隐藏层维度
+        lstm_num_layers=1    # LSTM层数
     ):
         super().__init__()
         self.input_dim = input_dim
@@ -170,7 +169,7 @@ class Model(nn.Module):
         self.state_seq = torch.zeros(1, seq_length, input_dim)
         self.action_seq = torch.zeros(1, seq_length, output_dim)
         self.buffer = {
-            'state_seqs': [],  # 存储时序状态序列
+            'state_seqs': [],          # 存储时序状态序列
             'action_seqs': [],
             'actions': [],
             'logprobs': [],
@@ -179,13 +178,17 @@ class Model(nn.Module):
     def _clear_buffer(self):
         """清空经验回放缓冲区"""
         self.buffer = {
-            'state_seqs': [],  # 存储时序状态序列
+            'state_seqs': [],          # 存储时序状态序列
             'action_seqs': [],
             'actions': [],
             'logprobs': [],
         }
         self.state_seq = torch.zeros(1, self.seq_length, self.input_dim)
         self.action_seq = torch.zeros(1, self.seq_length, self.output_dim)
+
+    def reset(self):
+        """重置模型的内部状态和缓冲区，为新的回合做准备"""
+        self._clear_buffer()
 
     def _state_progress(self, state):
         """状态预处理（裁剪极端值和NaN）"""
@@ -211,7 +214,9 @@ class Model(nn.Module):
         action = self.policy.exploit(state_seq, self.action_seq)
         # 记录状态序列与动作序列
         action_seq = self._action_process(action)
-
+        #dist = Categorical(action_probs)
+        #action = dist.sample()
+        #action=torch.tensor([2])
         return action.detach()
 
     def predict(self, state):
@@ -228,13 +233,13 @@ class Model(nn.Module):
         self.buffer['action_seqs'].append(action_seq.squeeze(0))
         self.buffer['actions'].append(action.detach())
         self.buffer['logprobs'].append(log_prob.detach())
-
+        
         return action.detach()
 
     def _calc_advantages(self, rewards, values):
         """计算优势函数"""
-        # print("reward:",rewards)
-        # print("value:",values)
+        #print("reward:",rewards)
+        #print("value:",values)
         return rewards.detach() - values.detach()
 
     def _calc_loss(self, rewards, logprobs, new_logprobs, new_values, entropy):
@@ -246,18 +251,18 @@ class Model(nn.Module):
         # 计算损失
         surr1 = ratios * advantages
         surr2 = torch.clamp(ratios, 1 - self.eps_clip, 1 + self.eps_clip) * advantages
-
+        
         actor_loss = torch.mean(-torch.min(surr1, surr2))
         critic_loss = torch.mean(F.mse_loss(new_values.squeeze(), rewards))  # 确保维度匹配
-
+        
         # 总损失： Actor损失 + Critic损失 - 熵奖励（鼓励探索）
-        loss = (self.loss_weight['actor'] * actor_loss
-                + self.loss_weight['critic'] * critic_loss
+        loss = (self.loss_weight['actor'] * actor_loss 
+                + self.loss_weight['critic'] * critic_loss 
                 - self.loss_weight['entropy'] * entropy.mean())
         return loss
 
     def learn(self, sample):
-        """训练PPO（适配LSTM的批量时序数据）"""
+        """训练PPO（适配LSTM的批量时序数据），引入minibatch"""
         # 1. 准备训练数据
         rewards = torch.stack([torch.tensor(reward, dtype=torch.float32) for reward in sample.rewards])
         state_seqs = torch.stack(self.buffer['state_seqs'])
@@ -271,27 +276,53 @@ class Model(nn.Module):
         else:
             rewards = rewards - rewards.mean()
 
+        # 将所有数据打包，方便后续打乱和分割
+        # 注意：这里假设所有张量的第一个维度都是批次大小，并且它们长度相同
+        data_size = state_seqs.size(0)
+        # 定义minibatch大小，可以作为hyperparameter
+        minibatch_size = 128  # 表示划分的大小
+
         # 3. 多轮更新（PPO核心）
         for i in range(self.K_epochs):
-            # 评估旧动作和状态
-            new_logprobs, new_values, entropy = self.policy.evaluate(state_seqs, action_seqs, actions)
+            # 在每个epoch开始时，打乱数据索引
+            indices = np.arange(data_size)
+            np.random.shuffle(indices)
 
-            # 计算损失并反向传播
-            loss = self._calc_loss(rewards.squeeze(), logprobs.squeeze(),
-                                   new_logprobs, new_values, entropy)
+            # 遍历minibatch
+            for start_idx in range(0, data_size, minibatch_size):
+                end_idx = min(start_idx + minibatch_size, data_size)
+                batch_indices = indices[start_idx:end_idx]
 
-            self.optimizer.zero_grad()
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=2.0)  # 全局梯度裁剪
-            self.optimizer.step()  # 清空缓冲区，准备下一轮收集经验
+                # 获取当前minibatch的数据
+                mb_state_seqs = state_seqs[batch_indices]
+                mb_action_seqs = action_seqs[batch_indices]
+                mb_actions = actions[batch_indices]
+                mb_logprobs = logprobs[batch_indices]
+                mb_rewards = rewards[batch_indices]
+
+                # 评估旧动作和状态
+                new_logprobs, new_values, entropy = self.policy.evaluate(
+                    mb_state_seqs, mb_action_seqs, mb_actions
+                )
+
+                # 计算损失并反向传播
+                loss = self._calc_loss(mb_rewards.squeeze(), mb_logprobs.squeeze(),
+                                       new_logprobs, new_values, entropy)
+
+                self.optimizer.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=2.0)  # 全局梯度裁剪
+                self.optimizer.step()
+
+                # 清空缓冲区，准备下一轮收集经验
         self._clear_buffer()
 
-    def save_model(self, path=None, id="1"):
+    def save_model(self, path=None, id="1",save_model=True):
         model_file_path = f"{path}/model.ckpt-{str(id)}.pt"
         torch.save({
             "policy": self.policy.state_dict()
         }, model_file_path)
 
-    def load_model(self, path):
+    def load_model(self, path,load_model=True):
         checkpoint = torch.load(path)
         self.policy.load_state_dict(checkpoint["policy"])
