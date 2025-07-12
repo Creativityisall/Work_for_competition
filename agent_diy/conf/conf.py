@@ -11,6 +11,8 @@ Author: Tencent AI Arena Authors
 # Configuration of dimensions
 # 关于维度的配置
 class Config:
+    MINIBATCH = 128
+
     LSTM_SEQ_LENGTH = 64
     INPUT_SIZE = 88
     OUTPUT_SIZE = 4
@@ -18,6 +20,7 @@ class Config:
     LSTM_HIDDEN_LAYERS = 1
 
     GAMMA = 0.9
+    LAM = 0.99
     EPSILON = 0.1
     K_STEPS = 6
     LR_ACTOR = 1e-4

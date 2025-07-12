@@ -75,17 +75,17 @@ def workflow(envs, agents, logger=None, monitor=None):
                 # 处理动作数据
                 act = agent.action_process(act_data)
                 # 环境交互
-                frame_no, _obs, terminated, truncated, _extra_info = env.step(act)
-                if _extra_info["result_code"] != 0:
+                frame_no, next_obs, terminated, truncated, next_extra_info = env.step(act)
+                if next_extra_info["result_code"] != 0:
                     logger.error(
                         f"extra_info.result_code is {_extra_info['result_code']}, \
                         extra_info.result_message is {_extra_info['result_message']}"
                     )
                     break
-                
-                score = _extra_info["score_info"]["score"]
-                reward = reward_shaping(frame_no, score, terminated, truncated, obs, _obs, step)
-                obs = _obs
+
+                reward = reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, next_extra_info)
+                obs = next_obs
+                extra_info = next_extra_info
                 done = terminated or truncated
                 
                 # 记录采样信息
@@ -95,16 +95,19 @@ def workflow(envs, agents, logger=None, monitor=None):
                 )
                 sample_buffer.append(sample)
                 total_reward += reward
+
+                obs_data = agent.observation_process(obs, extra_info)
                 if done:
+                    # 做最后一次预测但不做处理，储存结束时刻的state
+                    list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
                     break
-                obs_data = agent.observation_process(obs, _extra_info)
+                
 
             max_steps += 100
             # 采样数据处理
-            sample_data = sample_process(sample_buffer, agent.gamma)
+            sample_data = sample_process(sample_buffer)
             # 学习数据
             agent.learn(sample_data)
-            sample_buffer = []
 
 
             now = time.time()
@@ -145,7 +148,7 @@ def eval(env, agent, logger, usr_conf):
     while True:
         step += 1
         # 预测动作
-        list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
+        list_act_data, model_version = agent.exploit(list_obs_data=[obs_data])
         act_data = list_act_data[0]
         # 处理动作数据
         act = agent.action_process(act_data)

@@ -33,6 +33,9 @@ class Agent(BaseAgent):
         self.model = Model(
             input_dim = Config.INPUT_SIZE,
             output_dim = Config.OUTPUT_SIZE,
+            minibatch = Config.MINIBATCH,
+            gamma = Config.GAMMA,
+            lam = Config.LAM,
             seq_length = Config.LSTM_SEQ_LENGTH,
             lr_actor = Config.LR_ACTOR,
             lr_critic = Config.LR_CRITIC,
@@ -63,6 +66,7 @@ class Agent(BaseAgent):
 
     def observation_process(self, raw_obs, extra_info):
         game_info = extra_info["game_info"]
+        legal_actions = raw_obs['legal_act']
         pos = [game_info["pos_x"], game_info["pos_z"]]
 
         # 智能体当前位置相对于宝箱的距离(离散化)
@@ -98,7 +102,7 @@ class Agent(BaseAgent):
         )
 
 
-        return ObsData(feature=feature)
+        return ObsData(feature=feature, legal_actions=legal_actions)
 
 
     def action_process(self, act_data):

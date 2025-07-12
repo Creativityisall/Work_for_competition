@@ -83,13 +83,17 @@ class ActorCritic(nn.Module):
         
         # Actor网络 - 输出动作概率分布
         self.actor = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
             nn.Linear(hidden_dim, output_dim),
             nn.Softmax()
         )
         
         # Critic网络 - 输出状态价值
         self.critic = nn.Sequential(
-            nn.Linear(hidden_dim, 1)
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 1),
         )
         
     def forward(self, state_seq, action_seq):
@@ -113,15 +117,17 @@ class ActorCritic(nn.Module):
         
         return action.detach(), action_logprob.detach()
     
-    def evaluate(self, state_seq, action_seq, action):
+    def evaluate(self, state_seq, next_state_seq, action_seq, action):
         # 评估动作的价值和概率
         action_probs, state_value = self.forward(state_seq, action_seq)
+        next_action_probs, next_state_value = self.forward(next_state_seq, action_seq)
+
         dist = Categorical(action_probs)
         
         action_logprobs = dist.log_prob(action)
         dist_entropy = dist.entropy()
         
-        return action_logprobs, state_value, dist_entropy
+        return action_logprobs, state_value, next_state_value, dist_entropy
 
     def exploit(self, state_seq, action_seq):
         # 选择最优动作
@@ -135,6 +141,9 @@ class Model(nn.Module):
         self, 
         input_dim, 
         output_dim,
+        minibatch=180,
+        gamma=0.95,
+        lam=0.9,
         seq_length=64,
         lr_actor=3e-4,
         lr_critic=3e-4,
@@ -148,6 +157,9 @@ class Model(nn.Module):
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
+        self.minibatch = minibatch
+        self.gamma = gamma
+        self.lam = lam
         self.seq_length = seq_length
         self.eps_clip = eps_clip
         self.K_epochs = K_epochs
@@ -227,14 +239,32 @@ class Model(nn.Module):
         
         return action.detach()
 
-    def _calc_advantages(self, rewards, values):
-        """计算优势函数"""
-        return rewards.detach() - values.detach()
+    def _calc_advantages(self, values, next_values, rewards, dones):
+        """计算GAE优势函数"""
+        advantages = torch.zeros_like(rewards)
+        returns = torch.zeros_like(rewards)
+        discounts = (1 - dones)  * self.gamma * self.lam 
+        deltas = rewards + next_values * self.gamma * (1 - dones) - values
 
-    def _calc_loss(self, rewards, logprobs, new_logprobs, new_values, entropy):
+        gae = 0
+        for i in reversed(range(rewards.size(0))):
+            gae = deltas[i] + discounts[i] * gae 
+            advantages[i] = gae
+
+        returns = advantages + values    
+
+        # 归一化
+        if advantages.std() > 1e-7:
+            advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        else:
+            advantages = advantages - advantages.mean()
+        
+        return advantages, returns
+
+    def _calc_loss(self, rewards, logprobs, new_logprobs, new_values, new_next_values, entropy, dones):
         """计算PPO损失（适配LSTM输出）"""
         # 计算优势
-        advantages = self._calc_advantages(rewards, new_values)
+        advantages, returns = self._calc_advantages(new_values.squeeze(-1), new_next_values.squeeze(-1), rewards, dones)
         # 计算策略比率
         ratios = torch.exp(new_logprobs - logprobs)
         # 计算损失
@@ -242,7 +272,7 @@ class Model(nn.Module):
         surr2 = torch.clamp(ratios, 1 - self.eps_clip, 1 + self.eps_clip) * advantages
         
         actor_loss = torch.mean(-torch.min(surr1, surr2))
-        critic_loss = torch.mean(F.mse_loss(new_values.squeeze(), rewards))  # 确保维度匹配
+        critic_loss = torch.mean(F.mse_loss(returns, new_values))
         
         # 总损失： Actor损失 + Critic损失 - 熵奖励（鼓励探索）
         loss = (self.loss_weight['actor'] * actor_loss 
@@ -254,33 +284,55 @@ class Model(nn.Module):
         """训练PPO（适配LSTM的批量时序数据）"""
         # 1. 准备训练数据
         rewards =torch.stack([torch.tensor(reward, dtype=torch.float32) for reward in sample.rewards])
-        state_seqs = torch.stack(self.buffer['state_seqs'])
-        action_seqs = torch.stack(self.buffer['action_seqs'])
-        actions = torch.stack(self.buffer['actions'])
-        logprobs = torch.stack(self.buffer['logprobs'])
-        
+        dones = torch.stack([torch.tensor(done, dtype=torch.float32) for done in sample.dones])
+        state_seqs = torch.stack(self.buffer['state_seqs'][:-1])
+        next_state_seqs = torch.stack(self.buffer['state_seqs'][1:])
+        action_seqs = torch.stack(self.buffer['action_seqs'][:-1])
+        actions = torch.stack(self.buffer['actions'][:-1])
+        logprobs = torch.stack(self.buffer['logprobs'][:-1])
         # 2. 处理奖励归一化
         if rewards.std() > 1e-7:
             rewards = (rewards - rewards.mean()) / (rewards.std() + 1e-8)
         else:
             rewards = rewards - rewards.mean()
         
+        data_size = state_seqs.size(0)
         # 3. 多轮更新（PPO核心）
         for i in range(self.K_epochs):
-             # 评估旧动作和状态
-            new_logprobs, new_values, entropy = self.policy.evaluate(state_seqs, action_seqs, actions)
-            
-            # 计算损失并反向传播
-            loss = self._calc_loss(rewards.squeeze(), logprobs.squeeze(), 
-                                 new_logprobs, new_values, entropy)
-            
-            self.optimizer.zero_grad()
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=1.0)  # 全局梯度裁剪
-            self.optimizer.step()
+            indices = np.arange(data_size)
+            np.random.shuffle(indices)
+            # 遍历minibatch
+            for start_idx in range(0, data_size, self.minibatch):
+                end_idx = min(start_idx + self.minibatch, data_size)
+                batch_indices = indices[start_idx:end_idx]
+
+                # 获取当前minibatch的数据
+                mb_state_seqs = state_seqs[batch_indices]
+                mb_next_state_seqs = next_state_seqs[batch_indices]
+                mb_action_seqs = action_seqs[batch_indices]
+                mb_actions = actions[batch_indices]
+                mb_logprobs = logprobs[batch_indices]
+                mb_rewards = rewards[batch_indices]
+                mb_dones = dones[batch_indices]
+
+                # 评估动作和状态
+                new_logprobs, new_values, new_next_values, entropy = self.policy.evaluate(
+                    mb_state_seqs, mb_next_state_seqs, mb_action_seqs, mb_actions
+                )
+                # 计算损失并反向传播
+                loss = self._calc_loss(mb_rewards, mb_logprobs,
+                                       new_logprobs, new_values, new_next_values, entropy, mb_dones)
+
+                self.optimizer.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=2.0)  # 全局梯度裁剪
+                self.optimizer.step()
         
         # 清空缓冲区，准备下一轮收集经验
         self._clear_buffer()
+
+    def _update():
+       pass 
 
     def save_model(self, path=None, id="1"):
         model_file_path = f"{path}/model.ckpt-{str(id)}.pt"
