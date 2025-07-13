@@ -19,7 +19,7 @@ import time
 import math
 import os
 
-EPISODES = 100
+EPISODES = 50
 REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 1000
@@ -76,8 +76,12 @@ def workflow(envs, agents, logger=None, monitor=None):
                 act_data = list_act_data[0]
                 # 处理动作数据
                 act = agent.action_process(act_data)
+                #print(act)
                 # 环境交互
                 frame_no, _obs, terminated, truncated, _extra_info = env.step(act)
+                #print("obs:",_obs)
+                #print(_extra_info)
+                #print("frame_state:",_extra_info["frame_state"]["legal_act"])
                 if _extra_info["result_code"] != 0:
                     logger.error(
                         f"extra_info.result_code is {_extra_info['result_code']}, \
@@ -89,7 +93,7 @@ def workflow(envs, agents, logger=None, monitor=None):
                 reward = reward_shaping(frame_no, score, terminated, truncated, obs, _obs,  _extra_info, step)
                 obs = _obs
                 done = terminated or truncated
-                
+                #print(done)
                 # 记录采样信息
                 sample = Frame(
                     reward=reward,
@@ -105,15 +109,15 @@ def workflow(envs, agents, logger=None, monitor=None):
                 #print("observation:",truncated)
                 #print("observation:",_extra_info)
                 obs_data = agent.observation_process(obs, _extra_info)
-
-            max_steps += 100
+                #print(step)
+            #max_steps += 100
             # 采样数据处理
             sample_data = sample_process(sample_buffer, agent.gamma)
             # 学习数据
             agent.learn(sample_data)
             sample_buffer = []
 
-
+            #print(1)
             now = time.time()
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
