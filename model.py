@@ -8,6 +8,7 @@ Author: Tencent AI Arena Authors
 """
 
 import torch
+from sympy.physics.units import action
 from torch import nn
 from torch.distributions import Categorical
 import torch.nn.functional as F
@@ -104,9 +105,19 @@ class ActorCritic(nn.Module):
         
         return action_probs, state_value
     
-    def act(self, state_seq, action_seq):
+    def act(self, state_seq, action_seq, legal_actions):
         # 根据当前状态选择动作
+        #print(legal_actions)
         action_probs, _ = self.forward(state_seq, action_seq)
+        for i in range(len(action_probs[0])):
+            if i not in legal_actions:
+                action_probs[0][i]=0.000001
+        current_sum = torch.sum(action_probs[0])
+
+        if current_sum > 0:
+            action_probs[0] = action_probs[0] / current_sum
+        else:
+            action_probs[0][0]=1#既然全部不合法了就随便取一个
         dist = Categorical(action_probs)
         action = dist.sample()
         action_logprob = dist.log_prob(action)
@@ -123,10 +134,17 @@ class ActorCritic(nn.Module):
         
         return action_logprobs, state_value, dist_entropy
 
-    def exploit(self, state_seq, action_seq):
+    def exploit(self, state_seq, action_seq, legal_actions):
         # 选择最优动作
         action_probs, _ = self.forward(state_seq, action_seq)
-        action = torch.argmax(action_probs, dim=-1)
+        for i in range(len(action_probs[0])):
+            if i not in legal_actions:
+                action_probs[0][i] = 0.000001
+        max_prob=0
+        for j in range(len(action_probs[0])):
+            if action_probs[0][j] > max_prob:
+                action = torch.tensor([j])
+                max_prob = action_probs[0][j]      
         ###############注意
         #dist = Categorical(action_probs)
         #action = dist.sample()
@@ -139,12 +157,12 @@ class Model(nn.Module):
         input_dim, 
         output_dim,
         seq_length=64,
-        lr_actor=1e-4,
-        lr_critic=1e-4,
-        lr_lstm=1e-4,
+        lr_actor=1e-3,
+        lr_critic=1e-3,
+        lr_lstm=1e-3,
         eps_clip=0.2,
-        K_epochs=5,
-        loss_weight={'actor': 0.5, 'critic': 0.5, 'entropy': 0.8},
+        K_epochs=10,
+        loss_weight={'actor': 0.6, 'critic': 0.6, 'entropy': 0.2},
         lstm_hidden_dim=64,  # LSTM隐藏层维度
         lstm_num_layers=1    # LSTM层数
     ):
@@ -206,12 +224,12 @@ class Model(nn.Module):
 
         return self.action_seq
 
-    def exploit(self, state):
+    def exploit(self, state, legal_actions):
         """利用策略（选择概率最高的动作，用于测试）"""
         # 提取状态序列与动作序列
         state_seq = self._state_progress(state)
         # 获得最优动作
-        action = self.policy.exploit(state_seq, self.action_seq)
+        action = self.policy.exploit(state_seq, self.action_seq, legal_actions)
         # 记录状态序列与动作序列
         action_seq = self._action_process(action)
         #dist = Categorical(action_probs)
@@ -219,12 +237,12 @@ class Model(nn.Module):
         #action=torch.tensor([2])
         return action.detach()
 
-    def predict(self, state):
+    def predict(self, state, legal_actions):
         """探索策略（采样动作，用于训练）"""
         # 提取状态序列与动作序列
         state_seq = self._state_progress(state)
         # 得到模型预测动作
-        action, log_prob = self.policy.act(state_seq, self.action_seq)
+        action, log_prob = self.policy.act(state_seq, self.action_seq, legal_actions)
         # 获得新动作序列
         action_seq = self._action_process(action)
 
@@ -280,7 +298,7 @@ class Model(nn.Module):
         # 注意：这里假设所有张量的第一个维度都是批次大小，并且它们长度相同
         data_size = state_seqs.size(0)
         # 定义minibatch大小，可以作为hyperparameter
-        minibatch_size = 128  # 表示划分的大小
+        minibatch_size = 32  # 表示划分的大小
 
         # 3. 多轮更新（PPO核心）
         for i in range(self.K_epochs):
