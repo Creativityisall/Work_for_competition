@@ -54,16 +54,18 @@ class Agent(BaseAgent):
     @predict_wrapper
     def predict(self, list_obs_data):
         state = list_obs_data[0].feature
-        act = self.model.predict(state)
+        legal_actions = list_obs_data[0].legal_actions
+        act = self.model.predict(state, legal_actions)
         return [ActData(act=act)]
 
     @exploit_wrapper
     def exploit(self, list_obs_data):
         obs_data=self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
         state = obs_data.feature
-        action = self.model.exploit(state)
+        legal_actions=obs_data.legal_actions
+        action = self.model.exploit(state,legal_actions)
         ##
-        ##action = torch.tensor([2])
+        #action = torch.tensor([2])
         ##return [ActData(act=action.detach())]
         ##
         act = action.detach().cpu().item()
@@ -84,6 +86,46 @@ class Agent(BaseAgent):
 
         # Feature #5: Graph features generation (obstacle information, treasure information, endpoint information)
         # 图特征生成(障碍物信息, 宝箱信息, 终点信息)
+        #print("local_view:", game_info["local_view"])
+        # 将一维视野转换为 5x5 的二维网格
+        # 代理通常位于 5x5 网格的中心 (2, 2)
+        grid_size = 5
+        local_view_grid = [game_info["local_view"][i * grid_size : (i + 1) * grid_size] for i in range(grid_size)]
+
+        # 代理在 5x5 网格中的中心坐标
+        agent_row, agent_col = 2, 2
+
+        legal_actions = []
+
+        # 检查向上 (动作 0)
+        # 向上移动意味着行索引减 1
+        if agent_row - 1 >= 0:  # 确保不会超出网格上边界
+            target_cell_value = local_view_grid[agent_row - 1][agent_col]
+            # 如果目标单元格不是障碍物 (0)，则向上是合法动作
+            if target_cell_value != 0:
+                legal_actions.append(0)
+
+        # 检查向下 (动作 1)
+        # 向下移动意味着行索引加 1
+        if agent_row + 1 < grid_size:  # 确保不会超出网格下边界
+            target_cell_value = local_view_grid[agent_row + 1][agent_col]
+            if target_cell_value != 0:
+                legal_actions.append(1)
+
+        # 检查向左 (动作 2)
+        # 向左移动意味着列索引减 1
+        if agent_col - 1 >= 0:  # 确保不会超出网格左边界
+            target_cell_value = local_view_grid[agent_row][agent_col - 1]
+            if target_cell_value != 0:
+                legal_actions.append(2)
+
+        # 检查向右 (动作 3)
+        # 向右移动意味着列索引加 1
+        if agent_col + 1 < grid_size:  # 确保不会超出网格右边界
+            target_cell_value = local_view_grid[agent_row][agent_col + 1]
+            if target_cell_value != 0:
+                legal_actions.append(3)
+
         local_view = [game_info["local_view"][i : i + 5] for i in range(0, len(game_info["local_view"]), 5)]
         obstacle_map, treasure_map, end_map = [], [], []
         for sub_list in local_view:
@@ -112,7 +154,7 @@ class Agent(BaseAgent):
         )
         #print(feature)
 
-        return ObsData(feature=feature)
+        return ObsData(feature=feature,legal_actions= legal_actions)
 
 
     def action_process(self, act_data):
