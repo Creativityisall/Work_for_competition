@@ -19,7 +19,7 @@ end = [11, 55]
 # Description: configures the fixed chest IDs
 # 宝箱id，数组，id取值范围：0~9
 # 配置固定宝箱的id
-treasure_id = []
+treasure_id = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 # Integer, 0~10, -1 indicates random, and the default value is 0.
 # Description: Number of chests.

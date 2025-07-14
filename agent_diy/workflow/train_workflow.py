@@ -15,6 +15,7 @@ from agent_diy.feature.definition import (
 from kaiwu_agent.utils.common_func import Frame
 from kaiwu_agent.utils.common_func import attached
 from tools.train_env_conf_validate import read_usr_conf
+from tools.metrics_utils import get_training_metrics
 import time
 import math
 import os
@@ -32,6 +33,7 @@ def workflow(envs, agents, logger=None, monitor=None):
     """
 
     try:
+        print("v4")
         # Read and validate configuration file
         # 配置文件读取和校验
         usr_conf = read_usr_conf("agent_diy/conf/train_env_conf.toml", logger)
@@ -56,6 +58,13 @@ def workflow(envs, agents, logger=None, monitor=None):
         max_steps = INIT_MAX_STEPS
         # 开始训练
         for episode in range(EPISODES):
+            # Retrieving training metrics
+            # 获取训练中的指标
+            training_metrics = get_training_metrics()
+            if training_metrics:
+                logger.info(f"training_metrics is {training_metrics}")
+            # Reset the game and get the initial state
+            # 重置游戏, 并获取初始状态
             obs, extra_info = env.reset(usr_conf=usr_conf)
             if extra_info["result_code"] != 0:
                 logger.error(
@@ -66,6 +75,7 @@ def workflow(envs, agents, logger=None, monitor=None):
             obs_data = agent.observation_process(obs, extra_info)
             sample_buffer = []
             done = False
+            agent.reset()
             # 进行采样
             for step in range(max_steps):
                 steps_cnt += 1
@@ -82,12 +92,12 @@ def workflow(envs, agents, logger=None, monitor=None):
                         extra_info.result_message is {_extra_info['result_message']}"
                     )
                     break
-
-                reward = reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, next_extra_info)
+                
+                reward = reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, next_extra_info, step)
                 obs = next_obs
                 extra_info = next_extra_info
                 done = terminated or truncated
-                
+                # logger.info(f"act {act}, reward {reward}, terminated {terminated}, truncated {truncated}")
                 # 记录采样信息
                 sample = Frame(
                     reward=reward,
@@ -101,9 +111,10 @@ def workflow(envs, agents, logger=None, monitor=None):
                     # 做最后一次预测但不做处理，储存结束时刻的state
                     list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
                     break
-                
-
-            max_steps += 100
+        
+            max_steps = min(max_steps + 100, 2000)
+            import numpy as np
+            logger.info([np.exp(prob.item()) for prob in agent.model.buffer['logprobs']])
             # 采样数据处理
             sample_data = sample_process(sample_buffer)
             # 学习数据
@@ -125,51 +136,9 @@ def workflow(envs, agents, logger=None, monitor=None):
                 agent.save_model(id=str(episode + 1))
                 last_save_model_time = now
 
-        eval(env, agent, logger, usr_conf)
-        end_t = time.time()
-        logger.info(f"Training Time for {episode + 1} episodes: {end_t - start_t} s")
-
         agent.save_model(id="latest")
+        end_t = time.time()
+        logger.info(f"Training Time for {EPISODES} episodes: {end_t - start_t} s")
 
     except Exception as e:
         raise RuntimeError(f"workflow error")
-
-def eval(env, agent, logger, usr_conf):
-    logger.info("---------- EVAL -----------")
-    obs, extra_info = env.reset(usr_conf=usr_conf)
-    if extra_info["result_code"] != 0:
-        logger.error(
-            f"env.reset result_code is {extra_info['result_code']}, result_message is {extra_info['result_message']}"
-        )
-        raise RuntimeError(extra_info["result_message"])
-            
-    obs_data = agent.observation_process(obs, extra_info)
-    step = 0
-    while True:
-        step += 1
-        # 预测动作
-        list_act_data, model_version = agent.exploit(list_obs_data=[obs_data])
-        act_data = list_act_data[0]
-        # 处理动作数据
-        act = agent.action_process(act_data)
-        # 环境交互
-        frame_no, _obs, terminated, truncated, _extra_info = env.step(act)
-        if _extra_info["result_code"] != 0:
-            logger.error(
-                f"extra_info.result_code is {_extra_info['result_code']}, \
-                extra_info.result_message is {_extra_info['result_message']}"
-            )
-            break
-        
-        score = _extra_info["score_info"]["score"]
-        reward = reward_shaping(frame_no, score, terminated, truncated, obs, _obs, step)
-        obs = _obs
-        done = terminated or truncated
-
-        logger.info(f"act {act}, reward {reward}, terminated {terminated}, truncated {truncated}")
-        if done:
-            break
-        obs_data = agent.observation_process(obs, _extra_info)    
-        
-
-    logger.info("---------- EVAL -----------")

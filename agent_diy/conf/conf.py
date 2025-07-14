@@ -11,27 +11,19 @@ Author: Tencent AI Arena Authors
 # Configuration of dimensions
 # 关于维度的配置
 class Config:
-    MINIBATCH = 128
+    MINIBATCH = 256
 
-    LSTM_SEQ_LENGTH = 64
+    LSTM_SEQ_LENGTH = 128
     INPUT_SIZE = 88
     OUTPUT_SIZE = 4
-    LSTM_HIDDEN_SIZE = 64
-    LSTM_HIDDEN_LAYERS = 1
+    LSTM_HIDDEN_SIZE = 128
+    LSTM_HIDDEN_LAYERS = 2
 
-    GAMMA = 0.9
-    LAM = 0.99
-    EPSILON = 0.1
-    K_STEPS = 6
-    LR_ACTOR = 1e-4
-    LR_CRITIC = 1e-4
-    LR_LSTM = 1e-4
-    LOSS_WEIGHT = {'actor': 0.5, 'critic': 0.5, 'entropy': 0.01}
-
-    # dimensionality of the sample
-    # 样本维度
-    SAMPLE_DIM = 1
-
-    # Dimension of movement action direction
-    # 移动动作方向的维度
-    OBSERVATION_SHAPE = 214
+    GAMMA = 0.95
+    LAM = 0.95
+    EPSILON = 0.2
+    K_STEPS = 10
+    LR_ACTOR = 3e-4
+    LR_CRITIC = 3e-4
+    LR_LSTM = 3e-4
+    LOSS_WEIGHT = {'actor': 1.0, 'critic': 0.5, 'entropy': 0.05}

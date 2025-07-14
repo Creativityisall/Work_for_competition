@@ -48,17 +48,28 @@ class Agent(BaseAgent):
         )
         self.gamma = Config.GAMMA
 
+    def reset(self):
+        self.model.reset()
+
     @predict_wrapper
     def predict(self, list_obs_data):
         state = list_obs_data[0].feature
-        act = self.model.predict(state)
+        legal_actions = list_obs_data[0].legal_actions
+        act = self.model.predict(state, legal_actions)
         return [ActData(act=act)]
 
     @exploit_wrapper
     def exploit(self, list_obs_data):
-        state = list_obs_data[0].feature
-        act = self.model.exploit(state)
-        return [ActData(act=act)]
+        # obs_data=self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
+        # state = obs_data.feature
+        # legal_actions = obs_data.legal_actions
+        # act = self.model.exploit(state, legal_actions)
+        # return act.item()
+        obs_data = self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
+        state = obs_data.feature
+        legal_actions = obs_data.legal_actions
+        act = self.model.predict(state, legal_actions)
+        return act.item()
 
     @learn_wrapper
     def learn(self, list_sample_data):
@@ -66,7 +77,13 @@ class Agent(BaseAgent):
 
     def observation_process(self, raw_obs, extra_info):
         game_info = extra_info["game_info"]
-        legal_actions = raw_obs['legal_act']
+        # 合法动作
+        local_view = game_info['local_view']
+        legal_actions = []
+        for i, view in enumerate([local_view[8], local_view[18], local_view[12], local_view[14]]): # UP DOWN LEFT RIGHT
+            if view != 0:
+                legal_actions.append(i)
+        
         pos = [game_info["pos_x"], game_info["pos_z"]]
 
         # 智能体当前位置相对于宝箱的距离(离散化)
