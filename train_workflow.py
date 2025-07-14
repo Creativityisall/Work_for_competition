@@ -19,7 +19,7 @@ import time
 import math
 import os
 
-EPISODES = 50
+EPISODES = 200
 REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 1000
@@ -90,8 +90,9 @@ def workflow(envs, agents, logger=None, monitor=None):
                     break
                 
                 score = _extra_info["score_info"]["score"]
-                reward = reward_shaping(frame_no, score, terminated, truncated, obs, _obs,  _extra_info, step)
+                reward = reward_shaping(frame_no, score, terminated, truncated, obs, _obs, extra_info, _extra_info, step)
                 obs = _obs
+                extra_info = _extra_info
                 done = terminated or truncated
                 #print(done)
                 # 记录采样信息
@@ -133,7 +134,7 @@ def workflow(envs, agents, logger=None, monitor=None):
                 agent.save_model(id=str(episode + 1))
                 last_save_model_time = now
             #print("OK")
-            #time.sleep(1)
+            time.sleep(1)
 
         #eval(env, agent, logger, usr_conf)
         end_t = time.time()
