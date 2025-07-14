@@ -156,7 +156,6 @@ class Agent(BaseAgent):
 
         return ObsData(feature=feature,legal_actions= legal_actions)
 
-
     def action_process(self, act_data):
         return act_data.act.item()
 
