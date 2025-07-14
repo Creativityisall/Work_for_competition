@@ -104,24 +104,30 @@ class ActorCritic(nn.Module):
         state_value = self.critic(features)
         
         return action_probs, state_value
-    
+
     def act(self, state_seq, action_seq, legal_actions):
-        # 根据当前状态选择动作
-        #print(legal_actions)
         action_probs, _ = self.forward(state_seq, action_seq)
-        for i in range(len(action_probs[0])):
+
+        # 关键修改：在进行就地修改前，先 detach()
+        # 这样 action_probs_detached 不会跟踪梯度，对其的修改不会影响计算图
+        action_probs_detached = action_probs.detach()
+
+        for i in range(len(action_probs_detached[0])):  # 对 detached 版本进行修改
             if i not in legal_actions:
-                action_probs[0][i]=0.000001
-        current_sum = torch.sum(action_probs[0])
+                action_probs_detached[0][i] = 0.000001
+
+        current_sum = torch.sum(action_probs_detached[0])  # 对 detached 版本进行求和
 
         if current_sum > 0:
-            action_probs[0] = action_probs[0] / current_sum
+            action_probs_detached[0] = action_probs_detached[0] / current_sum
         else:
-            action_probs[0][0]=1#既然全部不合法了就随便取一个
-        dist = Categorical(action_probs)
+            action_probs_detached[0][0] = 1
+
+        # 使用 detached 版本来创建 Categorical 分布
+        dist = Categorical(action_probs_detached)
         action = dist.sample()
         action_logprob = dist.log_prob(action)
-        #print("action",action)
+
         return action.detach(), action_logprob.detach()
     
     def evaluate(self, state_seq, action_seq, action):
@@ -137,19 +143,34 @@ class ActorCritic(nn.Module):
     def exploit(self, state_seq, action_seq, legal_actions):
         # 选择最优动作
         action_probs, _ = self.forward(state_seq, action_seq)
+        action_probs = action_probs.detach()
         for i in range(len(action_probs[0])):
             if i not in legal_actions:
                 action_probs[0][i] = 0.000001
+
         max_prob=0
+        act_record=0
         for j in range(len(action_probs[0])):
             if action_probs[0][j] > max_prob:
-                action = torch.tensor([j])
-                max_prob = action_probs[0][j]      
+                max_prob = action_probs[0][j]
+                act_record=j
+
+        for t in range(len(action_probs[0])):
+            if t != act_record:
+                action_probs[0][t] = 0
+
+        #归一化
+        current_sum = torch.sum(action_probs[0])  # 对 detached 版本进行求和
+        if current_sum > 0:
+            action_probs[0] = action_probs[0] / current_sum
+        else:
+            action_probs[0][2] = 1
+
         ###############注意
-        #dist = Categorical(action_probs)
-        #action = dist.sample()
+        dist = Categorical(action_probs)
+        action = dist.sample()
         ###############
-        return action
+        return action.detach()
 
 class Model(nn.Module):
     def __init__(
@@ -186,6 +207,7 @@ class Model(nn.Module):
 
         self.state_seq = torch.zeros(1, seq_length, input_dim)
         self.action_seq = torch.zeros(1, seq_length, output_dim)
+        self.seq_idx = 0
         self.buffer = {
             'state_seqs': [],          # 存储时序状态序列
             'action_seqs': [],
@@ -201,8 +223,9 @@ class Model(nn.Module):
             'actions': [],
             'logprobs': [],
         }
-        self.state_seq = torch.zeros(1, self.seq_length, self.input_dim)
-        self.action_seq = torch.zeros(1, self.seq_length, self.output_dim)
+        self.state_seq.zero_()
+        self.action_seq.zero_()
+        self.seq_idx = 0
 
     def reset(self):
         """重置模型的内部状态和缓冲区，为新的回合做准备"""
@@ -214,13 +237,25 @@ class Model(nn.Module):
         state = torch.clamp(state, min=-1e4, max=1e4)
         state = torch.nan_to_num(state, nan=0.0, posinf=1e4, neginf=-1e4)
 
-        self.state_seq = torch.cat([self.state_seq[:, 1:, :], state.unsqueeze(0).unsqueeze(0)], dim=1)
+        if self.seq_idx < self.seq_length:
+            self.state_seq[0, self.seq_idx, :] = state
+            # 如果序列已满，将所有元素前移一位，再在末尾添加
+        else:
+            self.state_seq[0, :-1, :] = self.state_seq[0, 1:, :].clone()
+            self.state_seq[0, -1, :] = state
+
+            # 只有在序列未满时才增加指针
+        if self.seq_idx < self.seq_length:
+            self.seq_idx += 1
+
         return self.state_seq
 
     def _action_process(self, action):
         one_hot_action = torch.zeros(1, self.output_dim)
         one_hot_action[0, action.item()] = 1
-        self.action_seq = torch.cat([self.action_seq[:, 1:, :], one_hot_action.unsqueeze(0)], dim=1)
+
+        current_idx = min(self.seq_idx - 1, self.seq_length - 1)
+        self.action_seq[0, current_idx, :] = one_hot_action
 
         return self.action_seq
 
@@ -279,6 +314,7 @@ class Model(nn.Module):
                 - self.loss_weight['entropy'] * entropy.mean())
         return loss
 
+
     def learn(self, sample):
         """训练PPO（适配LSTM的批量时序数据），引入minibatch"""
         # 1. 准备训练数据
@@ -298,7 +334,7 @@ class Model(nn.Module):
         # 注意：这里假设所有张量的第一个维度都是批次大小，并且它们长度相同
         data_size = state_seqs.size(0)
         # 定义minibatch大小，可以作为hyperparameter
-        minibatch_size = 32  # 表示划分的大小
+        minibatch_size = 64  # 表示划分的大小
 
         # 3. 多轮更新（PPO核心）
         for i in range(self.K_epochs):
