@@ -21,9 +21,11 @@ class Config:
 
     GAMMA = 0.95
     LAM = 0.95
-    EPSILON = 0.2
+    EPSILON = 0.1
     K_STEPS = 10
-    LR_ACTOR = 3e-4
-    LR_CRITIC = 3e-4
-    LR_LSTM = 3e-4
-    LOSS_WEIGHT = {'actor': 1.0, 'critic': 0.5, 'entropy': 0.05}
+    LR_PPO = 1e-5
+    LR_SCHEDULER = 0.1
+    LOSS_WEIGHT = {'policy': 1.0, 'value': 0.5, 'entropy': 0.015}
+
+    SCHEDULER_STEP = 10
+    SCHEDULER_LR = 0.1

@@ -40,11 +40,14 @@ class Agent(BaseAgent):
             lr_actor = Config.LR_ACTOR,
             lr_critic = Config.LR_CRITIC,
             lr_lstm = Config.LR_LSTM,
+            weight_decay=Config.DECAY,
             eps_clip = Config.EPSILON,
             K_epochs = Config.K_STEPS,
             loss_weight = Config.LOSS_WEIGHT,
             lstm_hidden_dim = Config.LSTM_HIDDEN_SIZE,
-            lstm_num_layers = Config.LSTM_HIDDEN_LAYERS
+            lstm_num_layers = Config.LSTM_HIDDEN_LAYERS,
+            step_size=Config.SCHEDULER_STEP, 
+            gamma_lr=Config.SCHEDULER_LR
         )
         self.gamma = Config.GAMMA
 
@@ -60,16 +63,16 @@ class Agent(BaseAgent):
 
     @exploit_wrapper
     def exploit(self, list_obs_data):
-        # obs_data=self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
-        # state = obs_data.feature
-        # legal_actions = obs_data.legal_actions
-        # act = self.model.exploit(state, legal_actions)
-        # return act.item()
-        obs_data = self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
+        obs_data=self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
         state = obs_data.feature
         legal_actions = obs_data.legal_actions
-        act = self.model.predict(state, legal_actions)
+        act = self.model.exploit(state, legal_actions)
         return act.item()
+        # obs_data = self.observation_process(list_obs_data["obs"], list_obs_data["extra_info"])
+        # state = obs_data.feature
+        # legal_actions = obs_data.legal_actions
+        # act = self.model.predict(state, legal_actions)
+        # return act.item()
 
     @learn_wrapper
     def learn(self, list_sample_data):

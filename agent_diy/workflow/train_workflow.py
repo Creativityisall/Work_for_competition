@@ -7,13 +7,12 @@
 Author: Tencent AI Arena Authors
 """
 
-
 from agent_diy.feature.definition import (
     sample_process,
     reward_shaping,
 )
 from kaiwu_agent.utils.common_func import Frame
-from kaiwu_agent.utils.common_func import attached
+from kaiwu_agent.utils.common_func import attached, create_cls
 from tools.train_env_conf_validate import read_usr_conf
 from tools.metrics_utils import get_training_metrics
 import time
@@ -119,7 +118,6 @@ def workflow(envs, agents, logger=None, monitor=None):
             sample_data = sample_process(sample_buffer)
             # 学习数据
             agent.learn(sample_data)
-
 
             now = time.time()
             # 记录参数
