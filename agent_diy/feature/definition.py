@@ -13,17 +13,12 @@ from kaiwu_agent.utils.common_func import create_cls, attached
 
 SampleData = create_cls("SampleData", rewards=None, dones=None)
 ObsData = create_cls("ObsData", feature=None, legal_actions=None)
-ActData = create_cls("ActData", act=None)
+ActData = create_cls("ActData", action=None)
 
 
 @attached
-def sample_process(list_game_data):
-    rewards = []
-    dones = []
-    for sample in list_game_data:
-        rewards.append(sample.reward)
-        dones.append(sample.done)
-    return SampleData(rewards=rewards, dones=dones)
+def sample_process(sample):
+    return SampleData(rewards=sample.rewards, dones=sample.dones)
 
 class Map:
     def __init__(self, map_size=64):
@@ -63,7 +58,7 @@ class Map:
 
 map = Map()
 
-def reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, next_extra_info, step):
+def single_reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, next_extra_info, step):
     game_info, next_game_info = extra_info['game_info'], next_extra_info['game_info']
     next_pos_x, next_pos_z = next_game_info["pos_x"], next_game_info["pos_z"]
     end_treasure_dists, next_end_treasure_dists = obs["feature"], next_obs["feature"]
@@ -72,25 +67,25 @@ def reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, n
 
     reward = 0
 
-    # 探索奖励
-    if unkonwn > 0:
-        reward += 10
-    else: # 重复惩罚
-        reward -= 10
+    # # 探索奖励
+    # if unkonwn > 0:
+    #     reward += 10
+    # else: # 重复惩罚
+    #     reward -= 10
 
-    # 靠近宝箱的奖励
-    treasure_dist, next_treasure_dist = end_treasure_dists[1:],next_end_treasure_dists[1:]
-    nearest_treasure_index = np.argmin(treasure_dist)
-    if treasure_dist[nearest_treasure_index] > next_treasure_dist[nearest_treasure_index]:
-        reward += 10
-    else:
-        # 远离宝箱的惩罚
-        reward -= 10
+    # # 靠近宝箱的奖励
+    # treasure_dist, next_treasure_dist = end_treasure_dists[1:],next_end_treasure_dists[1:]
+    # nearest_treasure_index = np.argmin(treasure_dist)
+    # if treasure_dist[nearest_treasure_index] > next_treasure_dist[nearest_treasure_index]:
+    #     reward += 10
+    # else:
+    #     # 远离宝箱的惩罚
+    #     reward -= 10
 
-    # 靠近终点的奖励
-    end_dist, next_end_dist = end_treasure_dists[0], next_end_treasure_dists[0]
-    if end_dist > next_end_dist:
-        reward += 10
+    # # 靠近终点的奖励
+    # end_dist, next_end_dist = end_treasure_dists[0], next_end_treasure_dists[0]
+    # if end_dist > next_end_dist:
+    #     reward += 10
 
     # 获得宝箱的奖励
     score = game_info['score']
@@ -101,3 +96,28 @@ def reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, n
         reward += score
 
     return reward
+
+def reward_shaping(
+    list_frame_no, 
+    list_terminated, 
+    list_truncated, 
+    list_obs, 
+    list_next_obs, 
+    list_extra_info, 
+    list_next_extra_info, 
+    step
+    ) -> list[int]:
+    rewards = []
+    for idx in range(len(list_frame_no)):
+        reward = single_reward_shaping(
+            list_frame_no[idx], 
+            list_terminated[idx], 
+            list_truncated[idx], 
+            list_obs[idx], 
+            list_next_obs[idx], 
+            list_extra_info[idx], list_next_extra_info[idx], 
+            step
+        )
+        rewards.append(reward)
+
+    return rewards

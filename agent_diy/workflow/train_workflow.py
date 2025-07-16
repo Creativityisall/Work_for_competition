@@ -16,13 +16,16 @@ from kaiwu_agent.utils.common_func import attached, create_cls
 from tools.train_env_conf_validate import read_usr_conf
 from tools.metrics_utils import get_training_metrics
 import time
-import math
+import numpy as np
 import os
 
-EPISODES = 10
+EPISODES = 100
 REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 1000
+STEPS_INTERVAL = 100
+
+placeholder = [] # 迫于官方架构的装饰器限制，故添加
 
 @attached
 def workflow(envs, agents, logger=None, monitor=None):
@@ -30,9 +33,8 @@ def workflow(envs, agents, logger=None, monitor=None):
     Users can define their own training workflows here
     用户可以在此处自行定义训练工作流
     """
-
     try:
-        print("v4")
+        print("v7")
         # Read and validate configuration file
         # 配置文件读取和校验
         usr_conf = read_usr_conf("agent_diy/conf/train_env_conf.toml", logger)
@@ -47,92 +49,95 @@ def workflow(envs, agents, logger=None, monitor=None):
         monitor_data = {
             "reward": 0,
         }
+
         last_report_monitor_time = time.time()
 
         logger.info("Start Training...")
         start_t = time.time()
         last_save_model_time = start_t
 
-        total_reward, steps_cnt = 0, 0
         max_steps = INIT_MAX_STEPS
         # 开始训练
         for episode in range(EPISODES):
-            # Retrieving training metrics
-            # 获取训练中的指标
-            training_metrics = get_training_metrics()
-            if training_metrics:
-                logger.info(f"training_metrics is {training_metrics}")
-            # Reset the game and get the initial state
+            agent.reset()
             # 重置游戏, 并获取初始状态
-            obs, extra_info = env.reset(usr_conf=usr_conf)
+            time.sleep(3) # TODO: 删了报错，我不理解的bug?与env.step/reset 有关
+            obs, extra_info = env.reset(usr_conf=usr_conf) # TODO: 分布式
             if extra_info["result_code"] != 0:
                 logger.error(
                     f"env.reset result_code is {extra_info['result_code']}, result_message is {extra_info['result_message']}"
                 )
                 raise RuntimeError(extra_info["result_message"])
-            
-            obs_data = agent.observation_process(obs, extra_info)
-            sample_buffer = []
-            done = False
-            agent.reset()
-            # 进行采样
+            list_obs_data = agent.observation_process(list_obs=[obs], list_extra_info=[extra_info])
+            agent.set_feature(list_obs_data)
             for step in range(max_steps):
-                steps_cnt += 1
                 # 预测动作
-                list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
-                act_data = list_act_data[0]
+                list_act_data, model_version = agent.predict(list_obs_data=list_obs_data)
                 # 处理动作数据
-                act = agent.action_process(act_data)
+                actions = agent.action_process(list_act_data)
                 # 环境交互
-                frame_no, next_obs, terminated, truncated, next_extra_info = env.step(act)
+                action = actions[0] # 没有分布式，故动作列表只有一个
+
+                frame_no, next_obs, terminated, truncated, next_extra_info = env.step(action)
                 if next_extra_info["result_code"] != 0:
                     logger.error(
-                        f"extra_info.result_code is {_extra_info['result_code']}, \
-                        extra_info.result_message is {_extra_info['result_message']}"
+                        f"extra_info.result_code is {next_extra_info['result_code']}, \
+                        extra_info.result_message is {next_extra_info['result_message']}"
                     )
                     break
                 
-                reward = reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_info, next_extra_info, step)
-                obs = next_obs
-                extra_info = next_extra_info
-                done = terminated or truncated
-                # logger.info(f"act {act}, reward {reward}, terminated {terminated}, truncated {truncated}")
-                # 记录采样信息
+                rewards = reward_shaping(
+                    list_frame_no=[frame_no], 
+                    list_terminated=[terminated], 
+                    list_truncated=[truncated], 
+                    list_obs=[obs], 
+                    list_next_obs=[next_obs], 
+                    list_extra_info=[extra_info], 
+                    list_next_extra_info=[next_extra_info], 
+                    step=step
+                ) # (n_envs, )
+
+                obs, extra_info = next_obs, next_extra_info
+                # 没有分布式，故环境列表只有一个
+                # dones = np.logical_or(terminated, truncated)
+                dones = [terminated or truncated]
+                # 超时数据处理
+                rewards = agent.handle_timeout(truncateds=[truncated], rewards=rewards, list_obs_data=list_obs_data)
+                # 采样
                 sample = Frame(
-                    reward=reward,
-                    done=done
+                    rewards=rewards,
+                    dones=dones
                 )
-                sample_buffer.append(sample)
-                total_reward += reward
+                sample_data = sample_process(sample)
+                # next obs
+                list_obs_data = agent.observation_process(list_obs=[obs], list_extra_info=[extra_info])
+                # 收集采样数据
+                agent.collect(sample_data, list_obs_data)
+                # 记录参数
+                monitor_data['reward'] += rewards[0]
 
-                obs_data = agent.observation_process(obs, extra_info)
-                if done:
-                    # 做最后一次预测但不做处理，储存结束时刻的state
-                    list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
+                if dones[0]: # TODO: 分布式
                     break
-        
-            max_steps = min(max_steps + 100, 2000)
-            import numpy as np
-            logger.info([np.exp(prob.item()) for prob in agent.model.buffer['logprobs']])
-            # 采样数据处理
-            sample_data = sample_process(sample_buffer)
-            # 学习数据
-            agent.learn(sample_data)
 
+            agent.compute_returns_and_advantage()
+            # 学习数据
+            if agent.collect_full(): # 如果buffer填充满，则开始学习
+                agent.learn(placeholder)
             now = time.time()
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
-                avg_reward = total_reward / steps_cnt
-                monitor_data["reward"] = avg_reward
                 if monitor:
+                    monitor_data['reward'] = 100 * monitor_data['reward'] / max_steps
                     monitor.put_data({os.getpid(): monitor_data})
-                total_reward = 0
-                steps_cnt = 0
+                    monitor_data['reward'] = 0
+
                 last_report_monitor_time = now
             # 保存模型
             if now - last_save_model_time > SAVE_INTERVAL:
-                agent.save_model(id=str(episode + 1))
+                agent.save_model(id=episode+1)
                 last_save_model_time = now
+
+            max_steps = min(max_steps + STEPS_INTERVAL, 2000)
 
         agent.save_model(id="latest")
         end_t = time.time()
@@ -140,3 +145,4 @@ def workflow(envs, agents, logger=None, monitor=None):
 
     except Exception as e:
         raise RuntimeError(f"workflow error")
+
