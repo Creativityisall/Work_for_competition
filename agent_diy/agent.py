@@ -43,7 +43,7 @@ class Agent(BaseAgent):
             step_size = Config.SCHEDULER_STEP_SIZE,
             lr_scheduler = Config.LR_SCHEDULER,
             loss_weight=Config.LOSS_WEIGHT,
-            device = Config.DEVICE,
+            device = device,
             buffer_size = Config.BUFFER_SIZE,
             n_envs = Config.N_ENVS,
             K_epochs = Config.K_EPOCHS,
@@ -71,9 +71,10 @@ class Agent(BaseAgent):
         features, legal_actions = self._features_extract(list_obs_data)
 
         list_act_data = []
-        actions = self.model.predict(features) # (n_envs, action_dim)
+        actions, log_probs = self.model.predict(features) # (n_envs, action_dim)
+        self.logger.info(np.exp(log_probs.to('cpu')))
         for action in actions:
-            act_data = ActData(action=action)
+            act_data = ActData(action=action.to('cpu'))
             list_act_data.append(act_data)
         return list_act_data
 
@@ -86,7 +87,7 @@ class Agent(BaseAgent):
         actions = self.model.exploit(features) # (n_envs, action_dim)
         list_act_data = []
         for action in actions:
-            act_data = ActData(action=action)
+            act_data = ActData(action=action.to('cpu'))
             list_act_data.append(act_data)
 
         actions = self.action_process(list_act_data=list_act_data)

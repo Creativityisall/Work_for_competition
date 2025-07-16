@@ -27,7 +27,6 @@ class Config:
     LATENT_DIM_PI = 64
     LATENT_DIM_VF = 64
 
-    DEVICE = 'cpu'
     BUFFER_SIZE = 3072
     N_ENVS = 1
     K_EPOCHS = 10

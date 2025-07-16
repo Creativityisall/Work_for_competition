@@ -102,7 +102,7 @@ class Buffer:
         actions = actions.reshape((self.n_envs, self.action_dim))
 
         self.features[self.pos] = np.array(features)
-        self.actions[self.pos] = np.array(actions)
+        self.actions[self.pos] = np.array(actions.cpu())
         self.rewards[self.pos] = np.array(rewards)
         self.episode_starts[self.pos] = np.array(episode_starts)
         self.values[self.pos] = values.clone().cpu().numpy().flatten()
@@ -404,7 +404,7 @@ class Model(nn.Module):
             n_lstm_layers,
             latent_dim_pi,
             latent_dim_vf
-        )
+        ).to(self.device)
         self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=lr_ppo)
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=step_size, gamma=lr_scheduler)
         self.buffer = Buffer(
@@ -474,7 +474,7 @@ class Model(nn.Module):
         self.last_actions = ont_hot_actions # (n_envs, action_dim)
         self.last_values = values           # (n_envs, )
         self.last_log_probs = log_probs     # (n_envs, action_dim)
-        return actions.detach()
+        return actions.detach(), log_probs
 
     def _action_process(self, actions):
         """动作处理为one_hot向量"""
@@ -576,7 +576,7 @@ class Model(nn.Module):
             features = self._features_process(self.last_features)
             values = self.policy.predict_values(features, self.lstm_states.vf, episode_starts)
         
-        self.buffer.compute_returns_and_advantage(last_values=values, dones=episode_starts.numpy())
+        self.buffer.compute_returns_and_advantage(last_values=values, dones=episode_starts.cpu().numpy())
 
     def save_model(self, path=None, id="1"):
         model_file_path = f"{path}/model.ckpt-{str(id)}.pt"

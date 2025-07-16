@@ -19,7 +19,7 @@ import time
 import numpy as np
 import os
 
-EPISODES = 100
+EPISODES = 10
 REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 1000
