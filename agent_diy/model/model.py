@@ -100,7 +100,6 @@ class Buffer:
         # (n_envs, feature_dim)
         features = features.reshape((self.n_envs, *self.feature_shape))
         actions = actions.reshape((self.n_envs, self.action_dim))
-
         self.features[self.pos] = np.array(features)
         self.actions[self.pos] = np.array(actions.cpu())
         self.rewards[self.pos] = np.array(rewards)
@@ -114,7 +113,7 @@ class Buffer:
         self.cell_states_vf[self.pos] = np.array(lstm_states.vf[1].cpu().numpy())
 
         self.pos = (self.pos + 1) % self.buffer_size
-        if self.pos == self.buffer_size:
+        if self.pos == self.buffer_size - 1:
             self.full = True
 
     def compute_returns_and_advantage(self, last_values: torch.Tensor, dones: np.ndarray) -> None:
@@ -137,12 +136,10 @@ class Buffer:
         indices = np.arange(self.buffer_size * self.n_envs)
         indices = np.concatenate((indices[split_index:], indices[:split_index]))
 
-        self._get_ready()
-
         for start_idx in range(0, self.buffer_size * self.n_envs, minibatch):
             yield self._get_samples(indices[start_idx : start_idx + minibatch])
 
-    def _get_ready(self):
+    def get_ready(self):
         for tensor in ["hidden_states_pi", "cell_states_pi", "hidden_states_vf", "cell_states_vf"]:
             self.__dict__[tensor] = self.__dict__[tensor].swapaxes(1, 2)
 
@@ -164,7 +161,7 @@ class Buffer:
     def _to_torch(self, data):
         return torch.tensor(data, device=self.device).float()
 
-    def _get_sample(self, batch_indices):
+    def _get_samples(self, batch_indices):
         self.seq_start_indices, self.pad, self.pad_and_flatten = self._create_sequencers(self.episode_starts[batch_indices])
 
         n_seq = len(self.seq_start_indices)
@@ -185,14 +182,14 @@ class Buffer:
         lstm_states_vf = (self._to_torch(lstm_states_vf[0]).contiguous(), self._to_torch(lstm_states_vf[1]).contiguous())
 
         return BufferData(
-            # (batch_size, feature_dim) -> (n_seq, max_length, feature_dim) -> (n_seq * max_length, feature_dim)
-            features=self.pad(self.features[batch_indices]).reshape((padded_batch_size, *self.features_shape)),
+            # (batch_size * n_envs, feature_dim) -> (n_seq, max_length, feature_dim) -> (n_seq * max_length, feature_dim)
+            features=self.pad(self.features[batch_indices]).reshape((padded_batch_size, *self.feature_shape)),
             actions=self.pad(self.actions[batch_indices]).reshape((padded_batch_size,) + self.actions.shape[1:]),
             values=self.pad_and_flatten(self.values[batch_indices]),
             log_probs=self.pad_and_flatten(self.log_probs[batch_indices]),
             advantages=self.pad_and_flatten(self.advantages[batch_indices]),
             returns=self.pad_and_flatten(self.returns[batch_indices]),
-            lstm_states=LSTMStates(pi=lstm_states_pi, vf=lstm_states_vf),
+            lstm_states=LSTMState(pi=lstm_states_pi, vf=lstm_states_vf),
             episode_starts=self.pad_and_flatten(self.episode_starts[batch_indices]),
             mask=self.pad_and_flatten(np.ones_like(self.returns[batch_indices])),
         )
@@ -218,6 +215,35 @@ class Buffer:
         local_pad_and_flatten = partial(pad_and_flatten, seq_start_indices, seq_end_indices, self.device)
         return seq_start_indices, local_pad, local_pad_and_flatten
 
+
+import torch
+import torch.nn as nn
+
+class TempLSTM(nn.Module):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        # 调用 nn.LSTM 的初始化方法
+        self.lstm = nn.LSTM(*args, **kwargs)
+        # 获取输入和隐藏层的大小
+        self.input_size = self.lstm.input_size
+        self.hidden_size = self.lstm.hidden_size
+        # 定义 Embedding 层
+        self.embedding = nn.Linear(self.input_size, self.hidden_size)
+
+    def forward(self, input, hx=None):
+        # 使用 Embedding 层处理输入
+        output = self.embedding(input)
+        # 构造与 nn.LSTM 相同格式的返回值
+        if hx is not None:
+            h_n, c_n = hx
+        else:
+            # 如果没有提供隐藏状态，初始化为零
+            batch_size = input.size(0)
+            num_layers = self.lstm.num_layers
+            h_n = torch.zeros(num_layers, batch_size, self.hidden_size, device=input.device)
+            c_n = torch.zeros(num_layers, batch_size, self.hidden_size, device=input.device)
+        return output, (h_n, c_n)
+
 class LSTMPPO(nn.Module):
     def __init__(
         self,
@@ -236,33 +262,68 @@ class LSTMPPO(nn.Module):
         self.latent_dim_pi = latent_dim_pi
         self.latent_dim_vf = latent_dim_vf
     
-        self.policy_net = nn.Sequential(
-            nn.Linear(lstm_hidden_size, latent_dim_pi),
-            nn.ReLU(),
-            nn.Linear(latent_dim_pi, latent_dim_pi),
-        )
-        self.value_net = nn.Sequential(
-            nn.Linear(lstm_hidden_size, latent_dim_pi),
-            nn.ReLU(),
-            nn.Linear(latent_dim_pi, latent_dim_pi),
-        )
-        
-        self.actor_net = nn.Linear(self.latent_dim_pi, self.action_dim)
-        self.critic_net = nn.Linear(self.latent_dim_vf, 1)
-        self.lstm_actor = nn.LSTM(
+        # self.lstm_actor = nn.LSTM(
+        #     self.feature_dim,
+        #     lstm_hidden_size,
+        #     num_layers=n_lstm_layers,
+        # )
+        self.lstm_actor = TempLSTM(
             self.feature_dim,
             lstm_hidden_size,
-            num_layers=n_lstm_layers,
+            num_layers=n_lstm_layers
         )
         self.lstm_critic = nn.LSTM(
             self.feature_dim,
             lstm_hidden_size,
-            num_layers=n_lstm_layers,
+            num_layers=n_lstm_layers
             )
+        self.policy_net = nn.Sequential(
+            nn.Linear(lstm_hidden_size, latent_dim_pi),
+            nn.ReLU(),
+            nn.Linear(latent_dim_pi, latent_dim_pi),
+            nn.ReLU(),
+            nn.Linear(latent_dim_pi, action_dim)
+        )
+        self.value_net = nn.Sequential(
+            nn.Linear(lstm_hidden_size, latent_dim_vf),
+            nn.ReLU(),
+            nn.Linear(latent_dim_vf, latent_dim_vf),
+            nn.ReLU(),
+            nn.Linear(latent_dim_vf, 1)
+        )
 
+        # 对所有网络做正交初始化
+        self._orthogonal_init(self.lstm_actor)
+        self._orthogonal_init(self.lstm_critic)
+        self._orthogonal_init(self.policy_net)
+        self._orthogonal_init(self.value_net)
         # (n_lstm_layers, batch_size, lstm_hidden_size)
         self.lstm_hidden_state_shape = (n_lstm_layers, 1, lstm_hidden_size)
 
+    def _orthogonal_init(self, module: nn.Module, gain=1.0) -> None:
+        """网络正交化"""
+        for layer in module.modules():
+            if isinstance(module, nn.Embedding):
+                nn.init.orthogonal_(module.weight, gain=gain)
+            elif isinstance(module, nn.Linear):
+                nn.init.orthogonal_(module.weight, gain=gain)
+                if module.bias is not None:
+                    nn.init.constant_(module.bias, 0)
+            elif isinstance(module, nn.LSTM):
+                # LSTM 有多个权重和偏置：
+                # ih_l[k]：第 k 层输入到隐藏状态的权重
+                # hh_l[k]：第 k 层隐藏状态到隐藏状态的权重
+                # (以及对应的偏置 ih_b 和 hh_b)
+                for name, param in module.named_parameters():
+                    if 'weight' in name:
+                        nn.init.orthogonal_(param, gain=gain)
+                    elif 'bias' in name:
+                        nn.init.constant_(param, 0)  # LSTM偏置通常初始化为0，或根据门控机制初始化为小正值
+            elif isinstance(module, nn.Sequential):
+                # 递归调用 orthogonal_init 函数处理 nn.Sequential 中的每一层
+                for sub_module in module:
+                    self._orthogonal_init(sub_module, gain=gain)
+            
     def forward_actor(self, features):
         return self.policy_net(features)
 
@@ -277,22 +338,18 @@ class LSTMPPO(nn.Module):
         # share_features
         # TODO: other features_extractor? 
         pi_features = vf_features = features
-
+         
         latent_pi, lstm_states_pi = self._process_sequence(pi_features, lstm_states.pi, episode_starts, self.lstm_actor)
         latent_vf, lstm_states_vf = self._process_sequence(vf_features, lstm_states.vf, episode_starts, self.lstm_critic)
 
-        # 获得隐变量
-        latent_pi = self.forward_actor(latent_pi)       # (batch_size, latent_dim_pi)
-        latent_vf = self.forward_critic(latent_vf)      # (batch_size, latent_dim_vf)
-
         # Evaluate the values and actions
-        values = self.critic_net(latent_vf)             # (batch_size, )
-        mean_actions = self.actor_net(latent_pi)        # (batch_size, action_dim)
-        distribution = Categorical(logits=mean_actions) 
+        values = self.forward_critic(latent_vf)             # (batch_size, )
+        mean_actions = self.forward_actor(latent_pi)        # (batch_size, action_dim)
+        distribution = Categorical(logits=mean_actions)
 
         if deterministic:
             # 对应exploit
-            actions = distribution.mode()
+            actions = distribution.mode
         else:
             # 对应predict
             actions = distribution.sample()
@@ -310,9 +367,10 @@ class LSTMPPO(nn.Module):
         """Do a forward pass in the LSTM network"""
         n_seq = lstm_states[0].shape[1] # batch_size = n_envs * minibatch
         # (n_envs, feature_dim) -> (batch_size, seq_len, feature_dim) ->(seq_len, batch_size, feature_dim)
-        features_sequence = features.reshape((n_seq, -1, lstm.input_size)).swapaxes(0, 1)
+        features_sequence = features.reshape((n_seq, -1, lstm.input_size)).swapaxes(0, 1).float()
         # (n_envs, ) -> (batch_size, seq_len) ->(seq_len, batch_size)
-        episode_starts = episode_starts.reshape((n_seq, -1)).swapaxes(0, 1)
+        episode_starts = episode_starts.reshape((n_seq, -1)).swapaxes(0, 1).float()
+
         if torch.all(episode_starts == 0.0): # 若全零，则表示数据在一个episode中
             lstm_output, lstm_states = lstm(features_sequence, lstm_states)
             lstm_output = torch.flatten(lstm_output.transpose(0, 1), start_dim=0, end_dim=1)
@@ -324,8 +382,8 @@ class LSTMPPO(nn.Module):
             hidden, lstm_states = lstm(
                 features.unsqueeze(dim=0), # (1, batch_size, feature_dim)
                 (
-                    (1.0 - episode_start.float()).view(1, n_seq, 1) * lstm_states[0],
-                    (1.0 - episode_start.float()).view(1, n_seq, 1) * lstm_states[1],
+                    (1.0 - episode_start).view(1, n_seq, 1) * lstm_states[0],
+                    (1.0 - episode_start).view(1, n_seq, 1) * lstm_states[1],
                 ),
             )
             lstm_output += [hidden]
@@ -343,19 +401,17 @@ class LSTMPPO(nn.Module):
         latent_pi, _ = self._process_sequence(pi_features, lstm_states.pi, episode_starts, self.lstm_actor)
         latent_vf, _ = self._process_sequence(vf_features, lstm_states.vf, episode_starts, self.lstm_critic)
         
-        latent_pi = self.forward_actor(latent_pi)
-        latent_vf = self.forward_critic(latent_vf)
-
-        values = self.critic_net(latent_vf)
-        mean_actions = self.actor_net(latent_pi)
+        values = self.forward_critic(latent_vf)
+        mean_actions = self.forward_actor(latent_pi)
         distribution = Categorical(logits=mean_actions)
+
+        actions = torch.argmax(actions, dim=1) # (n_envs, action_dim) -> (n_envs, )
         log_prob = distribution.log_prob(actions)
         return values, log_prob, distribution.entropy()
 
     def predict_values(self, features, lstm_states, episode_starts):
         latent_vf, _ = self._process_sequence(features, lstm_states, episode_starts, self.lstm_critic)
-        latent_vf = self.forward_critic(latent_vf)
-        return self.critic_net(latent_vf)
+        return self.forward_critic(latent_vf)
 
     def predict(self, features, lstm_states, episode_starts):
         return self.forward(features, lstm_states, episode_starts, deterministic=False)
@@ -437,6 +493,8 @@ class Model(nn.Module):
         ## 批次相关
         self.K_epochs = K_epochs
         self.minibatch = minibatch
+
+        self.count = 0
         # TODO: logger
         if logger is not None:
             self.logger_mode = True
@@ -458,20 +516,22 @@ class Model(nn.Module):
             )
         )
         self.lstm_states = self.last_lstm_states
-        hidden_state_buffer_shape = (self.buffer_size, self.lstm_num_layers, self.n_envs, self.lstm_hidden_size)
     
     def _to_torch(self, data):
         return torch.tensor(data, device=self.device).float()
 
     def predict(self, features: np.ndarray) -> torch.Tensor: # (n_envs, action_dim)
         """预测下一个动作"""
+        self.count += 1
         features = self._features_process(features) # (n_envs, feature_dim)
         episode_starts = self._to_torch(self.episode_starts) # (n_envs, )
         with torch.no_grad():
+            
             actions, values, log_probs, self.lstm_states = self.policy.predict(features, self.lstm_states, episode_starts)
 
+
         ont_hot_actions = self._action_process(actions)
-        self.last_actions = ont_hot_actions # (n_envs, action_dim)
+        self.last_actions = ont_hot_actions # (n_envs, )
         self.last_values = values           # (n_envs, )
         self.last_log_probs = log_probs     # (n_envs, action_dim)
         return actions.detach(), log_probs
@@ -486,6 +546,7 @@ class Model(nn.Module):
         features = self._to_torch(features)
         features = torch.clamp(features, min=-1e4, max=1e4)
         features = torch.nan_to_num(features, nan=0.0, posinf=1e4, neginf=-1e4)
+        features = (features - features.mean()) / (features.std() + 1e-8)
         return features
 
     def handle_timeout(self, truncateds, rewards, features):
@@ -497,7 +558,7 @@ class Model(nn.Module):
                                 self.lstm_states.vf[1][:, idx : idx + 1, :].contiguous(),
                             )
                     features = self._features_process(features) # (n_envs, feature_dim)
-                    terminal_value = self.policy.predict_values(features, terminal_lstm_state, episode_starts)[0]
+                    terminal_value = self.policy.predict_values(features, terminal_lstm_state, self.episode_starts)[0]
 
                 rewards[idx] += self.gamma * terminal_value
         
@@ -505,16 +566,16 @@ class Model(nn.Module):
 
     def exploit(self, features: list[list]) -> torch.Tensor: # (n_envs, action_dim)
         features = self._features_process(features) # (n_envs, feature_dim)
-        episode_starts = self._to_torch(self.episode_starts, dtype=torch.float32, device=self.device) # (n_envs, )
+        episode_starts = self._to_torch(self.episode_starts) # (n_envs, )
 
         with torch.no_grad():
-            actions, values, log_probs, self.lstm_states = self.policy.exploit(feature, self.lstm_states, episode_starts)
+            actions, values, log_probs, self.lstm_states = self.policy.exploit(features, self.lstm_states, episode_starts)
 
         return actions.detach()
 
     def learn(self):
         self.policy.set_training_mode(True)
-
+        self.buffer.get_ready()
         for epoch in range(self.K_epochs):
             for rollout_data in self.buffer.get_batch_data(self.minibatch):
                 mask = rollout_data.mask > 1e-8
@@ -548,7 +609,7 @@ class Model(nn.Module):
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(
                     self.policy.parameters(), 
-                    max_norm=5.0,
+                    max_norm=1.0,
                     norm_type=2.0  # L2范数裁剪
                 )
                 self.optimizer.step()
@@ -586,6 +647,6 @@ class Model(nn.Module):
 
     def load_model(self, path=None, id="1"):
         model_file_path = f"{path}/model.ckpt-{str(id)}.pt"
-        checkpoint = torch.load(model_file_path)
+        checkpoint = torch.load(model_file_path, map_location=self.device)
         self.policy.load_state_dict(checkpoint["policy"])
         self.reset()

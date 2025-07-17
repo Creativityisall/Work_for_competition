@@ -19,8 +19,8 @@ import time
 import numpy as np
 import os
 
-EPISODES = 10
-REPORT_INTERVAL = 60
+EPISODES = 50
+REPORT_INTERVAL = 6
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 1000
 STEPS_INTERVAL = 100
@@ -47,7 +47,7 @@ def workflow(envs, agents, logger=None, monitor=None):
         # Initializing monitoring data
         # 监控数据初始化
         monitor_data = {
-            "reward": 0,
+            "reward": 0.0,
         }
 
         last_report_monitor_time = time.time()
@@ -114,6 +114,7 @@ def workflow(envs, agents, logger=None, monitor=None):
                 # 收集采样数据
                 agent.collect(sample_data, list_obs_data)
                 # 记录参数
+                # logger.info(f"prob - reward: {list_act_data[0].prob} - {rewards[0]}")
                 monitor_data['reward'] += rewards[0]
 
                 if dones[0]: # TODO: 分布式
@@ -122,12 +123,13 @@ def workflow(envs, agents, logger=None, monitor=None):
             agent.compute_returns_and_advantage()
             # 学习数据
             if agent.collect_full(): # 如果buffer填充满，则开始学习
+                logger.info(f" ---------- {episode} Start Learn ----------- ")
                 agent.learn(placeholder)
             now = time.time()
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
                 if monitor:
-                    monitor_data['reward'] = 100 * monitor_data['reward'] / max_steps
+                    monitor_data['reward'] = monitor_data['reward'] / max_steps
                     monitor.put_data({os.getpid(): monitor_data})
                     monitor_data['reward'] = 0
 

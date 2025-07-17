@@ -83,10 +83,8 @@ def single_reward_shaping(frame_no, terminated, truncated, obs, next_obs, extra_
     #     reward -= 10
 
     # # 靠近终点的奖励
-    # end_dist, next_end_dist = end_treasure_dists[0], next_end_treasure_dists[0]
-    # if end_dist > next_end_dist:
-    #     reward += 10
-
+    end_dist, next_end_dist = end_treasure_dists[0], next_end_treasure_dists[0]
+    reward -= 8 * next_end_dist
     # 获得宝箱的奖励
     score = game_info['score']
     if score > 0 and not terminated:
@@ -115,7 +113,8 @@ def reward_shaping(
             list_truncated[idx], 
             list_obs[idx], 
             list_next_obs[idx], 
-            list_extra_info[idx], list_next_extra_info[idx], 
+            list_extra_info[idx], 
+            list_next_extra_info[idx], 
             step
         )
         rewards.append(reward)

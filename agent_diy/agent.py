@@ -23,7 +23,7 @@ from agent_diy.conf.conf import Config
 from agent_diy.model.model import Model
 
 ObsData = create_cls("ObsData", feature=None, legal_actions=None)
-ActData = create_cls("ActData", action=None)
+ActData = create_cls("ActData", action=None, prob=None)
 
 @attached
 class Agent(BaseAgent):
@@ -72,9 +72,8 @@ class Agent(BaseAgent):
 
         list_act_data = []
         actions, log_probs = self.model.predict(features) # (n_envs, action_dim)
-        self.logger.info(np.exp(log_probs.to('cpu')))
-        for action in actions:
-            act_data = ActData(action=action.to('cpu'))
+        for action, log_prob in zip(actions, log_probs):
+            act_data = ActData(action=action.to('cpu'), prob=np.exp(log_prob.to('cpu')))
             list_act_data.append(act_data)
         return list_act_data
 
@@ -91,13 +90,12 @@ class Agent(BaseAgent):
             list_act_data.append(act_data)
 
         actions = self.action_process(list_act_data=list_act_data)
-        return actions[0].item() #TODO: 分布式
+        return actions[0] #TODO: 分布式
 
     @learn_wrapper
     def learn(self, placeholder):
         self.model.learn()
         self.model.buffer.reset()
-        print(self.model.buffer.pos)
 
     def action_process(self, list_act_data: list[ActData]) -> list[int]:
         actions = []

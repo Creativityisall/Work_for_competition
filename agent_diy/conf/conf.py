@@ -19,7 +19,6 @@ class Config:
     LR_SCHEDULER = 0.1
     LOSS_WEIGHT = {'policy': 1.0, 'value': 0.5, 'entropy': 0.015}
 
-
     FEATURE_DIM = 88
     ACTION_DIM = 4
     LSTM_HIDDEN_SIZE = 256
