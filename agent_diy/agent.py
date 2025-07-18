@@ -40,8 +40,7 @@ class Agent(BaseAgent):
             gae_lambda = Config.GAE_LAMBDA,
             eps_clip = Config.EPSILON,
             lr_ppo = Config.LR_PPO,
-            step_size = Config.SCHEDULER_STEP_SIZE,
-            lr_scheduler = Config.LR_SCHEDULER,
+            T_max=Config.T_MAX,
             loss_weight=Config.LOSS_WEIGHT,
             device = device,
             buffer_size = Config.BUFFER_SIZE,
@@ -53,6 +52,7 @@ class Agent(BaseAgent):
         self.logger = logger
         self.device = device
         self.monitor = monitor
+        self.update_interval = Config.UPDATE
 
     def reset(self):
         self.model.reset()
@@ -74,6 +74,7 @@ class Agent(BaseAgent):
         actions, log_probs = self.model.predict(features) # (n_envs, action_dim)
         for action, log_prob in zip(actions, log_probs):
             act_data = ActData(action=action.to('cpu'), prob=np.exp(log_prob.to('cpu')))
+            # self.logger.info(f"{act_data.action} - {act_data.prob}")
             list_act_data.append(act_data)
         return list_act_data
 
@@ -83,10 +84,11 @@ class Agent(BaseAgent):
         list_obs_data=self.observation_process(list_obs=[obs], list_extra_info=[extra_info])
         features, legal_actions = self._features_extract(list_obs_data)
 
-        actions = self.model.exploit(features) # (n_envs, action_dim)
+        actions, log_probs = self.model.exploit(features) # (n_envs, action_dim)
         list_act_data = []
-        for action in actions:
-            act_data = ActData(action=action.to('cpu'))
+        for action, log_prob in zip(actions, log_probs):
+            act_data = ActData(action=action.to('cpu'), prob=np.exp(log_prob.to('cpu')))
+            self.logger.info(f"{act_data.action} - {act_data.prob}")
             list_act_data.append(act_data)
 
         actions = self.action_process(list_act_data=list_act_data)
@@ -125,7 +127,7 @@ class Agent(BaseAgent):
 
     def collect_full(self) -> bool:
         """判断采样数据是否足够"""
-        return self.model.buffer.full
+        return (self.model.buffer.add_cnt > self.update_interval and self.model.buffer.full)
 
     @save_model_wrapper
     def save_model(self, path=None, id="1"):
@@ -142,7 +144,7 @@ class Agent(BaseAgent):
         legal_actions = []
         for i, view in enumerate([local_view[8], local_view[18], local_view[12], local_view[14]]): # UP DOWN LEFT RIGHT
             if view != 0:
-                legal_actions.append(i)
+                legal_actions.append(i + 1)
         
         pos = [game_info["pos_x"], game_info["pos_z"]]
 

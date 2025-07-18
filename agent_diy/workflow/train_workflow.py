@@ -19,8 +19,8 @@ import time
 import numpy as np
 import os
 
-EPISODES = 50
-REPORT_INTERVAL = 6
+EPISODES = 300
+REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 1000
 STEPS_INTERVAL = 100
@@ -34,7 +34,7 @@ def workflow(envs, agents, logger=None, monitor=None):
     用户可以在此处自行定义训练工作流
     """
     try:
-        print("v7")
+        print("v8")
         # Read and validate configuration file
         # 配置文件读取和校验
         usr_conf = read_usr_conf("agent_diy/conf/train_env_conf.toml", logger)
@@ -129,7 +129,8 @@ def workflow(envs, agents, logger=None, monitor=None):
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
                 if monitor:
-                    monitor_data['reward'] = monitor_data['reward'] / max_steps
+                    monitor_data['reward'] = 100 * monitor_data['reward'] / max_steps
+                    logger.info(f"reward {monitor_data['reward']}")
                     monitor.put_data({os.getpid(): monitor_data})
                     monitor_data['reward'] = 0
 
@@ -139,8 +140,12 @@ def workflow(envs, agents, logger=None, monitor=None):
                 agent.save_model(id=episode+1)
                 last_save_model_time = now
 
-            max_steps = min(max_steps + STEPS_INTERVAL, 2000)
+            # 更平缓地增加步数
+            if episode % 5 == 0:
+                max_steps = min(max_steps + 50, 2000)
 
+        logger.info("Train Over")
+        time.sleep(30) # 等待保存
         agent.save_model(id="latest")
         end_t = time.time()
         logger.info(f"Training Time for {EPISODES} episodes: {end_t - start_t} s")

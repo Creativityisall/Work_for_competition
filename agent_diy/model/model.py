@@ -67,8 +67,13 @@ class Buffer:
         # LSTM
         self.hidden_state_shape = (self.buffer_size, *hidden_state_shape) # (buffer_size, n_lstm_layers, n_envs, lstm_hidden_size)
         self.seq_start_indices, self.seq_end_indices = None, None
+        # buffer数据
+        self.pos = 0
+        self.add_cnt = 0
+        self.full = False
 
     def reset(self):
+        self.add_cnt = 0
         # 状态存储
         self.features = np.zeros((self.buffer_size, self.n_envs, *self.feature_shape))
         self.actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim))
@@ -77,9 +82,6 @@ class Buffer:
         self.values = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
         self.log_probs = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
         self.advantages = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
-        # buffer数据
-        self.pos = 0
-        self.full = False
         # LSTM
         # self.env_change = np.zeros(self.buffer_size * self.n_envs).reshape(self.buffer_size, self.n_envs) # 0-1向量 记录env转换
         self.hidden_states_pi = np.zeros(self.hidden_state_shape, dtype=np.float32)
@@ -113,7 +115,8 @@ class Buffer:
         self.cell_states_vf[self.pos] = np.array(lstm_states.vf[1].cpu().numpy())
 
         self.pos = (self.pos + 1) % self.buffer_size
-        if self.pos == self.buffer_size - 1:
+        self.add_cnt += 1
+        if self.add_cnt == self.buffer_size - 1:
             self.full = True
 
     def compute_returns_and_advantage(self, last_values: torch.Tensor, dones: np.ndarray) -> None:
@@ -131,13 +134,38 @@ class Buffer:
             self.advantages[step] = last_gae_lam
         self.returns = self.advantages + self.values
 
-    def get_batch_data(self, minibatch):
-        split_index = np.random.randint(self.buffer_size * self.n_envs)
-        indices = np.arange(self.buffer_size * self.n_envs)
-        indices = np.concatenate((indices[split_index:], indices[:split_index]))
+    def _sample(self, minibatch):
+        # TODO: 优先级采样
+        # 1. 按episode分组索引
+        seq_starts = np.where(self.episode_starts == 1)[0]
+        seq_ends = np.concatenate([seq_starts[1:], [len(self.episode_starts) * self.n_envs]])
+        
+        # 2. 打乱episode顺序但保持内部顺序
+        episode_indices = np.random.permutation(len(seq_starts))
+        
+        # 3. 按打乱后的顺序生成批次
+        current_idx = 0
+        list_batch_indices = []
+        batch_indices = []
+        for ep_idx in episode_indices:
+            ep_length = seq_ends[ep_idx] - seq_starts[ep_idx]
+            if current_idx + ep_length > minibatch and batch_indices:
+                list_batch_indices.append(np.concatenate(batch_indices))
+                batch_indices = []
+                current_idx = 0
+            
+            batch_indices.append(np.arange(seq_starts[ep_idx], seq_ends[ep_idx]))
+            current_idx += ep_length
 
-        for start_idx in range(0, self.buffer_size * self.n_envs, minibatch):
-            yield self._get_samples(indices[start_idx : start_idx + minibatch])
+        return list_batch_indices
+
+    def get_batch_data(self, minibatch):
+        list_batch_indices = self._sample(minibatch)
+        for indices in list_batch_indices:
+            yield self._get_samples(indices)
+        
+        # for start_idx in range(0, self.buffer_size * self.n_envs, minibatch):
+        #     yield self._get_samples(indices[start_idx : start_idx + minibatch])
 
     def get_ready(self):
         for tensor in ["hidden_states_pi", "cell_states_pi", "hidden_states_vf", "cell_states_vf"]:
@@ -215,10 +243,6 @@ class Buffer:
         local_pad_and_flatten = partial(pad_and_flatten, seq_start_indices, seq_end_indices, self.device)
         return seq_start_indices, local_pad, local_pad_and_flatten
 
-
-import torch
-import torch.nn as nn
-
 class TempLSTM(nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -267,6 +291,9 @@ class LSTMPPO(nn.Module):
         #     lstm_hidden_size,
         #     num_layers=n_lstm_layers,
         # )
+
+        self.feature_net = nn.Linear(self.feature_dim, self.feature_dim * 4)
+
         self.lstm_actor = TempLSTM(
             self.feature_dim,
             lstm_hidden_size,
@@ -278,16 +305,12 @@ class LSTMPPO(nn.Module):
             num_layers=n_lstm_layers
             )
         self.policy_net = nn.Sequential(
-            nn.Linear(lstm_hidden_size, latent_dim_pi),
-            nn.ReLU(),
-            nn.Linear(latent_dim_pi, latent_dim_pi),
+            nn.Linear(lstm_hidden_size + self.feature_dim * 3, latent_dim_pi),
             nn.ReLU(),
             nn.Linear(latent_dim_pi, action_dim)
         )
         self.value_net = nn.Sequential(
-            nn.Linear(lstm_hidden_size, latent_dim_vf),
-            nn.ReLU(),
-            nn.Linear(latent_dim_vf, latent_dim_vf),
+            nn.Linear(lstm_hidden_size + self.feature_dim * 3, latent_dim_vf),
             nn.ReLU(),
             nn.Linear(latent_dim_vf, 1)
         )
@@ -338,7 +361,7 @@ class LSTMPPO(nn.Module):
         # share_features
         # TODO: other features_extractor? 
         pi_features = vf_features = features
-         
+        
         latent_pi, lstm_states_pi = self._process_sequence(pi_features, lstm_states.pi, episode_starts, self.lstm_actor)
         latent_vf, lstm_states_vf = self._process_sequence(vf_features, lstm_states.vf, episode_starts, self.lstm_critic)
 
@@ -371,10 +394,24 @@ class LSTMPPO(nn.Module):
         # (n_envs, ) -> (batch_size, seq_len) ->(seq_len, batch_size)
         episode_starts = episode_starts.reshape((n_seq, -1)).swapaxes(0, 1).float()
 
+        # (seq_len, batch_size, feature_dim) -> (seq_len, batch_size, feature_dim * 4)
+        # -> (seq_len, batch_size, feature_dim * 3) + (seq_len, batch_size, feature_dim)
+        # 按学长所说，先拆分，后拼接
+        features_seq = self.feature_net(features_sequence)
+        features_seq_size = features_seq.size(-1)
+        features_seq1, features_seq2 = torch.split(
+            features_seq, 
+            [3 * features_seq_size // 4, features_seq_size - 3 * features_seq_size // 4], 
+            dim=-1
+        )
+        # (seq_len, batch_size, feature_dim * 3) -> (batch_size, feature_dim * 3)
+        features_seq1 = torch.flatten(features_seq1.transpose(0, 1), start_dim=0, end_dim=1)
+        
         if torch.all(episode_starts == 0.0): # 若全零，则表示数据在一个episode中
-            lstm_output, lstm_states = lstm(features_sequence, lstm_states)
+            lstm_output, lstm_states = lstm(features_seq2, lstm_states)
             lstm_output = torch.flatten(lstm_output.transpose(0, 1), start_dim=0, end_dim=1)
-            return lstm_output, lstm_states
+            output = torch.cat([features_seq1, lstm_output], dim=-1)
+            return output, lstm_states
 
         lstm_output = []
         # Iterate over the sequence
@@ -389,7 +426,8 @@ class LSTMPPO(nn.Module):
             lstm_output += [hidden]
         # (sequence length, n_seq, lstm_out_dim) -> (batch_size, lstm_out_dim)
         lstm_output = torch.flatten(torch.cat(lstm_output).transpose(0, 1), start_dim=0, end_dim=1)
-        return lstm_output, lstm_states
+        output = torch.cat([features_seq1, lstm_output], dim=-1)
+        return output, lstm_states
 
     def set_training_mode(self, mode):
         self.train(mode)
@@ -432,8 +470,7 @@ class Model(nn.Module):
         gae_lambda=0.95,            # GAE（广义优势估计）的λ参数，平衡偏差和方差
         eps_clip=0.1,               # PPO的裁剪参数，限制策略更新的步长
         lr_ppo=3e-4,                # PPO优化器的学习率
-        step_size=10,               # 学习率调度器的步长（每多少轮衰减一次）
-        lr_scheduler=0.1,           # 学习率衰减因子（每次衰减为原来的0.1倍）
+        T_max=75,                   # 学习率调度器的调节周期（每多少轮循环一次）
         loss_weight=None,           # Loss权重
         device="auto",              # 训练设备（CPU/GPU），"auto"自动选择
         buffer_size=3072,           # 经验回放缓冲区的大小（存储多少个时间步）
@@ -447,8 +484,7 @@ class Model(nn.Module):
         self.gamma = gamma
         self.gae_lambda = gae_lambda
         self.eps_clip = eps_clip
-        self.step_size = step_size
-        self.lr_scheduler = lr_scheduler
+        self.T_max = T_max
         self.lr_ppo = lr_ppo
         self.loss_weight = loss_weight
         # 训练工具
@@ -461,8 +497,12 @@ class Model(nn.Module):
             latent_dim_pi,
             latent_dim_vf
         ).to(self.device)
-        self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=lr_ppo)
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=step_size, gamma=lr_scheduler)
+        self.optimizer = torch.optim.AdamW(self.policy.parameters(), lr=lr_ppo, weight_decay=1e-4)
+        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            self.optimizer, 
+            T_max=T_max,  # 半周期
+            eta_min=lr_ppo / 10
+        )
         self.buffer = Buffer(
             buffer_size = buffer_size,
             feature_shape = [feature_dim],
@@ -534,7 +574,7 @@ class Model(nn.Module):
         self.last_actions = ont_hot_actions # (n_envs, )
         self.last_values = values           # (n_envs, )
         self.last_log_probs = log_probs     # (n_envs, action_dim)
-        return actions.detach(), log_probs
+        return actions.detach(), log_probs.detach()
 
     def _action_process(self, actions):
         """动作处理为one_hot向量"""
@@ -544,12 +584,14 @@ class Model(nn.Module):
     def _features_process(self, features: list[list]) -> torch.Tensor:
         """状态预处理(裁剪极端值和NaN), 将features转为张量"""
         features = self._to_torch(features)
-        features = torch.clamp(features, min=-1e4, max=1e4)
-        features = torch.nan_to_num(features, nan=0.0, posinf=1e4, neginf=-1e4)
-        features = (features - features.mean()) / (features.std() + 1e-8)
+        features = torch.clamp(features, min=-10.0, max=10.0)
+        features = torch.nan_to_num(features, nan=0.0, posinf=10.0, neginf=-10.0)
+
+        features = (features - features.mean()) / (features.std() + 1e-6)
         return features
 
     def handle_timeout(self, truncateds, rewards, features):
+        """TODO: 不理解准确作用"""
         for idx, truncated in enumerate(truncateds):
             if truncated:
                 with torch.no_grad():
@@ -571,11 +613,12 @@ class Model(nn.Module):
         with torch.no_grad():
             actions, values, log_probs, self.lstm_states = self.policy.exploit(features, self.lstm_states, episode_starts)
 
-        return actions.detach()
+        return actions.detach(), log_probs.detach()
 
     def learn(self):
         self.policy.set_training_mode(True)
         self.buffer.get_ready()
+        total_norms = []
         for epoch in range(self.K_epochs):
             for rollout_data in self.buffer.get_batch_data(self.minibatch):
                 mask = rollout_data.mask > 1e-8
@@ -588,6 +631,7 @@ class Model(nn.Module):
 
                 advantages = rollout_data.advantages
                 advantages = (advantages - advantages[mask].mean()) / (advantages[mask].std() + 1e-8)
+                advantages = torch.clamp(advantages, -5.0, 5.0)  # 硬截断
 
                 ratio = torch.exp(log_probs - rollout_data.log_probs)
                 policy_loss_1 = advantages * ratio
@@ -607,13 +651,26 @@ class Model(nn.Module):
 
                 self.optimizer.zero_grad()
                 loss.backward()
-                torch.nn.utils.clip_grad_norm_(
+                total_norm = torch.nn.utils.clip_grad_norm_(
                     self.policy.parameters(), 
-                    max_norm=1.0,
+                    max_norm=5.0,
                     norm_type=2.0  # L2范数裁剪
                 )
+                total_norms.append(total_norm)
                 self.optimizer.step()
+
+        if self.logger_mode:
+            total_grad = sum(total_norms) / len(total_norms)
+            self.logger.info(f"Total Grad: {total_grad:.4f}")
+            # 在model.py的learn()中添加分层监控
+            for name, param in self.policy.named_parameters():
+                if param.grad is not None:
+                    grad_norm = param.grad.norm().item()
+                    if grad_norm > 2:  # 只记录高梯度层
+                        self.logger.info(f"High grad layer: {name} = {grad_norm:.4f}")
+                
         self.scheduler.step()
+        self.eps_clip *= 0.995
 
     def collect_rollouts(self, sample, next_features):
         # TODO: SDE
