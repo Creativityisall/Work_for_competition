@@ -12,7 +12,7 @@ from torch import nn
 from torch.distributions import Categorical
 import torch.nn.functional as F
 import numpy as np
-
+from torch.optim.lr_scheduler import CosineAnnealingLR # 导入调度器
 
 def orthogonal_init(layer, gain=1.0):
     if isinstance(layer, nn.Linear):
@@ -144,24 +144,25 @@ class ActorCritic(nn.Module):
         return action.detach()
 
 
-# --- Model 类 (保持不变，但会传递 use_orthogonal_init 参数) ---
+# --- Model 类 (添加调度器) ---
 class Model(nn.Module):
     def __init__(
             self,
             input_dim,
             output_dim,
             seq_length=64,
-            lr_actor=1e-3,
-            lr_critic=1e-3,
-            lr_lstm=1e-3,
+            lr_actor=1e-4,
+            lr_critic=1e-4,
+            lr_lstm=1e-4,
             gamma=0.99,  # GAE新增：折扣因子
             gae_lambda=0.95,  # GAE新增：GAE的lambda参数
             eps_clip=0.2,
-            K_epochs=10,
-            loss_weight={'actor': 0.6, 'critic': 0.6, 'entropy': 0.015},
+            K_epochs=4,
+            loss_weight={'actor': 0.6, 'critic': 0.6, 'entropy': 1},#0.015
             lstm_hidden_dim=64,
             lstm_num_layers=1,
-            use_orthogonal_init=True # 新增参数
+            use_orthogonal_init=True, # 新增参数
+            total_training_steps=300 # 新增：用于调度器的总训练步数（或回合数）
     ):
         super().__init__()
         self.input_dim = input_dim
@@ -181,6 +182,11 @@ class Model(nn.Module):
             {'params': self.policy.critic_output_layer.parameters(), 'lr': lr_critic}, # 更改为 critic_output_layer
             {'params': self.policy.dual_lstm.parameters(), 'lr': lr_lstm}
         ])
+
+        # 初始化学习率调度器
+        # 我们使用 CosineAnnealingLR，T_max 设置为总训练步数/回合数
+        self.scheduler = CosineAnnealingLR(self.optimizer, T_max=total_training_steps)
+
 
         self.state_seq = torch.zeros(1, seq_length, input_dim)
         self.action_seq = torch.zeros(1, seq_length, output_dim)
@@ -302,9 +308,9 @@ class Model(nn.Module):
         adv_std = np.std(advantages) + 1e-8
         advantages = (advantages - adv_mean) / adv_std
 
-        returns_mean = np.mean(returns)
-        returns_std = np.std(returns) + 1e-8
-        returns = (returns - returns_mean) / returns_std
+        #returns_mean = np.mean(returns)
+        #returns_std = np.std(returns) + 1e-8
+        #returns = (returns - returns_mean) / returns_std
 
         return torch.tensor(advantages, dtype=torch.float32), torch.tensor(returns, dtype=torch.float32)
 
@@ -312,7 +318,7 @@ class Model(nn.Module):
     # def _calc_advantages(self, rewards, values): ...
 
     # _calc_loss 已更新，直接接收计算好的 advantages 和 returns
-    def _calc_loss(self, returns, advantages, logprobs, new_logprobs, new_values, entropy):
+    def _calc_loss(self,episode, returns, advantages, logprobs, new_logprobs, new_values, entropy):
         """
         计算PPO损失。
         Args:
@@ -337,7 +343,7 @@ class Model(nn.Module):
         # 总损失
         loss = (self.loss_weight['actor'] * actor_loss
                 + self.loss_weight['critic'] * critic_loss
-                - self.loss_weight['entropy'] * entropy.mean())
+                - self.loss_weight['entropy']/ (episode + 1) * entropy.mean())
         return loss
 
     # learn方法已重构，以集成GAE计算
@@ -399,15 +405,18 @@ class Model(nn.Module):
                 new_logprobs, new_values, entropy = self.policy.evaluate(
                     mb_state_seqs, mb_action_seqs, mb_actions
                 )
-
+                episode = sample.episode
                 # 计算损失并反向传播
-                loss = self._calc_loss(mb_returns, mb_advantages, mb_logprobs,
-                                       new_logprobs, new_values, entropy)
+                loss = self._calc_loss(episode, mb_returns, mb_advantages, mb_logprobs,
+                                         new_logprobs, new_values, entropy)
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=2.0)
                 self.optimizer.step()
+
+        # 在每次学习迭代后，更新学习率调度器
+        self.scheduler.step()
 
         # 清空缓冲区，准备下一轮收集经验
         self._clear_buffer()
@@ -415,9 +424,13 @@ class Model(nn.Module):
     def save_model(self, path=None, id="1"):
         model_file_path = f"{path}/model.ckpt-{str(id)}.pt"
         torch.save({
-            "policy": self.policy.state_dict()
+            "policy": self.policy.state_dict(),
+            "optimizer": self.optimizer.state_dict(), # 保存优化器状态
+            "scheduler": self.scheduler.state_dict() # 保存调度器状态
         }, model_file_path)
 
     def load_model(self, path):
         checkpoint = torch.load(path)
         self.policy.load_state_dict(checkpoint["policy"])
+        self.optimizer.load_state_dict(checkpoint["optimizer"]) # 加载优化器状态
+        self.scheduler.load_state_dict(checkpoint["scheduler"]) # 加载调度器状态
