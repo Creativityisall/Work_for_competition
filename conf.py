@@ -23,7 +23,7 @@ class Config:
     LR_ACTOR = 1e-4
     LR_CRITIC = 1e-4
     LR_LSTM = 1e-4
-    LOSS_WEIGHT = {'actor': 0.5, 'critic': 0.5, 'entropy': 0.8}
+    LOSS_WEIGHT = {'actor': 0.6, 'critic': 0.6, 'entropy': 1}#0.015
 
     # dimensionality of the sample
     # 样本维度
@@ -32,3 +32,4 @@ class Config:
     # Dimension of movement action direction
     # 移动动作方向的维度
     OBSERVATION_SHAPE = 214
+    episodes = 300
