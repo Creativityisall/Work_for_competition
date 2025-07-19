@@ -285,7 +285,8 @@ class LSTMPPO(nn.Module):
         self.n_lstm_layers = n_lstm_layers
         self.latent_dim_pi = latent_dim_pi
         self.latent_dim_vf = latent_dim_vf
-    
+
+        self.last_logits  = torch.zeros(action_dim)
         # self.lstm_actor = nn.LSTM(
         #     self.feature_dim,
         #     lstm_hidden_size,
@@ -348,7 +349,9 @@ class LSTMPPO(nn.Module):
                     self._orthogonal_init(sub_module, gain=gain)
             
     def forward_actor(self, features):
-        return self.policy_net(features)
+        logits = self.policy_net(features)
+        self.last_logits = logits
+        return logits
 
     def forward_critic(self, features):
         return self.value_net(features)
@@ -368,6 +371,7 @@ class LSTMPPO(nn.Module):
         # Evaluate the values and actions
         values = self.forward_critic(latent_vf)             # (batch_size, )
         mean_actions = self.forward_actor(latent_pi)        # (batch_size, action_dim)
+        self.last_logits = mean_actions
         distribution = Categorical(logits=mean_actions)
 
         if deterministic:
@@ -435,6 +439,8 @@ class LSTMPPO(nn.Module):
     def evaluate_actions(self, features, actions, lstm_states, episode_starts):
         # share_features
         # TODO: other features_extractor? 
+        last_distribution = Categorical(logits=self.last_logits)
+
         pi_features = vf_features = features
         latent_pi, _ = self._process_sequence(pi_features, lstm_states.pi, episode_starts, self.lstm_actor)
         latent_vf, _ = self._process_sequence(vf_features, lstm_states.vf, episode_starts, self.lstm_critic)
@@ -444,8 +450,10 @@ class LSTMPPO(nn.Module):
         distribution = Categorical(logits=mean_actions)
 
         actions = torch.argmax(actions, dim=1) # (n_envs, action_dim) -> (n_envs, )
+        kl = torch.distributions.kl.kl_divergence(last_distribution, distribution).mean()
+
         log_prob = distribution.log_prob(actions)
-        return values, log_prob, distribution.entropy()
+        return values, log_prob, distribution.entropy(), kl
 
     def predict_values(self, features, lstm_states, episode_starts):
         latent_vf, _ = self._process_sequence(features, lstm_states, episode_starts, self.lstm_critic)
@@ -501,7 +509,7 @@ class Model(nn.Module):
         self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             self.optimizer, 
             T_max=T_max,  # 半周期
-            eta_min=lr_ppo / 10
+            eta_min=lr_ppo / 100
         )
         self.buffer = Buffer(
             buffer_size = buffer_size,
@@ -622,12 +630,19 @@ class Model(nn.Module):
         for epoch in range(self.K_epochs):
             for rollout_data in self.buffer.get_batch_data(self.minibatch):
                 mask = rollout_data.mask > 1e-8
-                values, log_probs, entropies = self.policy.evaluate_actions(
+                values, log_probs, entropies, kl = self.policy.evaluate_actions(
                     rollout_data.features,
                     rollout_data.actions,
                     rollout_data.lstm_states,
                     rollout_data.episode_starts,
                 )
+
+                if kl > 0.02:  # 如果策略变化太大
+                    self.optimizer.param_groups[0]['lr'] *= 0.8
+                elif kl < 0.005:  # 如果策略变化太小
+                    self.optimizer.param_groups[0]['lr'] *= 1.05
+
+                kl_loss = 0.01 * kl
 
                 advantages = rollout_data.advantages
                 advantages = (advantages - advantages[mask].mean()) / (advantages[mask].std() + 1e-8)
@@ -644,7 +659,8 @@ class Model(nn.Module):
 
                 loss = (self.loss_weight['policy'] * policy_loss 
                         + self.loss_weight['value'] * value_loss
-                        + self.loss_weight['entropy'] * entropy_loss)
+                        + self.loss_weight['entropy'] * entropy_loss
+                        + kl_loss)
 
                 # TODO: 早停机制
                 # XXXXX
