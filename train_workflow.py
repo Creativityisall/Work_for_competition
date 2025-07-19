@@ -3,9 +3,7 @@
 ###########################################################################
 # Copyright © 1998 - 2025 Tencent. All Rights Reserved.
 ###########################################################################
-"""
-Author: Tencent AI Arena Authors
-"""
+
 
 
 from agent_diy.feature.definition import (
