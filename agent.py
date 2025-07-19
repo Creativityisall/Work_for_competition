@@ -113,8 +113,8 @@ class Agent(BaseAgent):
     # 假设 pos 有 2 个维度，end_treasure_dists 有 3 个维度 (请根据实际情况调整)
     # 您需要根据 raw_obs["feature"] 的实际维度来确定 end_treasure_dists_means/stds 的长度
     # 如果 raw_obs["feature"] 只有一个元素，那么只需要一个 mean 和 std
-    _POS_MEANS = np.array([50.0, 50.0], dtype=np.float32)
-    _POS_STDS = np.array([33.3, 33.3], dtype=np.float32)
+    _POS_MEANS = np.array([32.0, 32.0], dtype=np.float32)
+    _POS_STDS = np.array([10.67, 10.67], dtype=np.float32)
 
     # 假设 end_treasure_dists 只有 1 个维度，即 raw_obs["feature"] 的长度是 1
     # 如果 raw_obs["feature"] 实际上是多个距离的列表，请调整这里的维度和均值/标准差
@@ -203,7 +203,7 @@ class Agent(BaseAgent):
                 end_flat,
             ]
         )
-
+        #print(feature)
         return ObsData(feature=feature, legal_actions=legal_actions, done=done)
 
     def action_process(self, act_data):
