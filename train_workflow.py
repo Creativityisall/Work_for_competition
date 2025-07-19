@@ -19,10 +19,10 @@ import time
 import math
 import os
 
-EPISODES = 100
+EPISODES = 300
 REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
-INIT_MAX_STEPS = 1000
+INIT_MAX_STEPS = 2000
 
 @attached
 def workflow(envs, agents, logger=None, monitor=None):
@@ -39,7 +39,6 @@ def workflow(envs, agents, logger=None, monitor=None):
             logger.error("usr_conf is None, please check agent_diy/conf/train_env_conf.toml")
             return
         env, agent = envs[0], agents[0]
-        
         # Initializing monitoring data
         # 监控数据初始化
         monitor_data = {
@@ -116,7 +115,7 @@ def workflow(envs, agents, logger=None, monitor=None):
                 #print(step)
             #max_steps += 100
             # 采样数据处理
-            sample_data = sample_process(sample_buffer, agent.gamma, obs)
+            sample_data = sample_process(sample_buffer, agent.gamma, obs, episode)
             # 学习数据
             last_state = obs_data.feature
             sample_data.last_state = last_state
