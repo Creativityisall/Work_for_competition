@@ -13,10 +13,10 @@ from env import Env
 Frame = create_cls("Frame", rewards=None, dones=None)
 
 EPISODES = 300
-REPORT_INTERVAL = 60
+REPORT_INTERVAL = 6
 SAVE_INTERVAL = 300
-INIT_MAX_STEPS = 1000
-STEPS_INTERVAL = 100
+INIT_MAX_STEPS = 500
+STEPS_INTERVAL = 0
 
 def workflow(envs, agents, logger=None, monitor=None):
     """
@@ -108,7 +108,6 @@ def workflow(envs, agents, logger=None, monitor=None):
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
                 if monitor:
-                    monitor_data['reward'] = 100 * monitor_data['reward'] / max_steps
                     logger.info(f"reward {monitor_data['reward']}")
                     monitor.put_data(monitor_data)
                     monitor_data['reward'] = 0
@@ -121,7 +120,7 @@ def workflow(envs, agents, logger=None, monitor=None):
 
             # 更平缓地增加步数
             if episode % 5 == 0:
-                max_steps = min(max_steps + 50, 2000)
+                max_steps = min(max_steps + 50, 500)
 
         logger.info("Train Over")
         time.sleep(30) # 等待保存

@@ -2,6 +2,7 @@ import logging
 import matplotlib.pyplot as plt
 
 import logging
+import numpy as np
 
 def init_logger(name: str = __name__) -> logging.Logger:
     logger = logging.getLogger(name)
@@ -30,31 +31,32 @@ class Monitor:
             if key not in self.data:
                 self.data[key] = []
             self.data[key].append(value)
-        
-    def get_data(self):
-        """获取当前监控数据"""
-        return self.data
-    
+
     def clear(self):
         """清空监控数据"""
         self.data.clear()
 
     def draw(self):
-        """绘制监控数据"""
+        """绘制监控数据（支持多条曲线）"""
         if not self.data:
             print("No data to draw.")
             return
 
-        for label, value in self.data.items():
-            if isinstance(value, tuple) and len(value) == 2:
-                x, y = value
+        print(self.data)
+        plt.figure(figsize=(8, 4.5))
+        for label, values in self.data.items():
+            # 统一成 (x, y)
+            if isinstance(values, tuple) and len(values) == 2:
+                x, y = values
             else:
-                x, y = None, value   # 自动 x
-            plt.plot(x, y, label=str(label), marker='o', markersize=3)
+                y = np.asarray(values).flatten()   # 兼容 list / ndarray
+                x = np.arange(len(y))              # 0,1,2...
+
+            plt.plot(x, y, label=str(label), marker='o', markersize=2)
 
         plt.title("Monitor Data")
-        plt.xlabel("Index / X")
-        plt.ylabel("Value / Y")
+        plt.xlabel("Step")
+        plt.ylabel("Value")
         plt.grid(True)
         plt.legend()
         plt.tight_layout()

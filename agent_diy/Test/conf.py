@@ -1,10 +1,10 @@
 class Config:
     GAMMA = 0.99
     GAE_LAMBDA = 0.9
-    EPSILON = 0.15
-    LR_PPO = 5e-5
+    EPSILON = 0.1
+    LR_PPO = 1e-5
     T_MAX = 75
-    LOSS_WEIGHT = {'policy': 1.0, 'value': 0.5, 'entropy': 0.001}
+    LOSS_WEIGHT = {'policy': 1.0, 'value': 0.5, 'entropy': 0.01}
 
     FEATURE_DIM = 4
     ACTION_DIM = 2
