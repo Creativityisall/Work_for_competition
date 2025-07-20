@@ -1,0 +1,169 @@
+2025-07-20 13:44:16,899 [INFO] (workflow.py:35) Start Training...
+2025-07-20 13:44:17,203 [INFO] (workflow.py:105)  ---------- 14 Start Learn ----------- 
+2025-07-20 13:44:18,334 [INFO] (model.py:667) Total Grad: 9.6555
+2025-07-20 13:44:18,334 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.8078
+2025-07-20 13:44:18,334 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.9063
+2025-07-20 13:44:18,424 [INFO] (workflow.py:105)  ---------- 17 Start Learn ----------- 
+2025-07-20 13:44:19,015 [INFO] (model.py:667) Total Grad: 9.3639
+2025-07-20 13:44:19,015 [INFO] (model.py:673) High grad layer: value_net.0.bias = 2.0950
+2025-07-20 13:44:19,015 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.3571
+2025-07-20 13:44:19,019 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.8507
+2025-07-20 13:44:19,109 [INFO] (workflow.py:105)  ---------- 19 Start Learn ----------- 
+2025-07-20 13:44:19,490 [INFO] (model.py:667) Total Grad: 9.2601
+2025-07-20 13:44:19,490 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.0924
+2025-07-20 13:44:19,490 [INFO] (model.py:673) High grad layer: value_net.0.bias = 2.0355
+2025-07-20 13:44:19,490 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.5759
+2025-07-20 13:44:19,490 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.6158
+2025-07-20 13:44:19,578 [INFO] (workflow.py:105)  ---------- 22 Start Learn ----------- 
+2025-07-20 13:44:19,751 [INFO] (model.py:667) Total Grad: 10.8752
+2025-07-20 13:44:19,751 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.5619
+2025-07-20 13:44:19,751 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.9125
+2025-07-20 13:44:19,751 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.0584
+2025-07-20 13:44:19,834 [INFO] (workflow.py:105)  ---------- 25 Start Learn ----------- 
+2025-07-20 13:44:20,491 [INFO] (model.py:667) Total Grad: 9.3861
+2025-07-20 13:44:20,491 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.3777
+2025-07-20 13:44:20,491 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.9387
+2025-07-20 13:44:20,491 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.0800
+2025-07-20 13:44:20,572 [INFO] (workflow.py:105)  ---------- 27 Start Learn ----------- 
+2025-07-20 13:44:20,855 [INFO] (model.py:667) Total Grad: 11.0596
+2025-07-20 13:44:20,855 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.4716
+2025-07-20 13:44:20,855 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.0582
+2025-07-20 13:44:20,955 [INFO] (workflow.py:105)  ---------- 30 Start Learn ----------- 
+2025-07-20 13:44:21,446 [INFO] (model.py:667) Total Grad: 12.5401
+2025-07-20 13:44:21,446 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.2126
+2025-07-20 13:44:21,446 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.0288
+2025-07-20 13:44:21,533 [INFO] (workflow.py:105)  ---------- 34 Start Learn ----------- 
+2025-07-20 13:44:22,387 [INFO] (model.py:667) Total Grad: 5.8064
+2025-07-20 13:44:22,495 [INFO] (workflow.py:105)  ---------- 37 Start Learn ----------- 
+2025-07-20 13:44:23,287 [INFO] (model.py:667) Total Grad: 10.5096
+2025-07-20 13:44:23,287 [INFO] (model.py:673) High grad layer: lstm_critic.bias_ih_l0 = 2.2484
+2025-07-20 13:44:23,287 [INFO] (model.py:673) High grad layer: lstm_critic.bias_hh_l0 = 2.2484
+2025-07-20 13:44:23,289 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.4531
+2025-07-20 13:44:23,353 [INFO] (workflow.py:105)  ---------- 39 Start Learn ----------- 
+2025-07-20 13:44:23,511 [INFO] (model.py:667) Total Grad: 16.5447
+2025-07-20 13:44:23,511 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.1009
+2025-07-20 13:44:23,511 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.4791
+2025-07-20 13:44:23,586 [INFO] (workflow.py:105)  ---------- 42 Start Learn ----------- 
+2025-07-20 13:44:24,372 [INFO] (model.py:667) Total Grad: 19.4877
+2025-07-20 13:44:24,372 [INFO] (model.py:673) High grad layer: lstm_critic.bias_ih_l0 = 2.4675
+2025-07-20 13:44:24,372 [INFO] (model.py:673) High grad layer: lstm_critic.bias_hh_l0 = 2.4675
+2025-07-20 13:44:24,372 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.1011
+2025-07-20 13:44:24,459 [INFO] (workflow.py:105)  ---------- 45 Start Learn ----------- 
+2025-07-20 13:44:25,126 [INFO] (model.py:667) Total Grad: 17.2683
+2025-07-20 13:44:25,126 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.0830
+2025-07-20 13:44:25,195 [INFO] (workflow.py:105)  ---------- 48 Start Learn ----------- 
+2025-07-20 13:44:25,587 [INFO] (model.py:667) Total Grad: 13.6301
+2025-07-20 13:44:25,587 [INFO] (model.py:673) High grad layer: lstm_critic.weight_hh_l0 = 2.0085
+2025-07-20 13:44:25,587 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.2060
+2025-07-20 13:44:25,670 [INFO] (workflow.py:105)  ---------- 52 Start Learn ----------- 
+2025-07-20 13:44:26,461 [INFO] (model.py:667) Total Grad: 13.0700
+2025-07-20 13:44:26,461 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.6188
+2025-07-20 13:44:26,541 [INFO] (workflow.py:105)  ---------- 56 Start Learn ----------- 
+2025-07-20 13:44:27,187 [INFO] (model.py:667) Total Grad: 17.2044
+2025-07-20 13:44:27,187 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.7770
+2025-07-20 13:44:27,283 [INFO] (workflow.py:105)  ---------- 59 Start Learn ----------- 
+2025-07-20 13:44:27,687 [INFO] (model.py:667) Total Grad: 22.6780
+2025-07-20 13:44:27,687 [INFO] (model.py:673) High grad layer: lstm_critic.bias_ih_l0 = 2.7248
+2025-07-20 13:44:27,687 [INFO] (model.py:673) High grad layer: lstm_critic.bias_hh_l0 = 2.7248
+2025-07-20 13:44:27,766 [INFO] (workflow.py:105)  ---------- 62 Start Learn ----------- 
+2025-07-20 13:44:28,407 [INFO] (model.py:667) Total Grad: 21.7106
+2025-07-20 13:44:28,407 [INFO] (model.py:673) High grad layer: lstm_critic.bias_ih_l0 = 2.1369
+2025-07-20 13:44:28,407 [INFO] (model.py:673) High grad layer: lstm_critic.bias_hh_l0 = 2.1369
+2025-07-20 13:44:28,407 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.7913
+2025-07-20 13:44:28,514 [INFO] (workflow.py:105)  ---------- 65 Start Learn ----------- 
+2025-07-20 13:44:29,259 [INFO] (model.py:667) Total Grad: 24.2439
+2025-07-20 13:44:29,259 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.1009
+2025-07-20 13:44:29,446 [INFO] (workflow.py:105)  ---------- 68 Start Learn ----------- 
+2025-07-20 13:44:29,802 [INFO] (model.py:667) Total Grad: 32.7763
+2025-07-20 13:44:29,802 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.0779
+2025-07-20 13:44:29,914 [INFO] (workflow.py:105)  ---------- 70 Start Learn ----------- 
+2025-07-20 13:44:30,405 [INFO] (model.py:667) Total Grad: 18.0756
+2025-07-20 13:44:30,405 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.1925
+2025-07-20 13:44:30,552 [INFO] (workflow.py:105)  ---------- 72 Start Learn ----------- 
+2025-07-20 13:44:30,757 [INFO] (model.py:667) Total Grad: 43.3721
+2025-07-20 13:44:30,757 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.2060
+2025-07-20 13:44:30,870 [INFO] (workflow.py:105)  ---------- 74 Start Learn ----------- 
+2025-07-20 13:44:31,232 [INFO] (model.py:667) Total Grad: 17.0030
+2025-07-20 13:44:31,232 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.1641
+2025-07-20 13:44:31,296 [INFO] (workflow.py:105)  ---------- 77 Start Learn ----------- 
+2025-07-20 13:44:31,644 [INFO] (model.py:667) Total Grad: 20.7482
+2025-07-20 13:44:31,644 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.1916
+2025-07-20 13:44:31,756 [INFO] (workflow.py:105)  ---------- 79 Start Learn ----------- 
+2025-07-20 13:44:32,286 [INFO] (model.py:667) Total Grad: 28.2394
+2025-07-20 13:44:32,286 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.3503
+2025-07-20 13:44:32,370 [INFO] (workflow.py:105)  ---------- 82 Start Learn ----------- 
+2025-07-20 13:44:32,834 [INFO] (model.py:667) Total Grad: 19.6040
+2025-07-20 13:44:32,834 [INFO] (model.py:673) High grad layer: lstm_critic.bias_ih_l0 = 2.4271
+2025-07-20 13:44:32,834 [INFO] (model.py:673) High grad layer: lstm_critic.bias_hh_l0 = 2.4271
+2025-07-20 13:44:32,834 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.3288
+2025-07-20 13:44:32,955 [INFO] (workflow.py:105)  ---------- 85 Start Learn ----------- 
+2025-07-20 13:44:33,289 [INFO] (model.py:667) Total Grad: 37.8590
+2025-07-20 13:44:33,289 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.3327
+2025-07-20 13:44:33,353 [INFO] (workflow.py:105)  ---------- 87 Start Learn ----------- 
+2025-07-20 13:44:34,064 [INFO] (model.py:667) Total Grad: 32.7406
+2025-07-20 13:44:34,064 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.3669
+2025-07-20 13:44:34,128 [INFO] (workflow.py:105)  ---------- 89 Start Learn ----------- 
+2025-07-20 13:44:34,444 [INFO] (model.py:667) Total Grad: 38.2614
+2025-07-20 13:44:34,444 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.3144
+2025-07-20 13:44:34,539 [INFO] (workflow.py:105)  ---------- 91 Start Learn ----------- 
+2025-07-20 13:44:34,751 [INFO] (model.py:667) Total Grad: 40.1263
+2025-07-20 13:44:34,751 [INFO] (model.py:673) High grad layer: value_net.2.weight = 4.3481
+2025-07-20 13:44:34,897 [INFO] (workflow.py:105)  ---------- 94 Start Learn ----------- 
+2025-07-20 13:44:35,660 [INFO] (model.py:667) Total Grad: 10.7298
+2025-07-20 13:44:35,737 [INFO] (workflow.py:105)  ---------- 95 Start Learn ----------- 
+2025-07-20 13:46:16,912 [INFO] (workflow.py:35) Start Training...
+2025-07-20 13:46:17,177 [INFO] (workflow.py:105)  ---------- 11 Start Learn ----------- 
+2025-07-20 13:46:18,269 [INFO] (model.py:667) Total Grad: 10.6367
+2025-07-20 13:46:18,277 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.2451
+2025-07-20 13:46:18,277 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.7050
+2025-07-20 13:46:18,277 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.5084
+2025-07-20 13:46:18,348 [INFO] (workflow.py:105)  ---------- 15 Start Learn ----------- 
+2025-07-20 13:46:19,296 [INFO] (model.py:667) Total Grad: 7.6022
+2025-07-20 13:46:19,296 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.4224
+2025-07-20 13:46:19,296 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.7151
+2025-07-20 13:46:19,296 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.2798
+2025-07-20 13:46:19,376 [INFO] (workflow.py:105)  ---------- 18 Start Learn ----------- 
+2025-07-20 13:46:19,906 [INFO] (model.py:667) Total Grad: 9.1358
+2025-07-20 13:46:19,906 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.1431
+2025-07-20 13:46:19,906 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.6370
+2025-07-20 13:46:19,906 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.4435
+2025-07-20 13:46:19,986 [INFO] (workflow.py:105)  ---------- 22 Start Learn ----------- 
+2025-07-20 13:46:20,349 [INFO] (model.py:667) Total Grad: 9.3405
+2025-07-20 13:46:20,349 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.1318
+2025-07-20 13:46:20,444 [INFO] (workflow.py:105)  ---------- 24 Start Learn ----------- 
+2025-07-20 13:46:21,059 [INFO] (model.py:667) Total Grad: 6.0753
+2025-07-20 13:46:21,059 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.0296
+2025-07-20 13:46:21,060 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.7494
+2025-07-20 13:46:21,060 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.3083
+2025-07-20 13:46:21,124 [INFO] (workflow.py:105)  ---------- 27 Start Learn ----------- 
+2025-07-20 13:46:21,987 [INFO] (model.py:667) Total Grad: 7.2958
+2025-07-20 13:46:21,987 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.1682
+2025-07-20 13:46:21,987 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.9317
+2025-07-20 13:46:21,987 [INFO] (model.py:673) High grad layer: value_net.2.bias = 2.0426
+2025-07-20 13:46:22,072 [INFO] (workflow.py:105)  ---------- 30 Start Learn ----------- 
+2025-07-20 13:46:22,515 [INFO] (model.py:667) Total Grad: 10.0511
+2025-07-20 13:46:22,515 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.1825
+2025-07-20 13:46:22,515 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.8834
+2025-07-20 13:46:22,608 [INFO] (workflow.py:105)  ---------- 34 Start Learn ----------- 
+2025-07-20 13:46:23,497 [INFO] (model.py:667) Total Grad: 9.9761
+2025-07-20 13:46:23,497 [INFO] (model.py:673) High grad layer: value_net.2.weight = 2.7506
+2025-07-20 13:46:23,581 [INFO] (workflow.py:105)  ---------- 36 Start Learn ----------- 
+2025-07-20 13:46:24,275 [INFO] (model.py:667) Total Grad: 6.3017
+2025-07-20 13:46:24,355 [INFO] (workflow.py:105)  ---------- 39 Start Learn ----------- 
+2025-07-20 13:46:24,872 [INFO] (model.py:667) Total Grad: 11.7900
+2025-07-20 13:46:24,873 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.0490
+2025-07-20 13:46:24,949 [INFO] (workflow.py:105)  ---------- 43 Start Learn ----------- 
+2025-07-20 13:46:25,238 [INFO] (model.py:667) Total Grad: 16.2226
+2025-07-20 13:46:25,238 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.0728
+2025-07-20 13:46:25,313 [INFO] (workflow.py:105)  ---------- 46 Start Learn ----------- 
+2025-07-20 13:46:26,128 [INFO] (model.py:667) Total Grad: 8.1844
+2025-07-20 13:46:26,128 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.0708
+2025-07-20 13:46:26,128 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.5244
+2025-07-20 13:46:26,193 [INFO] (workflow.py:105)  ---------- 48 Start Learn ----------- 
+2025-07-20 13:46:26,694 [INFO] (model.py:667) Total Grad: 13.4146
+2025-07-20 13:46:26,694 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.4268
+2025-07-20 13:46:26,760 [INFO] (workflow.py:105)  ---------- 51 Start Learn ----------- 
+2025-07-20 13:46:27,066 [INFO] (model.py:667) Total Grad: 22.7752
+2025-07-20 13:46:27,066 [INFO] (model.py:673) High grad layer: value_net.0.weight = 2.0378
+2025-07-20 13:46:27,066 [INFO] (model.py:673) High grad layer: value_net.2.weight = 3.5007
+2025-07-20 13:46:27,150 [INFO] (workflow.py:105)  ---------- 55 Start Learn ----------- 

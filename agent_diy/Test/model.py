@@ -4,7 +4,8 @@ from torch.distributions import Categorical
 import torch.nn.functional as F
 import numpy as np
 from functools import partial
-from kaiwu_agent.utils.common_func import attached, create_cls
+
+from utils import create_cls
 
 LSTMState = create_cls("LSTMState", pi=None, vf=None)
 BufferData = create_cls(
@@ -285,8 +286,6 @@ class LSTMPPO(nn.Module):
         self.n_lstm_layers = n_lstm_layers
         self.latent_dim_pi = latent_dim_pi
         self.latent_dim_vf = latent_dim_vf
-
-        self.last_logits  = torch.zeros(action_dim)
         # self.lstm_actor = nn.LSTM(
         #     self.feature_dim,
         #     lstm_hidden_size,
@@ -350,7 +349,6 @@ class LSTMPPO(nn.Module):
             
     def forward_actor(self, features):
         logits = self.policy_net(features)
-        self.last_logits = logits
         return logits
 
     def forward_critic(self, features):
@@ -370,8 +368,7 @@ class LSTMPPO(nn.Module):
 
         # Evaluate the values and actions
         values = self.forward_critic(latent_vf)             # (batch_size, )
-        mean_actions = self.forward_actor(latent_pi)        # (batch_size, action_dim)
-        self.last_logits = mean_actions
+        mean_actions = self.forward_actor(latent_pi)        # (batch_size, action_dim
         distribution = Categorical(logits=mean_actions)
 
         if deterministic:
@@ -439,7 +436,6 @@ class LSTMPPO(nn.Module):
     def evaluate_actions(self, features, actions, lstm_states, episode_starts):
         # share_features
         # TODO: other features_extractor? 
-        last_distribution = Categorical(logits=self.last_logits)
 
         pi_features = vf_features = features
         latent_pi, _ = self._process_sequence(pi_features, lstm_states.pi, episode_starts, self.lstm_actor)
@@ -450,10 +446,9 @@ class LSTMPPO(nn.Module):
         distribution = Categorical(logits=mean_actions)
 
         actions = torch.argmax(actions, dim=1) # (n_envs, action_dim) -> (n_envs, )
-        kl = torch.distributions.kl.kl_divergence(last_distribution, distribution).mean()
 
         log_prob = distribution.log_prob(actions)
-        return values, log_prob, distribution.entropy(), kl
+        return values, log_prob, distribution.entropy()
 
     def predict_values(self, features, lstm_states, episode_starts):
         latent_vf, _ = self._process_sequence(features, lstm_states, episode_starts, self.lstm_critic)
@@ -630,19 +625,12 @@ class Model(nn.Module):
         for epoch in range(self.K_epochs):
             for rollout_data in self.buffer.get_batch_data(self.minibatch):
                 mask = rollout_data.mask > 1e-8
-                values, log_probs, entropies, kl = self.policy.evaluate_actions(
+                values, log_probs, entropies = self.policy.evaluate_actions(
                     rollout_data.features,
                     rollout_data.actions,
                     rollout_data.lstm_states,
                     rollout_data.episode_starts,
                 )
-
-                if kl > 0.02:  # 如果策略变化太大
-                    self.optimizer.param_groups[0]['lr'] *= 0.8
-                elif kl < 0.005:  # 如果策略变化太小
-                    self.optimizer.param_groups[0]['lr'] *= 1.05
-
-                kl_loss = 0.01 * kl
 
                 advantages = rollout_data.advantages
                 advantages = (advantages - advantages[mask].mean()) / (advantages[mask].std() + 1e-8)
@@ -659,8 +647,7 @@ class Model(nn.Module):
 
                 loss = (self.loss_weight['policy'] * policy_loss 
                         + self.loss_weight['value'] * value_loss
-                        + self.loss_weight['entropy'] * entropy_loss
-                        + kl_loss)
+                        + self.loss_weight['entropy'] * entropy_loss)
 
                 # TODO: 早停机制
                 # XXXXX
@@ -669,15 +656,16 @@ class Model(nn.Module):
                 loss.backward()
                 total_norm = torch.nn.utils.clip_grad_norm_(
                     self.policy.parameters(), 
-                    max_norm=5.0,
+                    max_norm=1.0,
                     norm_type=2.0  # L2范数裁剪
                 )
                 total_norms.append(total_norm)
                 self.optimizer.step()
 
         if self.logger_mode:
-            total_grad = sum(total_norms) / len(total_norms)
-            self.logger.info(f"Total Grad: {total_grad:.4f}")
+            if len(total_norms) != 0:
+                total_grad = sum(total_norms) / len(total_norms)
+                self.logger.info(f"Total Grad: {total_grad:.4f}")
             # 在model.py的learn()中添加分层监控
             for name, param in self.policy.named_parameters():
                 if param.grad is not None:
