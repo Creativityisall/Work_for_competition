@@ -42,7 +42,6 @@ class Monitor:
             print("No data to draw.")
             return
 
-        print(self.data)
         plt.figure(figsize=(8, 4.5))
         for label, values in self.data.items():
             # 统一成 (x, y)
@@ -55,7 +54,7 @@ class Monitor:
             plt.plot(x, y, label=str(label), marker='o', markersize=2)
 
         plt.title("Monitor Data")
-        plt.xlabel("Step")
+        plt.xlabel("index")
         plt.ylabel("Value")
         plt.grid(True)
         plt.legend()

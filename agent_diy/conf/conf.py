@@ -26,6 +26,7 @@ class Config:
 
     BUFFER_SIZE = 10240
     N_ENVS = 1
+    TRAIN_MODE = "distributed" # "distributed" or "local"
     K_EPOCHS = 8
     UPDATE = 6144
     MINIBATCH = 2048

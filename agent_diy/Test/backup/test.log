@@ -1,210 +1,1204 @@
-2025-07-20 14:23:29,989 [INFO] (workflow.py:35) Start Training...
-2025-07-20 14:23:30,274 [INFO] (workflow.py:105)  ---------- 11 Start Learn ----------- 
-2025-07-20 14:23:31,284 [INFO] (model.py:668) Total Grad: 8.8531
-2025-07-20 14:23:31,367 [INFO] (workflow.py:105)  ---------- 14 Start Learn ----------- 
-2025-07-20 14:23:31,940 [INFO] (model.py:668) Total Grad: 7.5711
-2025-07-20 14:23:32,003 [INFO] (workflow.py:105)  ---------- 17 Start Learn ----------- 
-2025-07-20 14:23:32,468 [INFO] (model.py:668) Total Grad: 7.3390
-2025-07-20 14:23:32,547 [INFO] (workflow.py:105)  ---------- 20 Start Learn ----------- 
-2025-07-20 14:23:32,862 [INFO] (model.py:668) Total Grad: 7.4347
-2025-07-20 14:23:32,961 [INFO] (workflow.py:105)  ---------- 22 Start Learn ----------- 
-2025-07-20 14:23:33,381 [INFO] (model.py:668) Total Grad: 6.1987
-2025-07-20 14:23:33,461 [INFO] (workflow.py:105)  ---------- 25 Start Learn ----------- 
-2025-07-20 14:23:33,922 [INFO] (model.py:668) Total Grad: 7.4126
-2025-07-20 14:23:34,001 [INFO] (workflow.py:105)  ---------- 27 Start Learn ----------- 
-2025-07-20 14:23:34,199 [INFO] (model.py:668) Total Grad: 9.3841
-2025-07-20 14:23:34,263 [INFO] (workflow.py:105)  ---------- 29 Start Learn ----------- 
-2025-07-20 14:23:34,664 [INFO] (model.py:668) Total Grad: 3.4599
-2025-07-20 14:23:34,743 [INFO] (workflow.py:105)  ---------- 32 Start Learn ----------- 
-2025-07-20 14:23:35,362 [INFO] (model.py:668) Total Grad: 6.9067
-2025-07-20 14:23:35,441 [INFO] (workflow.py:105)  ---------- 35 Start Learn ----------- 
-2025-07-20 14:23:35,763 [INFO] (model.py:668) Total Grad: 9.0421
-2025-07-20 14:23:35,828 [INFO] (workflow.py:105)  ---------- 38 Start Learn ----------- 
-2025-07-20 14:23:36,656 [INFO] (model.py:668) Total Grad: 6.0111
-2025-07-20 14:23:36,656 [INFO] (workflow.py:111) reward 1084.0
-2025-07-20 14:23:36,803 [INFO] (workflow.py:105)  ---------- 42 Start Learn ----------- 
-2025-07-20 14:23:37,489 [INFO] (model.py:668) Total Grad: 8.5387
-2025-07-20 14:23:37,567 [INFO] (workflow.py:105)  ---------- 46 Start Learn ----------- 
-2025-07-20 14:23:38,489 [INFO] (model.py:668) Total Grad: 4.9563
-2025-07-20 14:23:38,546 [INFO] (workflow.py:105)  ---------- 49 Start Learn ----------- 
-2025-07-20 14:23:39,401 [INFO] (model.py:668) Total Grad: 5.7874
-2025-07-20 14:23:39,480 [INFO] (workflow.py:105)  ---------- 51 Start Learn ----------- 
-2025-07-20 14:23:39,843 [INFO] (model.py:668) Total Grad: 6.5224
-2025-07-20 14:23:39,915 [INFO] (workflow.py:105)  ---------- 53 Start Learn ----------- 
-2025-07-20 14:23:40,104 [INFO] (model.py:668) Total Grad: 8.7931
-2025-07-20 14:23:40,167 [INFO] (workflow.py:105)  ---------- 55 Start Learn ----------- 
-2025-07-20 14:23:40,388 [INFO] (model.py:668) Total Grad: 7.6945
-2025-07-20 14:23:40,467 [INFO] (workflow.py:105)  ---------- 59 Start Learn ----------- 
-2025-07-20 14:23:41,078 [INFO] (model.py:668) Total Grad: 6.5588
-2025-07-20 14:23:41,157 [INFO] (workflow.py:105)  ---------- 62 Start Learn ----------- 
-2025-07-20 14:23:41,527 [INFO] (model.py:668) Total Grad: 7.3553
-2025-07-20 14:23:41,622 [INFO] (workflow.py:105)  ---------- 65 Start Learn ----------- 
-2025-07-20 14:23:42,120 [INFO] (model.py:668) Total Grad: 4.8480
-2025-07-20 14:23:42,198 [INFO] (workflow.py:105)  ---------- 68 Start Learn ----------- 
-2025-07-20 14:23:42,835 [INFO] (model.py:668) Total Grad: 7.2603
-2025-07-20 14:23:42,835 [INFO] (workflow.py:111) reward 827.0
-2025-07-20 14:23:42,930 [INFO] (workflow.py:105)  ---------- 71 Start Learn ----------- 
-2025-07-20 14:23:43,377 [INFO] (model.py:668) Total Grad: 8.3488
-2025-07-20 14:23:43,455 [INFO] (workflow.py:105)  ---------- 75 Start Learn ----------- 
-2025-07-20 14:23:44,445 [INFO] (model.py:668) Total Grad: 5.1435
-2025-07-20 14:23:44,516 [INFO] (workflow.py:105)  ---------- 78 Start Learn ----------- 
-2025-07-20 14:23:45,244 [INFO] (model.py:668) Total Grad: 6.5718
-2025-07-20 14:23:45,323 [INFO] (workflow.py:105)  ---------- 80 Start Learn ----------- 
-2025-07-20 14:23:45,801 [INFO] (model.py:668) Total Grad: 3.6515
-2025-07-20 14:23:45,878 [INFO] (workflow.py:105)  ---------- 83 Start Learn ----------- 
-2025-07-20 14:23:46,165 [INFO] (model.py:668) Total Grad: 8.5854
-2025-07-20 14:23:46,269 [INFO] (workflow.py:105)  ---------- 87 Start Learn ----------- 
-2025-07-20 14:23:47,275 [INFO] (model.py:668) Total Grad: 5.2305
-2025-07-20 14:23:47,387 [INFO] (workflow.py:105)  ---------- 90 Start Learn ----------- 
-2025-07-20 14:23:47,999 [INFO] (model.py:668) Total Grad: 8.2308
-2025-07-20 14:23:48,068 [INFO] (workflow.py:105)  ---------- 92 Start Learn ----------- 
-2025-07-20 14:23:48,284 [INFO] (model.py:668) Total Grad: 7.8424
-2025-07-20 14:23:48,354 [INFO] (workflow.py:105)  ---------- 94 Start Learn ----------- 
-2025-07-20 14:23:49,032 [INFO] (model.py:668) Total Grad: 3.5348
-2025-07-20 14:23:49,032 [INFO] (workflow.py:111) reward 703.0
-2025-07-20 14:23:49,101 [INFO] (workflow.py:105)  ---------- 98 Start Learn ----------- 
-2025-07-20 14:23:49,760 [INFO] (model.py:668) Total Grad: 7.0355
-2025-07-20 14:23:49,851 [INFO] (workflow.py:105)  ---------- 101 Start Learn ----------- 
-2025-07-20 14:23:50,214 [INFO] (model.py:668) Total Grad: 8.5987
-2025-07-20 14:23:50,280 [INFO] (workflow.py:105)  ---------- 104 Start Learn ----------- 
-2025-07-20 14:23:50,636 [INFO] (model.py:668) Total Grad: 5.8996
-2025-07-20 14:23:50,722 [INFO] (workflow.py:105)  ---------- 107 Start Learn ----------- 
-2025-07-20 14:23:51,450 [INFO] (model.py:668) Total Grad: 7.0445
-2025-07-20 14:23:51,529 [INFO] (workflow.py:105)  ---------- 110 Start Learn ----------- 
-2025-07-20 14:23:51,949 [INFO] (model.py:668) Total Grad: 7.6822
-2025-07-20 14:23:52,035 [INFO] (workflow.py:105)  ---------- 114 Start Learn ----------- 
-2025-07-20 14:23:52,867 [INFO] (model.py:668) Total Grad: 5.3392
-2025-07-20 14:23:52,937 [INFO] (workflow.py:105)  ---------- 116 Start Learn ----------- 
-2025-07-20 14:23:53,539 [INFO] (model.py:668) Total Grad: 5.3358
-2025-07-20 14:23:53,608 [INFO] (workflow.py:105)  ---------- 119 Start Learn ----------- 
-2025-07-20 14:23:54,001 [INFO] (model.py:668) Total Grad: 7.8873
-2025-07-20 14:23:54,101 [INFO] (workflow.py:105)  ---------- 122 Start Learn ----------- 
-2025-07-20 14:23:54,300 [INFO] (model.py:668) Total Grad: 9.3647
-2025-07-20 14:23:54,406 [INFO] (workflow.py:105)  ---------- 126 Start Learn ----------- 
-2025-07-20 14:23:55,367 [INFO] (model.py:668) Total Grad: 6.6850
-2025-07-20 14:23:55,367 [INFO] (workflow.py:111) reward 829.0
-2025-07-20 14:23:55,448 [INFO] (workflow.py:105)  ---------- 130 Start Learn ----------- 
-2025-07-20 14:23:55,914 [INFO] (model.py:668) Total Grad: 6.2431
-2025-07-20 14:23:56,002 [INFO] (workflow.py:105)  ---------- 134 Start Learn ----------- 
-2025-07-20 14:23:56,255 [INFO] (model.py:668) Total Grad: 7.7482
-2025-07-20 14:23:56,350 [INFO] (workflow.py:105)  ---------- 136 Start Learn ----------- 
-2025-07-20 14:23:56,793 [INFO] (model.py:668) Total Grad: 7.0683
-2025-07-20 14:23:56,885 [INFO] (workflow.py:105)  ---------- 140 Start Learn ----------- 
-2025-07-20 14:23:57,509 [INFO] (model.py:668) Total Grad: 7.4823
-2025-07-20 14:23:57,607 [INFO] (workflow.py:105)  ---------- 144 Start Learn ----------- 
-2025-07-20 14:23:57,877 [INFO] (model.py:668) Total Grad: 7.9956
-2025-07-20 14:23:58,023 [INFO] (workflow.py:105)  ---------- 147 Start Learn ----------- 
-2025-07-20 14:23:58,941 [INFO] (model.py:668) Total Grad: 8.5099
-2025-07-20 14:23:59,031 [INFO] (workflow.py:105)  ---------- 151 Start Learn ----------- 
-2025-07-20 14:23:59,376 [INFO] (model.py:668) Total Grad: 8.5792
-2025-07-20 14:23:59,464 [INFO] (workflow.py:105)  ---------- 153 Start Learn ----------- 
-2025-07-20 14:24:00,259 [INFO] (model.py:668) Total Grad: 3.1367
-2025-07-20 14:24:00,334 [INFO] (workflow.py:105)  ---------- 155 Start Learn ----------- 
-2025-07-20 14:24:00,654 [INFO] (model.py:668) Total Grad: 9.2739
-2025-07-20 14:24:00,766 [INFO] (workflow.py:105)  ---------- 158 Start Learn ----------- 
-2025-07-20 14:24:01,144 [INFO] (model.py:668) Total Grad: 10.0282
-2025-07-20 14:24:01,208 [INFO] (workflow.py:105)  ---------- 161 Start Learn ----------- 
-2025-07-20 14:24:02,211 [INFO] (model.py:668) Total Grad: 2.8077
-2025-07-20 14:24:02,211 [INFO] (workflow.py:111) reward 978.0
-2025-07-20 14:24:02,306 [INFO] (workflow.py:105)  ---------- 165 Start Learn ----------- 
-2025-07-20 14:24:02,995 [INFO] (model.py:668) Total Grad: 6.8090
-2025-07-20 14:24:03,073 [INFO] (workflow.py:105)  ---------- 169 Start Learn ----------- 
-2025-07-20 14:24:03,416 [INFO] (model.py:668) Total Grad: 8.6650
-2025-07-20 14:24:03,488 [INFO] (workflow.py:105)  ---------- 173 Start Learn ----------- 
-2025-07-20 14:24:04,319 [INFO] (model.py:668) Total Grad: 3.6418
-2025-07-20 14:24:04,402 [INFO] (workflow.py:105)  ---------- 177 Start Learn ----------- 
-2025-07-20 14:24:05,008 [INFO] (model.py:668) Total Grad: 6.0402
-2025-07-20 14:24:05,105 [INFO] (workflow.py:105)  ---------- 179 Start Learn ----------- 
-2025-07-20 14:24:05,329 [INFO] (model.py:668) Total Grad: 10.6250
-2025-07-20 14:24:05,408 [INFO] (workflow.py:105)  ---------- 181 Start Learn ----------- 
-2025-07-20 14:24:05,830 [INFO] (model.py:668) Total Grad: 5.4093
-2025-07-20 14:24:05,909 [INFO] (workflow.py:105)  ---------- 183 Start Learn ----------- 
-2025-07-20 14:24:06,428 [INFO] (model.py:668) Total Grad: 5.8482
-2025-07-20 14:24:06,505 [INFO] (workflow.py:105)  ---------- 187 Start Learn ----------- 
-2025-07-20 14:24:06,900 [INFO] (model.py:668) Total Grad: 7.2510
-2025-07-20 14:24:07,012 [INFO] (workflow.py:105)  ---------- 190 Start Learn ----------- 
-2025-07-20 14:24:07,731 [INFO] (model.py:668) Total Grad: 7.3612
-2025-07-20 14:24:07,822 [INFO] (workflow.py:105)  ---------- 194 Start Learn ----------- 
-2025-07-20 14:24:08,515 [INFO] (model.py:668) Total Grad: 7.7719
-2025-07-20 14:24:08,515 [INFO] (workflow.py:111) reward 891.0
-2025-07-20 14:24:08,599 [INFO] (workflow.py:105)  ---------- 196 Start Learn ----------- 
-2025-07-20 14:24:08,772 [INFO] (model.py:668) Total Grad: 9.6100
-2025-07-20 14:24:08,869 [INFO] (workflow.py:105)  ---------- 199 Start Learn ----------- 
-2025-07-20 14:24:09,593 [INFO] (model.py:668) Total Grad: 7.1296
-2025-07-20 14:24:09,694 [INFO] (workflow.py:105)  ---------- 204 Start Learn ----------- 
-2025-07-20 14:24:10,366 [INFO] (model.py:668) Total Grad: 7.5594
-2025-07-20 14:24:10,438 [INFO] (workflow.py:105)  ---------- 206 Start Learn ----------- 
-2025-07-20 14:24:11,002 [INFO] (model.py:668) Total Grad: 5.9282
-2025-07-20 14:24:11,155 [INFO] (workflow.py:105)  ---------- 211 Start Learn ----------- 
-2025-07-20 14:24:12,106 [INFO] (model.py:668) Total Grad: 7.3482
-2025-07-20 14:24:12,176 [INFO] (workflow.py:105)  ---------- 213 Start Learn ----------- 
-2025-07-20 14:24:12,362 [INFO] (model.py:668) Total Grad: 11.1001
-2025-07-20 14:24:12,492 [INFO] (workflow.py:105)  ---------- 216 Start Learn ----------- 
-2025-07-20 14:24:13,045 [INFO] (model.py:668) Total Grad: 5.5163
-2025-07-20 14:24:13,128 [INFO] (workflow.py:105)  ---------- 220 Start Learn ----------- 
-2025-07-20 14:24:13,695 [INFO] (model.py:668) Total Grad: 7.5838
-2025-07-20 14:24:13,772 [INFO] (workflow.py:105)  ---------- 222 Start Learn ----------- 
-2025-07-20 14:24:14,514 [INFO] (model.py:668) Total Grad: 2.8485
-2025-07-20 14:24:14,528 [INFO] (workflow.py:111) reward 864.0
-2025-07-20 14:24:14,592 [INFO] (workflow.py:105)  ---------- 225 Start Learn ----------- 
-2025-07-20 14:24:15,482 [INFO] (model.py:668) Total Grad: 5.6762
-2025-07-20 14:24:15,565 [INFO] (workflow.py:105)  ---------- 228 Start Learn ----------- 
-2025-07-20 14:24:16,141 [INFO] (model.py:668) Total Grad: 7.5882
-2025-07-20 14:24:16,210 [INFO] (workflow.py:105)  ---------- 230 Start Learn ----------- 
-2025-07-20 14:24:16,486 [INFO] (model.py:668) Total Grad: 9.2172
-2025-07-20 14:24:16,585 [INFO] (workflow.py:105)  ---------- 234 Start Learn ----------- 
-2025-07-20 14:24:17,568 [INFO] (model.py:668) Total Grad: 5.6006
-2025-07-20 14:24:17,656 [INFO] (workflow.py:105)  ---------- 236 Start Learn ----------- 
-2025-07-20 14:24:18,143 [INFO] (model.py:668) Total Grad: 6.8228
-2025-07-20 14:24:18,238 [INFO] (workflow.py:105)  ---------- 240 Start Learn ----------- 
-2025-07-20 14:24:18,681 [INFO] (model.py:668) Total Grad: 8.3249
-2025-07-20 14:24:18,759 [INFO] (workflow.py:105)  ---------- 242 Start Learn ----------- 
-2025-07-20 14:24:18,841 [INFO] (workflow.py:105)  ---------- 245 Start Learn ----------- 
-2025-07-20 14:24:19,542 [INFO] (model.py:668) Total Grad: 7.1456
-2025-07-20 14:24:19,623 [INFO] (workflow.py:105)  ---------- 247 Start Learn ----------- 
-2025-07-20 14:24:19,965 [INFO] (model.py:668) Total Grad: 6.8517
-2025-07-20 14:24:20,056 [INFO] (workflow.py:105)  ---------- 250 Start Learn ----------- 
-2025-07-20 14:24:20,242 [INFO] (model.py:668) Total Grad: 6.5453
-2025-07-20 14:24:20,338 [INFO] (workflow.py:105)  ---------- 254 Start Learn ----------- 
-2025-07-20 14:24:24,846 [INFO] (model.py:668) Total Grad: 6.9977
-2025-07-20 14:24:24,848 [INFO] (workflow.py:111) reward 848.0
-2025-07-20 14:24:25,277 [INFO] (workflow.py:105)  ---------- 256 Start Learn ----------- 
-2025-07-20 14:24:27,147 [INFO] (model.py:668) Total Grad: 7.7659
-2025-07-20 14:24:27,902 [INFO] (workflow.py:105)  ---------- 259 Start Learn ----------- 
-2025-07-20 14:24:30,151 [INFO] (model.py:668) Total Grad: 10.0379
-2025-07-20 14:24:30,703 [INFO] (workflow.py:105)  ---------- 262 Start Learn ----------- 
-2025-07-20 14:24:35,224 [INFO] (model.py:668) Total Grad: 7.3340
-2025-07-20 14:24:35,226 [INFO] (workflow.py:111) reward 243.0
-2025-07-20 14:24:35,746 [INFO] (workflow.py:105)  ---------- 265 Start Learn ----------- 
-2025-07-20 14:24:40,008 [INFO] (model.py:668) Total Grad: 6.0836
-2025-07-20 14:24:40,635 [INFO] (workflow.py:105)  ---------- 269 Start Learn ----------- 
-2025-07-20 14:24:43,236 [INFO] (model.py:668) Total Grad: 9.0918
-2025-07-20 14:24:43,239 [INFO] (workflow.py:111) reward 154.0
-2025-07-20 14:24:43,743 [INFO] (workflow.py:105)  ---------- 272 Start Learn ----------- 
-2025-07-20 14:24:50,952 [INFO] (model.py:668) Total Grad: 3.2484
-2025-07-20 14:24:50,956 [INFO] (workflow.py:111) reward 66.0
-2025-07-20 14:24:51,564 [INFO] (workflow.py:105)  ---------- 273 Start Learn ----------- 
-2025-07-20 14:24:52,097 [INFO] (workflow.py:105)  ---------- 277 Start Learn ----------- 
-2025-07-20 14:24:54,535 [INFO] (model.py:668) Total Grad: 7.8464
-2025-07-20 14:24:55,158 [INFO] (workflow.py:105)  ---------- 279 Start Learn ----------- 
-2025-07-20 14:25:00,039 [INFO] (model.py:668) Total Grad: 4.8423
-2025-07-20 14:25:00,044 [INFO] (workflow.py:111) reward 237.0
-2025-07-20 14:25:00,509 [INFO] (workflow.py:105)  ---------- 282 Start Learn ----------- 
-2025-07-20 14:25:05,577 [INFO] (model.py:668) Total Grad: 6.7440
-2025-07-20 14:25:06,077 [INFO] (workflow.py:105)  ---------- 284 Start Learn ----------- 
-2025-07-20 14:25:08,923 [INFO] (model.py:668) Total Grad: 6.3612
-2025-07-20 14:25:08,926 [INFO] (workflow.py:111) reward 141.0
-2025-07-20 14:25:09,686 [INFO] (workflow.py:105)  ---------- 287 Start Learn ----------- 
-2025-07-20 14:25:11,540 [INFO] (model.py:668) Total Grad: 9.4103
-2025-07-20 14:25:12,301 [INFO] (workflow.py:105)  ---------- 290 Start Learn ----------- 
-2025-07-20 14:25:16,105 [INFO] (model.py:668) Total Grad: 8.5621
-2025-07-20 14:25:16,107 [INFO] (workflow.py:111) reward 207.0
-2025-07-20 14:25:16,579 [INFO] (workflow.py:105)  ---------- 292 Start Learn ----------- 
-2025-07-20 14:25:19,458 [INFO] (model.py:668) Total Grad: 5.8324
-2025-07-20 14:25:20,041 [INFO] (workflow.py:105)  ---------- 295 Start Learn ----------- 
-2025-07-20 14:25:26,478 [INFO] (model.py:668) Total Grad: 6.0298
-2025-07-20 14:25:26,478 [INFO] (workflow.py:111) reward 146.0
-2025-07-20 14:25:26,605 [INFO] (workflow.py:105)  ---------- 297 Start Learn ----------- 
-2025-07-20 14:25:27,458 [INFO] (model.py:668) Total Grad: 5.5844
-2025-07-20 14:25:27,511 [INFO] (workflow.py:125) Train Over
-2025-07-20 14:25:57,514 [INFO] (workflow.py:129) Training Time for 300 episodes: 147.52511620521545 s
+2025-07-20 15:17:41,939 [INFO] (workflow.py:36) Start Training...
+2025-07-20 15:17:42,330 [INFO] (workflow.py:108)  ---------- 15 Start Learn ----------- 
+2025-07-20 15:17:45,411 [INFO] (model.py:671) Total Grad: 7.1785
+2025-07-20 15:17:45,513 [INFO] (workflow.py:108)  ---------- 21 Start Learn ----------- 
+2025-07-20 15:17:46,864 [INFO] (model.py:671) Total Grad: 4.3728
+2025-07-20 15:17:46,994 [INFO] (workflow.py:108)  ---------- 27 Start Learn ----------- 
+2025-07-20 15:17:48,028 [INFO] (model.py:671) Total Grad: 4.8534
+2025-07-20 15:17:48,028 [INFO] (workflow.py:115) reward 14.8929
+2025-07-20 15:17:48,150 [INFO] (workflow.py:108)  ---------- 31 Start Learn ----------- 
+2025-07-20 15:17:48,666 [INFO] (model.py:671) Total Grad: 7.9677
+2025-07-20 15:17:48,771 [INFO] (workflow.py:108)  ---------- 35 Start Learn ----------- 
+2025-07-20 15:17:50,151 [INFO] (model.py:671) Total Grad: 5.4015
+2025-07-20 15:17:50,271 [INFO] (workflow.py:108)  ---------- 39 Start Learn ----------- 
+2025-07-20 15:17:51,483 [INFO] (model.py:671) Total Grad: 6.1325
+2025-07-20 15:17:51,597 [INFO] (workflow.py:108)  ---------- 43 Start Learn ----------- 
+2025-07-20 15:17:52,355 [INFO] (model.py:671) Total Grad: 6.2438
+2025-07-20 15:17:52,476 [INFO] (workflow.py:108)  ---------- 47 Start Learn ----------- 
+2025-07-20 15:17:53,649 [INFO] (model.py:671) Total Grad: 6.2695
+2025-07-20 15:17:53,761 [INFO] (workflow.py:108)  ---------- 53 Start Learn ----------- 
+2025-07-20 15:17:54,484 [INFO] (model.py:671) Total Grad: 5.2974
+2025-07-20 15:17:54,484 [INFO] (workflow.py:115) reward 17.6923
+2025-07-20 15:17:54,598 [INFO] (workflow.py:108)  ---------- 58 Start Learn ----------- 
+2025-07-20 15:17:55,311 [INFO] (model.py:671) Total Grad: 5.8765
+2025-07-20 15:17:55,417 [INFO] (workflow.py:108)  ---------- 63 Start Learn ----------- 
+2025-07-20 15:17:55,686 [INFO] (model.py:671) Total Grad: 6.4633
+2025-07-20 15:17:55,800 [INFO] (workflow.py:108)  ---------- 65 Start Learn ----------- 
+2025-07-20 15:17:56,509 [INFO] (model.py:671) Total Grad: 8.9435
+2025-07-20 15:17:56,634 [INFO] (workflow.py:108)  ---------- 70 Start Learn ----------- 
+2025-07-20 15:17:57,468 [INFO] (model.py:671) Total Grad: 5.7035
+2025-07-20 15:17:57,584 [INFO] (workflow.py:108)  ---------- 75 Start Learn ----------- 
+2025-07-20 15:17:57,933 [INFO] (model.py:671) Total Grad: 5.5312
+2025-07-20 15:17:58,074 [INFO] (workflow.py:108)  ---------- 81 Start Learn ----------- 
+2025-07-20 15:17:59,337 [INFO] (model.py:671) Total Grad: 4.9309
+2025-07-20 15:17:59,446 [INFO] (workflow.py:108)  ---------- 87 Start Learn ----------- 
+2025-07-20 15:18:00,236 [INFO] (model.py:671) Total Grad: 5.4239
+2025-07-20 15:18:00,348 [INFO] (workflow.py:108)  ---------- 92 Start Learn ----------- 
+2025-07-20 15:18:00,800 [INFO] (model.py:671) Total Grad: 5.4340
+2025-07-20 15:18:00,800 [INFO] (workflow.py:115) reward 15.9487
+2025-07-20 15:18:00,893 [INFO] (workflow.py:108)  ---------- 97 Start Learn ----------- 
+2025-07-20 15:18:02,012 [INFO] (model.py:671) Total Grad: 4.7169
+2025-07-20 15:18:02,116 [INFO] (workflow.py:108)  ---------- 101 Start Learn ----------- 
+2025-07-20 15:18:03,094 [INFO] (model.py:671) Total Grad: 5.5634
+2025-07-20 15:18:03,189 [INFO] (workflow.py:108)  ---------- 104 Start Learn ----------- 
+2025-07-20 15:18:03,666 [INFO] (model.py:671) Total Grad: 8.0872
+2025-07-20 15:18:03,778 [INFO] (workflow.py:108)  ---------- 109 Start Learn ----------- 
+2025-07-20 15:18:04,230 [INFO] (model.py:671) Total Grad: 5.5224
+2025-07-20 15:18:04,335 [INFO] (workflow.py:108)  ---------- 112 Start Learn ----------- 
+2025-07-20 15:18:05,448 [INFO] (model.py:671) Total Grad: 6.1310
+2025-07-20 15:18:05,574 [INFO] (workflow.py:108)  ---------- 117 Start Learn ----------- 
+2025-07-20 15:18:06,799 [INFO] (model.py:671) Total Grad: 5.1596
+2025-07-20 15:18:06,863 [INFO] (workflow.py:115) reward 17.1154
+2025-07-20 15:18:06,908 [INFO] (workflow.py:108)  ---------- 120 Start Learn ----------- 
+2025-07-20 15:18:07,669 [INFO] (model.py:671) Total Grad: 6.7338
+2025-07-20 15:18:07,833 [INFO] (workflow.py:108)  ---------- 125 Start Learn ----------- 
+2025-07-20 15:18:08,265 [INFO] (model.py:671) Total Grad: 7.4264
+2025-07-20 15:18:08,368 [INFO] (workflow.py:108)  ---------- 129 Start Learn ----------- 
+2025-07-20 15:18:09,822 [INFO] (model.py:671) Total Grad: 5.1723
+2025-07-20 15:18:09,956 [INFO] (workflow.py:108)  ---------- 134 Start Learn ----------- 
+2025-07-20 15:18:10,985 [INFO] (model.py:671) Total Grad: 5.3150
+2025-07-20 15:18:11,098 [INFO] (workflow.py:108)  ---------- 139 Start Learn ----------- 
+2025-07-20 15:18:11,494 [INFO] (model.py:671) Total Grad: 5.7306
+2025-07-20 15:18:11,599 [INFO] (workflow.py:108)  ---------- 144 Start Learn ----------- 
+2025-07-20 15:18:13,002 [INFO] (model.py:671) Total Grad: 3.3864
+2025-07-20 15:18:13,002 [INFO] (workflow.py:115) reward 15.8077
+2025-07-20 15:18:13,100 [INFO] (workflow.py:108)  ---------- 148 Start Learn ----------- 
+2025-07-20 15:18:14,473 [INFO] (model.py:671) Total Grad: 6.0535
+2025-07-20 15:18:14,588 [INFO] (workflow.py:108)  ---------- 153 Start Learn ----------- 
+2025-07-20 15:18:15,188 [INFO] (model.py:671) Total Grad: 6.5316
+2025-07-20 15:18:15,304 [INFO] (workflow.py:108)  ---------- 158 Start Learn ----------- 
+2025-07-20 15:18:15,509 [INFO] (model.py:671) Total Grad: 5.1386
+2025-07-20 15:18:15,620 [INFO] (workflow.py:108)  ---------- 162 Start Learn ----------- 
+2025-07-20 15:18:16,775 [INFO] (model.py:671) Total Grad: 7.4561
+2025-07-20 15:18:16,887 [INFO] (workflow.py:108)  ---------- 166 Start Learn ----------- 
+2025-07-20 15:18:17,493 [INFO] (model.py:671) Total Grad: 5.5769
+2025-07-20 15:18:17,602 [INFO] (workflow.py:108)  ---------- 171 Start Learn ----------- 
+2025-07-20 15:18:18,042 [INFO] (model.py:671) Total Grad: 5.4518
+2025-07-20 15:18:18,147 [INFO] (workflow.py:108)  ---------- 176 Start Learn ----------- 
+2025-07-20 15:18:19,215 [INFO] (model.py:671) Total Grad: 4.0786
+2025-07-20 15:18:19,215 [INFO] (workflow.py:115) reward 15.7812
+2025-07-20 15:18:19,331 [INFO] (workflow.py:108)  ---------- 180 Start Learn ----------- 
+2025-07-20 15:18:20,717 [INFO] (model.py:671) Total Grad: 5.7251
+2025-07-20 15:18:20,855 [INFO] (workflow.py:108)  ---------- 185 Start Learn ----------- 
+2025-07-20 15:18:21,554 [INFO] (model.py:671) Total Grad: 5.6694
+2025-07-20 15:18:21,673 [INFO] (workflow.py:108)  ---------- 191 Start Learn ----------- 
+2025-07-20 15:18:23,055 [INFO] (model.py:671) Total Grad: 4.5126
+2025-07-20 15:18:23,171 [INFO] (workflow.py:108)  ---------- 197 Start Learn ----------- 
+2025-07-20 15:18:24,309 [INFO] (model.py:671) Total Grad: 4.8167
+2025-07-20 15:18:24,436 [INFO] (workflow.py:108)  ---------- 201 Start Learn ----------- 
+2025-07-20 15:18:25,386 [INFO] (model.py:671) Total Grad: 6.8014
+2025-07-20 15:18:25,386 [INFO] (workflow.py:115) reward 15.3600
+2025-07-20 15:18:25,495 [INFO] (workflow.py:108)  ---------- 206 Start Learn ----------- 
+2025-07-20 15:18:25,908 [INFO] (model.py:671) Total Grad: 6.7339
+2025-07-20 15:18:26,009 [INFO] (workflow.py:108)  ---------- 210 Start Learn ----------- 
+2025-07-20 15:18:27,248 [INFO] (model.py:671) Total Grad: 5.8014
+2025-07-20 15:18:27,342 [INFO] (workflow.py:108)  ---------- 215 Start Learn ----------- 
+2025-07-20 15:18:28,167 [INFO] (model.py:671) Total Grad: 5.0810
+2025-07-20 15:18:28,279 [INFO] (workflow.py:108)  ---------- 220 Start Learn ----------- 
+2025-07-20 15:18:28,966 [INFO] (model.py:671) Total Grad: 6.1954
+2025-07-20 15:18:29,075 [INFO] (workflow.py:108)  ---------- 225 Start Learn ----------- 
+2025-07-20 15:18:30,258 [INFO] (model.py:671) Total Grad: 4.9681
+2025-07-20 15:18:30,392 [INFO] (workflow.py:108)  ---------- 230 Start Learn ----------- 
+2025-07-20 15:18:31,443 [INFO] (model.py:671) Total Grad: 5.7757
+2025-07-20 15:18:31,443 [INFO] (workflow.py:115) reward 15.5862
+2025-07-20 15:18:31,541 [INFO] (workflow.py:108)  ---------- 233 Start Learn ----------- 
+2025-07-20 15:18:32,350 [INFO] (model.py:671) Total Grad: 5.0565
+2025-07-20 15:18:32,468 [INFO] (workflow.py:108)  ---------- 238 Start Learn ----------- 
+2025-07-20 15:18:32,850 [INFO] (model.py:671) Total Grad: 8.0863
+2025-07-20 15:18:32,979 [INFO] (workflow.py:108)  ---------- 244 Start Learn ----------- 
+2025-07-20 15:18:33,986 [INFO] (model.py:671) Total Grad: 4.9605
+2025-07-20 15:18:34,104 [INFO] (workflow.py:108)  ---------- 249 Start Learn ----------- 
+2025-07-20 15:18:35,070 [INFO] (model.py:671) Total Grad: 4.4055
+2025-07-20 15:18:35,170 [INFO] (workflow.py:108)  ---------- 254 Start Learn ----------- 
+2025-07-20 15:18:35,718 [INFO] (model.py:671) Total Grad: 4.6631
+2025-07-20 15:18:35,838 [INFO] (workflow.py:108)  ---------- 259 Start Learn ----------- 
+2025-07-20 15:18:36,834 [INFO] (model.py:671) Total Grad: 5.8095
+2025-07-20 15:18:36,955 [INFO] (workflow.py:108)  ---------- 265 Start Learn ----------- 
+2025-07-20 15:18:37,722 [INFO] (model.py:671) Total Grad: 5.6309
+2025-07-20 15:18:37,722 [INFO] (workflow.py:115) reward 14.6571
+2025-07-20 15:18:37,828 [INFO] (workflow.py:108)  ---------- 270 Start Learn ----------- 
+2025-07-20 15:18:38,486 [INFO] (model.py:671) Total Grad: 5.0219
+2025-07-20 15:18:38,588 [INFO] (workflow.py:108)  ---------- 274 Start Learn ----------- 
+2025-07-20 15:18:38,899 [INFO] (model.py:671) Total Grad: 8.4874
+2025-07-20 15:18:39,005 [INFO] (workflow.py:108)  ---------- 279 Start Learn ----------- 
+2025-07-20 15:18:40,172 [INFO] (model.py:671) Total Grad: 6.6910
+2025-07-20 15:18:40,303 [INFO] (workflow.py:108)  ---------- 283 Start Learn ----------- 
+2025-07-20 15:18:41,371 [INFO] (model.py:671) Total Grad: 7.3984
+2025-07-20 15:18:41,505 [INFO] (workflow.py:108)  ---------- 287 Start Learn ----------- 
+2025-07-20 15:18:41,921 [INFO] (model.py:671) Total Grad: 7.0475
+2025-07-20 15:18:42,043 [INFO] (workflow.py:108)  ---------- 293 Start Learn ----------- 
+2025-07-20 15:18:43,254 [INFO] (model.py:671) Total Grad: 4.8987
+2025-07-20 15:18:43,382 [INFO] (workflow.py:108)  ---------- 299 Start Learn ----------- 
+2025-07-20 15:18:44,338 [INFO] (model.py:671) Total Grad: 5.0172
+2025-07-20 15:18:44,338 [INFO] (workflow.py:115) reward 16.0000
+2025-07-20 15:18:44,446 [INFO] (workflow.py:108)  ---------- 304 Start Learn ----------- 
+2025-07-20 15:18:45,165 [INFO] (model.py:671) Total Grad: 5.3891
+2025-07-20 15:18:45,265 [INFO] (workflow.py:108)  ---------- 307 Start Learn ----------- 
+2025-07-20 15:18:46,437 [INFO] (model.py:671) Total Grad: 5.5002
+2025-07-20 15:18:46,543 [INFO] (workflow.py:108)  ---------- 312 Start Learn ----------- 
+2025-07-20 15:18:47,644 [INFO] (model.py:671) Total Grad: 5.7867
+2025-07-20 15:18:47,764 [INFO] (workflow.py:108)  ---------- 317 Start Learn ----------- 
+2025-07-20 15:18:48,573 [INFO] (model.py:671) Total Grad: 5.0946
+2025-07-20 15:18:48,685 [INFO] (workflow.py:108)  ---------- 322 Start Learn ----------- 
+2025-07-20 15:18:49,170 [INFO] (model.py:671) Total Grad: 7.8623
+2025-07-20 15:18:49,295 [INFO] (workflow.py:108)  ---------- 328 Start Learn ----------- 
+2025-07-20 15:18:50,646 [INFO] (model.py:671) Total Grad: 3.4836
+2025-07-20 15:18:50,649 [INFO] (workflow.py:115) reward 14.8966
+2025-07-20 15:18:50,771 [INFO] (workflow.py:108)  ---------- 334 Start Learn ----------- 
+2025-07-20 15:18:51,848 [INFO] (model.py:671) Total Grad: 4.8553
+2025-07-20 15:18:51,954 [INFO] (workflow.py:108)  ---------- 339 Start Learn ----------- 
+2025-07-20 15:18:52,454 [INFO] (model.py:671) Total Grad: 5.1278
+2025-07-20 15:18:52,565 [INFO] (workflow.py:108)  ---------- 344 Start Learn ----------- 
+2025-07-20 15:18:53,746 [INFO] (model.py:671) Total Grad: 5.0813
+2025-07-20 15:18:53,839 [INFO] (workflow.py:108)  ---------- 349 Start Learn ----------- 
+2025-07-20 15:18:55,067 [INFO] (model.py:671) Total Grad: 4.2489
+2025-07-20 15:18:55,205 [INFO] (workflow.py:108)  ---------- 353 Start Learn ----------- 
+2025-07-20 15:18:56,343 [INFO] (model.py:671) Total Grad: 5.8095
+2025-07-20 15:18:56,464 [INFO] (workflow.py:108)  ---------- 358 Start Learn ----------- 
+2025-07-20 15:18:57,094 [INFO] (model.py:671) Total Grad: 6.7418
+2025-07-20 15:18:57,097 [INFO] (workflow.py:115) reward 14.3667
+2025-07-20 15:18:57,224 [INFO] (workflow.py:108)  ---------- 363 Start Learn ----------- 
+2025-07-20 15:18:58,439 [INFO] (model.py:671) Total Grad: 5.2653
+2025-07-20 15:18:58,541 [INFO] (workflow.py:108)  ---------- 368 Start Learn ----------- 
+2025-07-20 15:18:59,441 [INFO] (model.py:671) Total Grad: 5.1377
+2025-07-20 15:18:59,556 [INFO] (workflow.py:108)  ---------- 373 Start Learn ----------- 
+2025-07-20 15:18:59,855 [INFO] (model.py:671) Total Grad: 6.8801
+2025-07-20 15:18:59,967 [INFO] (workflow.py:108)  ---------- 378 Start Learn ----------- 
+2025-07-20 15:19:00,252 [INFO] (model.py:671) Total Grad: 5.9114
+2025-07-20 15:19:00,357 [INFO] (workflow.py:108)  ---------- 383 Start Learn ----------- 
+2025-07-20 15:19:01,520 [INFO] (model.py:671) Total Grad: 5.9989
+2025-07-20 15:19:01,645 [INFO] (workflow.py:108)  ---------- 387 Start Learn ----------- 
+2025-07-20 15:19:02,511 [INFO] (model.py:671) Total Grad: 4.6779
+2025-07-20 15:19:02,621 [INFO] (workflow.py:108)  ---------- 393 Start Learn ----------- 
+2025-07-20 15:19:03,090 [INFO] (model.py:671) Total Grad: 5.5737
+2025-07-20 15:19:03,103 [INFO] (workflow.py:115) reward 14.0556
+2025-07-20 15:19:03,208 [INFO] (workflow.py:108)  ---------- 397 Start Learn ----------- 
+2025-07-20 15:19:04,390 [INFO] (model.py:671) Total Grad: 5.3276
+2025-07-20 15:19:04,491 [INFO] (workflow.py:108)  ---------- 401 Start Learn ----------- 
+2025-07-20 15:19:05,461 [INFO] (model.py:671) Total Grad: 5.9925
+2025-07-20 15:19:05,579 [INFO] (workflow.py:108)  ---------- 407 Start Learn ----------- 
+2025-07-20 15:19:06,138 [INFO] (model.py:671) Total Grad: 5.5411
+2025-07-20 15:19:06,260 [INFO] (workflow.py:108)  ---------- 411 Start Learn ----------- 
+2025-07-20 15:19:06,737 [INFO] (model.py:671) Total Grad: 9.1615
+2025-07-20 15:19:06,847 [INFO] (workflow.py:108)  ---------- 416 Start Learn ----------- 
+2025-07-20 15:19:08,338 [INFO] (model.py:671) Total Grad: 5.1081
+2025-07-20 15:19:08,470 [INFO] (workflow.py:108)  ---------- 421 Start Learn ----------- 
+2025-07-20 15:19:09,383 [INFO] (model.py:671) Total Grad: 5.6426
+2025-07-20 15:19:09,383 [INFO] (workflow.py:115) reward 15.9259
+2025-07-20 15:19:09,573 [INFO] (workflow.py:108)  ---------- 427 Start Learn ----------- 
+2025-07-20 15:19:10,234 [INFO] (model.py:671) Total Grad: 5.4884
+2025-07-20 15:19:10,366 [INFO] (workflow.py:108)  ---------- 434 Start Learn ----------- 
+2025-07-20 15:19:11,806 [INFO] (model.py:671) Total Grad: 4.1135
+2025-07-20 15:19:11,909 [INFO] (workflow.py:108)  ---------- 440 Start Learn ----------- 
+2025-07-20 15:19:12,783 [INFO] (model.py:671) Total Grad: 5.1487
+2025-07-20 15:19:12,890 [INFO] (workflow.py:108)  ---------- 447 Start Learn ----------- 
+2025-07-20 15:19:13,547 [INFO] (model.py:671) Total Grad: 4.6333
+2025-07-20 15:19:13,657 [INFO] (workflow.py:108)  ---------- 449 Start Learn ----------- 
+2025-07-20 15:19:13,921 [INFO] (model.py:671) Total Grad: 10.5599
+2025-07-20 15:19:14,046 [INFO] (workflow.py:108)  ---------- 454 Start Learn ----------- 
+2025-07-20 15:19:15,001 [INFO] (model.py:671) Total Grad: 4.8856
+2025-07-20 15:19:15,093 [INFO] (workflow.py:108)  ---------- 458 Start Learn ----------- 
+2025-07-20 15:19:16,080 [INFO] (model.py:671) Total Grad: 6.1295
+2025-07-20 15:19:16,080 [INFO] (workflow.py:115) reward 13.5946
+2025-07-20 15:19:16,195 [INFO] (workflow.py:108)  ---------- 462 Start Learn ----------- 
+2025-07-20 15:19:16,775 [INFO] (model.py:671) Total Grad: 7.0309
+2025-07-20 15:19:16,909 [INFO] (workflow.py:108)  ---------- 467 Start Learn ----------- 
+2025-07-20 15:19:18,179 [INFO] (model.py:671) Total Grad: 6.2724
+2025-07-20 15:19:18,286 [INFO] (workflow.py:108)  ---------- 472 Start Learn ----------- 
+2025-07-20 15:19:19,418 [INFO] (model.py:671) Total Grad: 4.9129
+2025-07-20 15:19:19,528 [INFO] (workflow.py:108)  ---------- 477 Start Learn ----------- 
+2025-07-20 15:19:20,205 [INFO] (model.py:671) Total Grad: 5.0850
+2025-07-20 15:19:20,310 [INFO] (workflow.py:108)  ---------- 482 Start Learn ----------- 
+2025-07-20 15:19:20,684 [INFO] (model.py:671) Total Grad: 7.1481
+2025-07-20 15:19:20,810 [INFO] (workflow.py:108)  ---------- 488 Start Learn ----------- 
+2025-07-20 15:19:22,408 [INFO] (model.py:671) Total Grad: 4.2364
+2025-07-20 15:19:22,408 [INFO] (workflow.py:115) reward 15.1667
+2025-07-20 15:19:22,514 [INFO] (workflow.py:108)  ---------- 492 Start Learn ----------- 
+2025-07-20 15:19:23,383 [INFO] (model.py:671) Total Grad: 6.4533
+2025-07-20 15:19:23,486 [INFO] (workflow.py:108)  ---------- 497 Start Learn ----------- 
+2025-07-20 15:19:23,897 [INFO] (model.py:671) Total Grad: 5.5379
+2025-07-20 15:19:24,028 [INFO] (workflow.py:108)  ---------- 502 Start Learn ----------- 
+2025-07-20 15:19:25,347 [INFO] (model.py:671) Total Grad: 4.5798
+2025-07-20 15:19:25,451 [INFO] (workflow.py:108)  ---------- 508 Start Learn ----------- 
+2025-07-20 15:19:26,296 [INFO] (model.py:671) Total Grad: 4.9252
+2025-07-20 15:19:26,480 [INFO] (workflow.py:108)  ---------- 511 Start Learn ----------- 
+2025-07-20 15:19:27,169 [INFO] (model.py:671) Total Grad: 7.0674
+2025-07-20 15:19:27,304 [INFO] (workflow.py:108)  ---------- 515 Start Learn ----------- 
+2025-07-20 15:19:27,618 [INFO] (model.py:671) Total Grad: 8.2721
+2025-07-20 15:19:27,735 [INFO] (workflow.py:108)  ---------- 521 Start Learn ----------- 
+2025-07-20 15:19:29,185 [INFO] (model.py:671) Total Grad: 4.5974
+2025-07-20 15:19:29,185 [INFO] (workflow.py:115) reward 15.3636
+2025-07-20 15:19:29,285 [INFO] (workflow.py:108)  ---------- 526 Start Learn ----------- 
+2025-07-20 15:19:30,085 [INFO] (model.py:671) Total Grad: 5.2540
+2025-07-20 15:19:30,198 [INFO] (workflow.py:108)  ---------- 531 Start Learn ----------- 
+2025-07-20 15:19:30,823 [INFO] (model.py:671) Total Grad: 6.1851
+2025-07-20 15:19:30,928 [INFO] (workflow.py:108)  ---------- 536 Start Learn ----------- 
+2025-07-20 15:19:32,328 [INFO] (model.py:671) Total Grad: 5.8214
+2025-07-20 15:19:32,431 [INFO] (workflow.py:108)  ---------- 540 Start Learn ----------- 
+2025-07-20 15:19:33,544 [INFO] (model.py:671) Total Grad: 6.4504
+2025-07-20 15:19:33,638 [INFO] (workflow.py:108)  ---------- 544 Start Learn ----------- 
+2025-07-20 15:19:34,298 [INFO] (model.py:671) Total Grad: 4.6365
+2025-07-20 15:19:34,393 [INFO] (workflow.py:108)  ---------- 549 Start Learn ----------- 
+2025-07-20 15:19:34,759 [INFO] (model.py:671) Total Grad: 6.2164
+2025-07-20 15:19:34,857 [INFO] (workflow.py:108)  ---------- 554 Start Learn ----------- 
+2025-07-20 15:19:36,209 [INFO] (model.py:671) Total Grad: 3.6228
+2025-07-20 15:19:36,209 [INFO] (workflow.py:115) reward 14.7273
+2025-07-20 15:19:36,318 [INFO] (workflow.py:108)  ---------- 558 Start Learn ----------- 
+2025-07-20 15:19:37,269 [INFO] (model.py:671) Total Grad: 6.2317
+2025-07-20 15:19:37,382 [INFO] (workflow.py:108)  ---------- 564 Start Learn ----------- 
+2025-07-20 15:19:37,981 [INFO] (model.py:671) Total Grad: 5.1245
+2025-07-20 15:19:38,108 [INFO] (workflow.py:108)  ---------- 570 Start Learn ----------- 
+2025-07-20 15:19:39,322 [INFO] (model.py:671) Total Grad: 4.7219
+2025-07-20 15:19:39,460 [INFO] (workflow.py:108)  ---------- 574 Start Learn ----------- 
+2025-07-20 15:19:40,275 [INFO] (model.py:671) Total Grad: 6.8119
+2025-07-20 15:19:40,378 [INFO] (workflow.py:108)  ---------- 579 Start Learn ----------- 
+2025-07-20 15:19:41,089 [INFO] (model.py:671) Total Grad: 5.0449
+2025-07-20 15:19:41,207 [INFO] (workflow.py:108)  ---------- 583 Start Learn ----------- 
+2025-07-20 15:19:41,607 [INFO] (model.py:671) Total Grad: 6.8955
+2025-07-20 15:19:41,722 [INFO] (workflow.py:108)  ---------- 588 Start Learn ----------- 
+2025-07-20 15:19:42,958 [INFO] (model.py:671) Total Grad: 4.6035
+2025-07-20 15:19:42,958 [INFO] (workflow.py:115) reward 15.2941
+2025-07-20 15:19:43,047 [INFO] (workflow.py:108)  ---------- 592 Start Learn ----------- 
+2025-07-20 15:19:44,338 [INFO] (model.py:671) Total Grad: 6.2782
+2025-07-20 15:19:44,449 [INFO] (workflow.py:108)  ---------- 597 Start Learn ----------- 
+2025-07-20 15:19:44,998 [INFO] (model.py:671) Total Grad: 5.2802
+2025-07-20 15:19:45,111 [INFO] (workflow.py:108)  ---------- 602 Start Learn ----------- 
+2025-07-20 15:19:46,196 [INFO] (model.py:671) Total Grad: 5.6232
+2025-07-20 15:19:46,318 [INFO] (workflow.py:108)  ---------- 607 Start Learn ----------- 
+2025-07-20 15:19:47,554 [INFO] (model.py:671) Total Grad: 6.3091
+2025-07-20 15:19:47,651 [INFO] (workflow.py:108)  ---------- 612 Start Learn ----------- 
+2025-07-20 15:19:48,481 [INFO] (model.py:671) Total Grad: 6.3407
+2025-07-20 15:19:48,583 [INFO] (workflow.py:108)  ---------- 616 Start Learn ----------- 
+2025-07-20 15:19:49,049 [INFO] (model.py:671) Total Grad: 5.8906
+2025-07-20 15:19:49,050 [INFO] (workflow.py:115) reward 15.2143
+2025-07-20 15:19:49,154 [INFO] (workflow.py:108)  ---------- 621 Start Learn ----------- 
+2025-07-20 15:19:50,336 [INFO] (model.py:671) Total Grad: 5.4734
+2025-07-20 15:19:50,449 [INFO] (workflow.py:108)  ---------- 626 Start Learn ----------- 
+2025-07-20 15:19:51,396 [INFO] (model.py:671) Total Grad: 6.6263
+2025-07-20 15:19:51,511 [INFO] (workflow.py:108)  ---------- 632 Start Learn ----------- 
+2025-07-20 15:19:52,270 [INFO] (model.py:671) Total Grad: 4.5757
+2025-07-20 15:19:52,369 [INFO] (workflow.py:108)  ---------- 636 Start Learn ----------- 
+2025-07-20 15:19:52,606 [INFO] (model.py:671) Total Grad: 6.8357
+2025-07-20 15:19:52,713 [INFO] (workflow.py:108)  ---------- 641 Start Learn ----------- 
+2025-07-20 15:19:53,872 [INFO] (model.py:671) Total Grad: 6.2394
+2025-07-20 15:19:53,981 [INFO] (workflow.py:108)  ---------- 646 Start Learn ----------- 
+2025-07-20 15:19:54,715 [INFO] (model.py:671) Total Grad: 5.5202
+2025-07-20 15:19:54,821 [INFO] (workflow.py:108)  ---------- 652 Start Learn ----------- 
+2025-07-20 15:19:55,264 [INFO] (model.py:671) Total Grad: 5.6374
+2025-07-20 15:19:55,264 [INFO] (workflow.py:115) reward 13.9444
+2025-07-20 15:19:55,356 [INFO] (workflow.py:108)  ---------- 657 Start Learn ----------- 
+2025-07-20 15:19:56,740 [INFO] (model.py:671) Total Grad: 5.0242
+2025-07-20 15:19:56,838 [INFO] (workflow.py:108)  ---------- 663 Start Learn ----------- 
+2025-07-20 15:19:57,782 [INFO] (model.py:671) Total Grad: 4.3065
+2025-07-20 15:19:57,888 [INFO] (workflow.py:108)  ---------- 669 Start Learn ----------- 
+2025-07-20 15:19:58,577 [INFO] (model.py:671) Total Grad: 5.2463
+2025-07-20 15:19:58,675 [INFO] (workflow.py:108)  ---------- 674 Start Learn ----------- 
+2025-07-20 15:19:59,037 [INFO] (model.py:671) Total Grad: 5.4974
+2025-07-20 15:19:59,146 [INFO] (workflow.py:108)  ---------- 679 Start Learn ----------- 
+2025-07-20 15:20:00,370 [INFO] (model.py:671) Total Grad: 6.7476
+2025-07-20 15:20:00,513 [INFO] (workflow.py:108)  ---------- 684 Start Learn ----------- 
+2025-07-20 15:20:01,715 [INFO] (model.py:671) Total Grad: 5.5712
+2025-07-20 15:20:01,719 [INFO] (workflow.py:115) reward 13.3125
+2025-07-20 15:20:01,840 [INFO] (workflow.py:108)  ---------- 690 Start Learn ----------- 
+2025-07-20 15:20:02,419 [INFO] (model.py:671) Total Grad: 5.1667
+2025-07-20 15:20:02,535 [INFO] (workflow.py:108)  ---------- 694 Start Learn ----------- 
+2025-07-20 15:20:03,899 [INFO] (model.py:671) Total Grad: 5.2360
+2025-07-20 15:20:04,018 [INFO] (workflow.py:108)  ---------- 698 Start Learn ----------- 
+2025-07-20 15:20:05,115 [INFO] (model.py:671) Total Grad: 6.2764
+2025-07-20 15:20:05,217 [INFO] (workflow.py:108)  ---------- 703 Start Learn ----------- 
+2025-07-20 15:20:06,011 [INFO] (model.py:671) Total Grad: 4.6594
+2025-07-20 15:20:06,146 [INFO] (workflow.py:108)  ---------- 708 Start Learn ----------- 
+2025-07-20 15:20:06,593 [INFO] (model.py:671) Total Grad: 8.2575
+2025-07-20 15:20:06,712 [INFO] (workflow.py:108)  ---------- 714 Start Learn ----------- 
+2025-07-20 15:20:07,884 [INFO] (model.py:671) Total Grad: 4.5723
+2025-07-20 15:20:07,884 [INFO] (workflow.py:115) reward 14.7667
+2025-07-20 15:20:08,010 [INFO] (workflow.py:108)  ---------- 720 Start Learn ----------- 
+2025-07-20 15:20:08,751 [INFO] (model.py:671) Total Grad: 5.9289
+2025-07-20 15:20:08,850 [INFO] (workflow.py:108)  ---------- 725 Start Learn ----------- 
+2025-07-20 15:20:09,375 [INFO] (model.py:671) Total Grad: 5.4968
+2025-07-20 15:20:09,483 [INFO] (workflow.py:108)  ---------- 730 Start Learn ----------- 
+2025-07-20 15:20:10,840 [INFO] (model.py:671) Total Grad: 5.5102
+2025-07-20 15:20:10,938 [INFO] (workflow.py:108)  ---------- 734 Start Learn ----------- 
+2025-07-20 15:20:11,909 [INFO] (model.py:671) Total Grad: 6.9837
+2025-07-20 15:20:12,015 [INFO] (workflow.py:108)  ---------- 739 Start Learn ----------- 
+2025-07-20 15:20:12,735 [INFO] (model.py:671) Total Grad: 4.7887
+2025-07-20 15:20:12,836 [INFO] (workflow.py:108)  ---------- 745 Start Learn ----------- 
+2025-07-20 15:20:13,146 [INFO] (model.py:671) Total Grad: 6.0615
+2025-07-20 15:20:13,260 [INFO] (workflow.py:108)  ---------- 751 Start Learn ----------- 
+2025-07-20 15:20:14,222 [INFO] (model.py:671) Total Grad: 4.3703
+2025-07-20 15:20:14,240 [INFO] (workflow.py:115) reward 13.6757
+2025-07-20 15:20:14,370 [INFO] (workflow.py:108)  ---------- 757 Start Learn ----------- 
+2025-07-20 15:20:15,327 [INFO] (model.py:671) Total Grad: 5.2620
+2025-07-20 15:20:15,444 [INFO] (workflow.py:108)  ---------- 762 Start Learn ----------- 
+2025-07-20 15:20:16,049 [INFO] (model.py:671) Total Grad: 6.4529
+2025-07-20 15:20:16,159 [INFO] (workflow.py:108)  ---------- 767 Start Learn ----------- 
+2025-07-20 15:20:17,213 [INFO] (model.py:671) Total Grad: 4.4902
+2025-07-20 15:20:17,307 [INFO] (workflow.py:108)  ---------- 772 Start Learn ----------- 
+2025-07-20 15:20:18,649 [INFO] (model.py:671) Total Grad: 5.0331
+2025-07-20 15:20:18,738 [INFO] (workflow.py:108)  ---------- 776 Start Learn ----------- 
+2025-07-20 15:20:19,457 [INFO] (model.py:671) Total Grad: 6.7456
+2025-07-20 15:20:19,562 [INFO] (workflow.py:108)  ---------- 781 Start Learn ----------- 
+2025-07-20 15:20:20,072 [INFO] (model.py:671) Total Grad: 7.1033
+2025-07-20 15:20:20,178 [INFO] (workflow.py:108)  ---------- 786 Start Learn ----------- 
+2025-07-20 15:20:21,290 [INFO] (model.py:671) Total Grad: 6.3862
+2025-07-20 15:20:21,290 [INFO] (workflow.py:115) reward 14.2286
+2025-07-20 15:20:21,386 [INFO] (workflow.py:108)  ---------- 791 Start Learn ----------- 
+2025-07-20 15:20:22,496 [INFO] (model.py:671) Total Grad: 5.3542
+2025-07-20 15:20:22,606 [INFO] (workflow.py:108)  ---------- 795 Start Learn ----------- 
+2025-07-20 15:20:23,282 [INFO] (model.py:671) Total Grad: 8.0537
+2025-07-20 15:20:23,388 [INFO] (workflow.py:108)  ---------- 801 Start Learn ----------- 
+2025-07-20 15:20:24,669 [INFO] (model.py:671) Total Grad: 4.2611
+2025-07-20 15:20:24,781 [INFO] (workflow.py:108)  ---------- 806 Start Learn ----------- 
+2025-07-20 15:20:26,207 [INFO] (model.py:671) Total Grad: 6.2922
+2025-07-20 15:20:26,363 [INFO] (workflow.py:108)  ---------- 812 Start Learn ----------- 
+2025-07-20 15:20:27,480 [INFO] (model.py:671) Total Grad: 5.9183
+2025-07-20 15:20:27,480 [INFO] (workflow.py:115) reward 14.2308
+2025-07-20 15:20:27,589 [INFO] (workflow.py:108)  ---------- 817 Start Learn ----------- 
+2025-07-20 15:20:28,035 [INFO] (model.py:671) Total Grad: 8.0620
+2025-07-20 15:20:28,137 [INFO] (workflow.py:108)  ---------- 823 Start Learn ----------- 
+2025-07-20 15:20:29,509 [INFO] (model.py:671) Total Grad: 3.8704
+2025-07-20 15:20:29,634 [INFO] (workflow.py:108)  ---------- 828 Start Learn ----------- 
+2025-07-20 15:20:30,488 [INFO] (model.py:671) Total Grad: 6.7875
+2025-07-20 15:20:30,583 [INFO] (workflow.py:108)  ---------- 833 Start Learn ----------- 
+2025-07-20 15:20:31,138 [INFO] (model.py:671) Total Grad: 5.0930
+2025-07-20 15:20:31,238 [INFO] (workflow.py:108)  ---------- 837 Start Learn ----------- 
+2025-07-20 15:20:31,535 [INFO] (model.py:671) Total Grad: 7.5431
+2025-07-20 15:20:31,642 [INFO] (workflow.py:108)  ---------- 841 Start Learn ----------- 
+2025-07-20 15:20:32,528 [INFO] (model.py:671) Total Grad: 7.8161
+2025-07-20 15:20:32,652 [INFO] (workflow.py:108)  ---------- 847 Start Learn ----------- 
+2025-07-20 15:20:33,491 [INFO] (model.py:671) Total Grad: 5.5940
+2025-07-20 15:20:33,491 [INFO] (workflow.py:115) reward 14.0571
+2025-07-20 15:20:33,606 [INFO] (workflow.py:108)  ---------- 853 Start Learn ----------- 
+2025-07-20 15:20:34,087 [INFO] (model.py:671) Total Grad: 6.2829
+2025-07-20 15:20:34,189 [INFO] (workflow.py:108)  ---------- 857 Start Learn ----------- 
+2025-07-20 15:20:35,419 [INFO] (model.py:671) Total Grad: 6.9048
+2025-07-20 15:20:35,524 [INFO] (workflow.py:108)  ---------- 862 Start Learn ----------- 
+2025-07-20 15:20:36,564 [INFO] (model.py:671) Total Grad: 5.3296
+2025-07-20 15:20:36,671 [INFO] (workflow.py:108)  ---------- 867 Start Learn ----------- 
+2025-07-20 15:20:37,347 [INFO] (model.py:671) Total Grad: 6.2561
+2025-07-20 15:20:37,461 [INFO] (workflow.py:108)  ---------- 873 Start Learn ----------- 
+2025-07-20 15:20:37,721 [INFO] (model.py:671) Total Grad: 7.0585
+2025-07-20 15:20:37,822 [INFO] (workflow.py:108)  ---------- 878 Start Learn ----------- 
+2025-07-20 15:20:38,994 [INFO] (model.py:671) Total Grad: 6.9174
+2025-07-20 15:20:39,095 [INFO] (workflow.py:108)  ---------- 883 Start Learn ----------- 
+2025-07-20 15:20:40,078 [INFO] (model.py:671) Total Grad: 7.1786
+2025-07-20 15:20:40,078 [INFO] (workflow.py:115) reward 14.3056
+2025-07-20 15:20:40,178 [INFO] (workflow.py:108)  ---------- 889 Start Learn ----------- 
+2025-07-20 15:20:40,679 [INFO] (model.py:671) Total Grad: 5.7637
+2025-07-20 15:20:40,788 [INFO] (workflow.py:108)  ---------- 894 Start Learn ----------- 
+2025-07-20 15:20:41,976 [INFO] (model.py:671) Total Grad: 5.4727
+2025-07-20 15:20:42,087 [INFO] (workflow.py:108)  ---------- 898 Start Learn ----------- 
+2025-07-20 15:20:42,935 [INFO] (model.py:671) Total Grad: 7.6184
+2025-07-20 15:20:43,039 [INFO] (workflow.py:108)  ---------- 904 Start Learn ----------- 
+2025-07-20 15:20:43,764 [INFO] (model.py:671) Total Grad: 5.3793
+2025-07-20 15:20:43,866 [INFO] (workflow.py:108)  ---------- 909 Start Learn ----------- 
+2025-07-20 15:20:44,194 [INFO] (model.py:671) Total Grad: 6.7729
+2025-07-20 15:20:44,317 [INFO] (workflow.py:108)  ---------- 914 Start Learn ----------- 
+2025-07-20 15:20:45,581 [INFO] (model.py:671) Total Grad: 4.1417
+2025-07-20 15:20:45,701 [INFO] (workflow.py:108)  ---------- 919 Start Learn ----------- 
+2025-07-20 15:20:46,619 [INFO] (model.py:671) Total Grad: 5.5966
+2025-07-20 15:20:46,619 [INFO] (workflow.py:115) reward 14.3056
+2025-07-20 15:20:46,721 [INFO] (workflow.py:108)  ---------- 924 Start Learn ----------- 
+2025-07-20 15:20:47,231 [INFO] (model.py:671) Total Grad: 7.8528
+2025-07-20 15:20:47,340 [INFO] (workflow.py:108)  ---------- 929 Start Learn ----------- 
+2025-07-20 15:20:48,438 [INFO] (model.py:671) Total Grad: 4.2914
+2025-07-20 15:20:48,556 [INFO] (workflow.py:108)  ---------- 934 Start Learn ----------- 
+2025-07-20 15:20:49,696 [INFO] (model.py:671) Total Grad: 6.5279
+2025-07-20 15:20:49,793 [INFO] (workflow.py:108)  ---------- 939 Start Learn ----------- 
+2025-07-20 15:20:50,521 [INFO] (model.py:671) Total Grad: 7.1342
+2025-07-20 15:20:50,626 [INFO] (workflow.py:108)  ---------- 945 Start Learn ----------- 
+2025-07-20 15:20:50,877 [INFO] (model.py:671) Total Grad: 7.7599
+2025-07-20 15:20:50,967 [INFO] (workflow.py:108)  ---------- 950 Start Learn ----------- 
+2025-07-20 15:20:52,370 [INFO] (model.py:671) Total Grad: 3.6548
+2025-07-20 15:20:52,516 [INFO] (workflow.py:108)  ---------- 956 Start Learn ----------- 
+2025-07-20 15:20:53,446 [INFO] (model.py:671) Total Grad: 5.7983
+2025-07-20 15:20:53,446 [INFO] (workflow.py:115) reward 13.6757
+2025-07-20 15:20:53,576 [INFO] (workflow.py:108)  ---------- 961 Start Learn ----------- 
+2025-07-20 15:20:54,157 [INFO] (model.py:671) Total Grad: 6.6730
+2025-07-20 15:20:54,259 [INFO] (workflow.py:108)  ---------- 967 Start Learn ----------- 
+2025-07-20 15:20:55,464 [INFO] (model.py:671) Total Grad: 3.9056
+2025-07-20 15:20:55,564 [INFO] (workflow.py:108)  ---------- 972 Start Learn ----------- 
+2025-07-20 15:20:56,970 [INFO] (model.py:671) Total Grad: 4.9388
+2025-07-20 15:20:57,080 [INFO] (workflow.py:108)  ---------- 978 Start Learn ----------- 
+2025-07-20 15:20:57,830 [INFO] (model.py:671) Total Grad: 5.7793
+2025-07-20 15:20:57,950 [INFO] (workflow.py:108)  ---------- 983 Start Learn ----------- 
+2025-07-20 15:20:58,277 [INFO] (model.py:671) Total Grad: 8.8862
+2025-07-20 15:20:58,391 [INFO] (workflow.py:108)  ---------- 990 Start Learn ----------- 
+2025-07-20 15:20:59,428 [INFO] (model.py:671) Total Grad: 5.7703
+2025-07-20 15:20:59,461 [INFO] (workflow.py:115) reward 13.1944
+2025-07-20 15:20:59,556 [INFO] (workflow.py:108)  ---------- 996 Start Learn ----------- 
+2025-07-20 15:21:00,445 [INFO] (model.py:671) Total Grad: 5.4649
+2025-07-20 15:21:00,549 [INFO] (workflow.py:108)  ---------- 1002 Start Learn ----------- 
+2025-07-20 15:21:01,077 [INFO] (model.py:671) Total Grad: 5.4383
+2025-07-20 15:21:01,181 [INFO] (workflow.py:108)  ---------- 1008 Start Learn ----------- 
+2025-07-20 15:21:02,209 [INFO] (model.py:671) Total Grad: 3.9724
+2025-07-20 15:21:02,312 [INFO] (workflow.py:108)  ---------- 1013 Start Learn ----------- 
+2025-07-20 15:21:03,333 [INFO] (model.py:671) Total Grad: 5.9933
+2025-07-20 15:21:03,435 [INFO] (workflow.py:108)  ---------- 1019 Start Learn ----------- 
+2025-07-20 15:21:04,185 [INFO] (model.py:671) Total Grad: 5.5742
+2025-07-20 15:21:04,303 [INFO] (workflow.py:108)  ---------- 1026 Start Learn ----------- 
+2025-07-20 15:21:04,554 [INFO] (model.py:671) Total Grad: 6.5418
+2025-07-20 15:21:04,661 [INFO] (workflow.py:108)  ---------- 1032 Start Learn ----------- 
+2025-07-20 15:21:05,441 [INFO] (model.py:671) Total Grad: 4.6977
+2025-07-20 15:21:05,484 [INFO] (workflow.py:115) reward 11.9286
+2025-07-20 15:21:05,555 [INFO] (workflow.py:108)  ---------- 1037 Start Learn ----------- 
+2025-07-20 15:21:06,636 [INFO] (model.py:671) Total Grad: 7.2369
+2025-07-20 15:21:06,776 [INFO] (workflow.py:108)  ---------- 1042 Start Learn ----------- 
+2025-07-20 15:21:07,439 [INFO] (model.py:671) Total Grad: 8.7388
+2025-07-20 15:21:07,619 [INFO] (workflow.py:108)  ---------- 1047 Start Learn ----------- 
+2025-07-20 15:21:08,708 [INFO] (model.py:671) Total Grad: 5.0030
+2025-07-20 15:21:08,826 [INFO] (workflow.py:108)  ---------- 1052 Start Learn ----------- 
+2025-07-20 15:21:09,987 [INFO] (model.py:671) Total Grad: 6.3350
+2025-07-20 15:21:10,082 [INFO] (workflow.py:108)  ---------- 1056 Start Learn ----------- 
+2025-07-20 15:21:10,895 [INFO] (model.py:671) Total Grad: 7.2911
+2025-07-20 15:21:11,016 [INFO] (workflow.py:108)  ---------- 1060 Start Learn ----------- 
+2025-07-20 15:21:11,242 [INFO] (model.py:671) Total Grad: 8.2391
+2025-07-20 15:21:11,355 [INFO] (workflow.py:108)  ---------- 1064 Start Learn ----------- 
+2025-07-20 15:21:12,435 [INFO] (model.py:671) Total Grad: 8.0883
+2025-07-20 15:21:12,435 [INFO] (workflow.py:115) reward 16.5667
+2025-07-20 15:21:12,552 [INFO] (workflow.py:108)  ---------- 1068 Start Learn ----------- 
+2025-07-20 15:21:13,096 [INFO] (model.py:671) Total Grad: 6.9775
+2025-07-20 15:21:13,188 [INFO] (workflow.py:108)  ---------- 1073 Start Learn ----------- 
+2025-07-20 15:21:13,638 [INFO] (model.py:671) Total Grad: 5.3675
+2025-07-20 15:21:13,747 [INFO] (workflow.py:108)  ---------- 1079 Start Learn ----------- 
+2025-07-20 15:21:14,992 [INFO] (model.py:671) Total Grad: 4.7331
+2025-07-20 15:21:15,099 [INFO] (workflow.py:108)  ---------- 1086 Start Learn ----------- 
+2025-07-20 15:21:15,996 [INFO] (model.py:671) Total Grad: 5.4691
+2025-07-20 15:21:16,106 [INFO] (workflow.py:108)  ---------- 1093 Start Learn ----------- 
+2025-07-20 15:21:16,857 [INFO] (model.py:671) Total Grad: 4.8452
+2025-07-20 15:21:16,951 [INFO] (workflow.py:108)  ---------- 1097 Start Learn ----------- 
+2025-07-20 15:21:17,325 [INFO] (model.py:671) Total Grad: 8.2311
+2025-07-20 15:21:17,446 [INFO] (workflow.py:108)  ---------- 1102 Start Learn ----------- 
+2025-07-20 15:21:18,580 [INFO] (model.py:671) Total Grad: 4.8692
+2025-07-20 15:21:18,580 [INFO] (workflow.py:115) reward 13.0789
+2025-07-20 15:21:18,680 [INFO] (workflow.py:108)  ---------- 1107 Start Learn ----------- 
+2025-07-20 15:21:19,553 [INFO] (model.py:671) Total Grad: 6.0803
+2025-07-20 15:21:19,647 [INFO] (workflow.py:108)  ---------- 1112 Start Learn ----------- 
+2025-07-20 15:21:20,207 [INFO] (model.py:671) Total Grad: 6.1477
+2025-07-20 15:21:20,329 [INFO] (workflow.py:108)  ---------- 1118 Start Learn ----------- 
+2025-07-20 15:21:21,466 [INFO] (model.py:671) Total Grad: 5.8741
+2025-07-20 15:21:21,604 [INFO] (workflow.py:108)  ---------- 1122 Start Learn ----------- 
+2025-07-20 15:21:22,779 [INFO] (model.py:671) Total Grad: 6.9612
+2025-07-20 15:21:22,889 [INFO] (workflow.py:108)  ---------- 1127 Start Learn ----------- 
+2025-07-20 15:21:23,781 [INFO] (model.py:671) Total Grad: 7.6608
+2025-07-20 15:21:23,878 [INFO] (workflow.py:108)  ---------- 1131 Start Learn ----------- 
+2025-07-20 15:21:24,445 [INFO] (model.py:671) Total Grad: 7.8862
+2025-07-20 15:21:24,555 [INFO] (workflow.py:108)  ---------- 1137 Start Learn ----------- 
+2025-07-20 15:21:26,040 [INFO] (model.py:671) Total Grad: 4.2912
+2025-07-20 15:21:26,040 [INFO] (workflow.py:115) reward 14.3143
+2025-07-20 15:21:26,173 [INFO] (workflow.py:108)  ---------- 1142 Start Learn ----------- 
+2025-07-20 15:21:27,079 [INFO] (model.py:671) Total Grad: 7.4117
+2025-07-20 15:21:27,189 [INFO] (workflow.py:108)  ---------- 1148 Start Learn ----------- 
+2025-07-20 15:21:27,760 [INFO] (model.py:671) Total Grad: 6.1531
+2025-07-20 15:21:27,876 [INFO] (workflow.py:108)  ---------- 1153 Start Learn ----------- 
+2025-07-20 15:21:28,984 [INFO] (model.py:671) Total Grad: 6.6191
+2025-07-20 15:21:29,081 [INFO] (workflow.py:108)  ---------- 1158 Start Learn ----------- 
+2025-07-20 15:21:30,447 [INFO] (model.py:671) Total Grad: 5.9135
+2025-07-20 15:21:30,567 [INFO] (workflow.py:108)  ---------- 1164 Start Learn ----------- 
+2025-07-20 15:21:33,242 [INFO] (model.py:671) Total Grad: 6.4471
+2025-07-20 15:21:33,243 [INFO] (workflow.py:115) reward 13.4444
+2025-07-20 15:21:33,586 [INFO] (workflow.py:108)  ---------- 1170 Start Learn ----------- 
+2025-07-20 15:21:34,960 [INFO] (model.py:671) Total Grad: 7.2793
+2025-07-20 15:21:35,267 [INFO] (workflow.py:108)  ---------- 1176 Start Learn ----------- 
+2025-07-20 15:21:37,048 [INFO] (model.py:671) Total Grad: 5.3277
+2025-07-20 15:21:37,148 [INFO] (workflow.py:108)  ---------- 1182 Start Learn ----------- 
+2025-07-20 15:21:38,105 [INFO] (model.py:671) Total Grad: 4.4551
+2025-07-20 15:21:38,223 [INFO] (workflow.py:108)  ---------- 1188 Start Learn ----------- 
+2025-07-20 15:21:38,914 [INFO] (model.py:671) Total Grad: 6.1232
+2025-07-20 15:21:39,083 [INFO] (workflow.py:108)  ---------- 1194 Start Learn ----------- 
+2025-07-20 15:21:40,348 [INFO] (model.py:671) Total Grad: 4.4927
+2025-07-20 15:21:40,351 [INFO] (workflow.py:115) reward 13.1000
+2025-07-20 15:21:40,475 [INFO] (workflow.py:108)  ---------- 1199 Start Learn ----------- 
+2025-07-20 15:21:41,655 [INFO] (model.py:671) Total Grad: 5.9077
+2025-07-20 15:21:41,758 [INFO] (workflow.py:108)  ---------- 1205 Start Learn ----------- 
+2025-07-20 15:21:42,526 [INFO] (model.py:671) Total Grad: 6.4570
+2025-07-20 15:21:42,638 [INFO] (workflow.py:108)  ---------- 1210 Start Learn ----------- 
+2025-07-20 15:21:43,065 [INFO] (model.py:671) Total Grad: 8.9361
+2025-07-20 15:21:43,177 [INFO] (workflow.py:108)  ---------- 1216 Start Learn ----------- 
+2025-07-20 15:21:44,429 [INFO] (model.py:671) Total Grad: 3.9887
+2025-07-20 15:21:44,544 [INFO] (workflow.py:108)  ---------- 1223 Start Learn ----------- 
+2025-07-20 15:21:45,361 [INFO] (model.py:671) Total Grad: 5.0615
+2025-07-20 15:21:45,478 [INFO] (workflow.py:108)  ---------- 1229 Start Learn ----------- 
+2025-07-20 15:21:45,959 [INFO] (model.py:671) Total Grad: 6.6546
+2025-07-20 15:21:46,072 [INFO] (workflow.py:108)  ---------- 1234 Start Learn ----------- 
+2025-07-20 15:21:47,203 [INFO] (model.py:671) Total Grad: 5.8841
+2025-07-20 15:21:47,205 [INFO] (workflow.py:115) reward 12.7000
+2025-07-20 15:21:47,322 [INFO] (workflow.py:108)  ---------- 1239 Start Learn ----------- 
+2025-07-20 15:21:48,473 [INFO] (model.py:671) Total Grad: 5.1171
+2025-07-20 15:21:48,609 [INFO] (workflow.py:108)  ---------- 1246 Start Learn ----------- 
+2025-07-20 15:21:49,478 [INFO] (model.py:671) Total Grad: 5.1143
+2025-07-20 15:21:49,582 [INFO] (workflow.py:108)  ---------- 1249 Start Learn ----------- 
+2025-07-20 15:21:49,914 [INFO] (model.py:671) Total Grad: 9.5891
+2025-07-20 15:21:50,036 [INFO] (workflow.py:108)  ---------- 1255 Start Learn ----------- 
+2025-07-20 15:21:51,691 [INFO] (model.py:671) Total Grad: 5.4208
+2025-07-20 15:21:51,789 [INFO] (workflow.py:108)  ---------- 1260 Start Learn ----------- 
+2025-07-20 15:21:52,946 [INFO] (model.py:671) Total Grad: 6.1648
+2025-07-20 15:21:53,106 [INFO] (workflow.py:108)  ---------- 1266 Start Learn ----------- 
+2025-07-20 15:21:54,096 [INFO] (model.py:671) Total Grad: 5.4276
+2025-07-20 15:21:54,096 [INFO] (workflow.py:115) reward 13.5000
+2025-07-20 15:21:54,206 [INFO] (workflow.py:108)  ---------- 1273 Start Learn ----------- 
+2025-07-20 15:21:55,219 [INFO] (model.py:671) Total Grad: 4.6236
+2025-07-20 15:21:55,329 [INFO] (workflow.py:108)  ---------- 1277 Start Learn ----------- 
+2025-07-20 15:21:56,558 [INFO] (model.py:671) Total Grad: 5.8014
+2025-07-20 15:21:56,673 [INFO] (workflow.py:108)  ---------- 1282 Start Learn ----------- 
+2025-07-20 15:21:57,518 [INFO] (model.py:671) Total Grad: 5.6172
+2025-07-20 15:21:57,630 [INFO] (workflow.py:108)  ---------- 1288 Start Learn ----------- 
+2025-07-20 15:21:58,066 [INFO] (model.py:671) Total Grad: 5.7701
+2025-07-20 15:21:58,168 [INFO] (workflow.py:108)  ---------- 1293 Start Learn ----------- 
+2025-07-20 15:21:59,267 [INFO] (model.py:671) Total Grad: 4.7373
+2025-07-20 15:21:59,386 [INFO] (workflow.py:108)  ---------- 1298 Start Learn ----------- 
+2025-07-20 15:22:00,381 [INFO] (model.py:671) Total Grad: 5.5726
+2025-07-20 15:22:00,381 [INFO] (workflow.py:115) reward 13.3125
+2025-07-20 15:22:00,497 [INFO] (workflow.py:108)  ---------- 1303 Start Learn ----------- 
+2025-07-20 15:22:01,187 [INFO] (model.py:671) Total Grad: 7.5323
+2025-07-20 15:22:01,297 [INFO] (workflow.py:108)  ---------- 1308 Start Learn ----------- 
+2025-07-20 15:22:02,530 [INFO] (model.py:671) Total Grad: 5.3734
+2025-07-20 15:22:02,647 [INFO] (workflow.py:108)  ---------- 1313 Start Learn ----------- 
+2025-07-20 15:22:04,078 [INFO] (model.py:671) Total Grad: 6.2650
+2025-07-20 15:22:04,198 [INFO] (workflow.py:108)  ---------- 1319 Start Learn ----------- 
+2025-07-20 15:22:04,986 [INFO] (model.py:671) Total Grad: 6.2589
+2025-07-20 15:22:05,109 [INFO] (workflow.py:108)  ---------- 1325 Start Learn ----------- 
+2025-07-20 15:22:05,443 [INFO] (model.py:671) Total Grad: 5.4108
+2025-07-20 15:22:05,551 [INFO] (workflow.py:108)  ---------- 1331 Start Learn ----------- 
+2025-07-20 15:22:06,891 [INFO] (model.py:671) Total Grad: 4.0679
+2025-07-20 15:22:06,893 [INFO] (workflow.py:115) reward 13.4848
+2025-07-20 15:22:06,991 [INFO] (workflow.py:108)  ---------- 1335 Start Learn ----------- 
+2025-07-20 15:22:07,775 [INFO] (model.py:671) Total Grad: 7.0684
+2025-07-20 15:22:07,893 [INFO] (workflow.py:108)  ---------- 1341 Start Learn ----------- 
+2025-07-20 15:22:08,434 [INFO] (model.py:671) Total Grad: 6.6413
+2025-07-20 15:22:08,553 [INFO] (workflow.py:108)  ---------- 1347 Start Learn ----------- 
+2025-07-20 15:22:09,789 [INFO] (model.py:671) Total Grad: 4.7246
+2025-07-20 15:22:09,908 [INFO] (workflow.py:108)  ---------- 1351 Start Learn ----------- 
+2025-07-20 15:22:11,327 [INFO] (model.py:671) Total Grad: 7.4727
+2025-07-20 15:22:11,440 [INFO] (workflow.py:108)  ---------- 1356 Start Learn ----------- 
+2025-07-20 15:22:12,142 [INFO] (model.py:671) Total Grad: 6.1217
+2025-07-20 15:22:12,261 [INFO] (workflow.py:108)  ---------- 1363 Start Learn ----------- 
+2025-07-20 15:22:12,625 [INFO] (model.py:671) Total Grad: 5.9506
+2025-07-20 15:22:12,730 [INFO] (workflow.py:108)  ---------- 1367 Start Learn ----------- 
+2025-07-20 15:22:14,273 [INFO] (model.py:671) Total Grad: 5.4850
+2025-07-20 15:22:14,273 [INFO] (workflow.py:115) reward 13.8889
+2025-07-20 15:22:14,403 [INFO] (workflow.py:108)  ---------- 1373 Start Learn ----------- 
+2025-07-20 15:22:15,560 [INFO] (model.py:671) Total Grad: 5.4045
+2025-07-20 15:22:15,664 [INFO] (workflow.py:108)  ---------- 1378 Start Learn ----------- 
+2025-07-20 15:22:16,192 [INFO] (model.py:671) Total Grad: 6.2766
+2025-07-20 15:22:16,294 [INFO] (workflow.py:108)  ---------- 1383 Start Learn ----------- 
+2025-07-20 15:22:17,224 [INFO] (model.py:671) Total Grad: 5.3470
+2025-07-20 15:22:17,330 [INFO] (workflow.py:108)  ---------- 1388 Start Learn ----------- 
+2025-07-20 15:22:18,803 [INFO] (model.py:671) Total Grad: 5.5211
+2025-07-20 15:22:18,938 [INFO] (workflow.py:108)  ---------- 1393 Start Learn ----------- 
+2025-07-20 15:22:20,012 [INFO] (model.py:671) Total Grad: 5.4402
+2025-07-20 15:22:20,134 [INFO] (workflow.py:108)  ---------- 1398 Start Learn ----------- 
+2025-07-20 15:22:20,665 [INFO] (model.py:671) Total Grad: 6.6573
+2025-07-20 15:22:20,665 [INFO] (workflow.py:115) reward 14.0645
+2025-07-20 15:22:20,768 [INFO] (workflow.py:108)  ---------- 1403 Start Learn ----------- 
+2025-07-20 15:22:21,708 [INFO] (model.py:671) Total Grad: 5.8452
+2025-07-20 15:22:21,804 [INFO] (workflow.py:108)  ---------- 1408 Start Learn ----------- 
+2025-07-20 15:22:22,882 [INFO] (model.py:671) Total Grad: 5.4127
+2025-07-20 15:22:23,004 [INFO] (workflow.py:108)  ---------- 1414 Start Learn ----------- 
+2025-07-20 15:22:23,706 [INFO] (model.py:671) Total Grad: 6.2131
+2025-07-20 15:22:23,800 [INFO] (workflow.py:108)  ---------- 1419 Start Learn ----------- 
+2025-07-20 15:22:24,104 [INFO] (model.py:671) Total Grad: 6.8457
+2025-07-20 15:22:24,213 [INFO] (workflow.py:108)  ---------- 1425 Start Learn ----------- 
+2025-07-20 15:22:25,388 [INFO] (model.py:671) Total Grad: 5.3207
+2025-07-20 15:22:25,497 [INFO] (workflow.py:108)  ---------- 1430 Start Learn ----------- 
+2025-07-20 15:22:26,599 [INFO] (model.py:671) Total Grad: 6.3610
+2025-07-20 15:22:26,683 [INFO] (workflow.py:115) reward 13.0857
+2025-07-20 15:22:26,734 [INFO] (workflow.py:108)  ---------- 1435 Start Learn ----------- 
+2025-07-20 15:22:27,311 [INFO] (model.py:671) Total Grad: 7.3459
+2025-07-20 15:22:27,434 [INFO] (workflow.py:108)  ---------- 1441 Start Learn ----------- 
+2025-07-20 15:22:28,561 [INFO] (model.py:671) Total Grad: 5.8031
+2025-07-20 15:22:28,677 [INFO] (workflow.py:108)  ---------- 1446 Start Learn ----------- 
+2025-07-20 15:22:29,903 [INFO] (model.py:671) Total Grad: 6.6200
+2025-07-20 15:22:30,008 [INFO] (workflow.py:108)  ---------- 1450 Start Learn ----------- 
+2025-07-20 15:22:30,777 [INFO] (model.py:671) Total Grad: 6.0223
+2025-07-20 15:22:30,893 [INFO] (workflow.py:108)  ---------- 1454 Start Learn ----------- 
+2025-07-20 15:22:31,463 [INFO] (model.py:671) Total Grad: 10.0931
+2025-07-20 15:22:31,582 [INFO] (workflow.py:108)  ---------- 1460 Start Learn ----------- 
+2025-07-20 15:22:32,850 [INFO] (model.py:671) Total Grad: 5.3058
+2025-07-20 15:22:32,850 [INFO] (workflow.py:115) reward 15.0370
+2025-07-20 15:22:32,958 [INFO] (workflow.py:108)  ---------- 1466 Start Learn ----------- 
+2025-07-20 15:22:33,939 [INFO] (model.py:671) Total Grad: 5.3946
+2025-07-20 15:22:34,036 [INFO] (workflow.py:108)  ---------- 1470 Start Learn ----------- 
+2025-07-20 15:22:34,681 [INFO] (model.py:671) Total Grad: 7.8588
+2025-07-20 15:22:34,838 [INFO] (workflow.py:108)  ---------- 1476 Start Learn ----------- 
+2025-07-20 15:22:35,718 [INFO] (model.py:671) Total Grad: 5.4090
+2025-07-20 15:22:35,825 [INFO] (workflow.py:108)  ---------- 1482 Start Learn ----------- 
+2025-07-20 15:22:37,155 [INFO] (model.py:671) Total Grad: 6.2442
+2025-07-20 15:22:37,292 [INFO] (workflow.py:108)  ---------- 1487 Start Learn ----------- 
+2025-07-20 15:22:38,200 [INFO] (model.py:671) Total Grad: 6.3798
+2025-07-20 15:22:38,348 [INFO] (workflow.py:108)  ---------- 1494 Start Learn ----------- 
+2025-07-20 15:22:38,663 [INFO] (model.py:671) Total Grad: 6.6734
+2025-07-20 15:22:38,769 [INFO] (workflow.py:108)  ---------- 1500 Start Learn ----------- 
+2025-07-20 15:22:39,974 [INFO] (model.py:671) Total Grad: 6.1014
+2025-07-20 15:22:39,974 [INFO] (workflow.py:115) reward 12.6000
+2025-07-20 15:22:40,079 [INFO] (workflow.py:108)  ---------- 1506 Start Learn ----------- 
+2025-07-20 15:22:41,087 [INFO] (model.py:671) Total Grad: 5.5900
+2025-07-20 15:22:41,197 [INFO] (workflow.py:108)  ---------- 1512 Start Learn ----------- 
+2025-07-20 15:22:41,846 [INFO] (model.py:671) Total Grad: 5.4933
+2025-07-20 15:22:41,944 [INFO] (workflow.py:108)  ---------- 1517 Start Learn ----------- 
+2025-07-20 15:22:43,239 [INFO] (model.py:671) Total Grad: 5.4612
+2025-07-20 15:22:43,378 [INFO] (workflow.py:108)  ---------- 1522 Start Learn ----------- 
+2025-07-20 15:22:44,907 [INFO] (model.py:671) Total Grad: 6.3922
+2025-07-20 15:22:45,038 [INFO] (workflow.py:108)  ---------- 1528 Start Learn ----------- 
+2025-07-20 15:22:45,921 [INFO] (model.py:671) Total Grad: 6.2328
+2025-07-20 15:22:45,985 [INFO] (workflow.py:115) reward 13.0323
+2025-07-20 15:22:46,027 [INFO] (workflow.py:108)  ---------- 1533 Start Learn ----------- 
+2025-07-20 15:22:46,407 [INFO] (model.py:671) Total Grad: 7.5170
+2025-07-20 15:22:46,516 [INFO] (workflow.py:108)  ---------- 1537 Start Learn ----------- 
+2025-07-20 15:22:47,720 [INFO] (model.py:671) Total Grad: 4.4080
+2025-07-20 15:22:47,825 [INFO] (workflow.py:108)  ---------- 1541 Start Learn ----------- 
+2025-07-20 15:22:48,933 [INFO] (model.py:671) Total Grad: 7.2146
+2025-07-20 15:22:49,049 [INFO] (workflow.py:108)  ---------- 1547 Start Learn ----------- 
+2025-07-20 15:22:49,758 [INFO] (model.py:671) Total Grad: 6.2839
+2025-07-20 15:22:49,876 [INFO] (workflow.py:108)  ---------- 1551 Start Learn ----------- 
+2025-07-20 15:22:50,222 [INFO] (model.py:671) Total Grad: 9.1824
+2025-07-20 15:22:50,324 [INFO] (workflow.py:108)  ---------- 1555 Start Learn ----------- 
+2025-07-20 15:22:51,079 [INFO] (model.py:671) Total Grad: 6.8978
+2025-07-20 15:22:51,198 [INFO] (workflow.py:108)  ---------- 1561 Start Learn ----------- 
+2025-07-20 15:22:51,938 [INFO] (model.py:671) Total Grad: 6.6404
+2025-07-20 15:22:52,004 [INFO] (workflow.py:115) reward 15.4848
+2025-07-20 15:22:52,047 [INFO] (workflow.py:108)  ---------- 1566 Start Learn ----------- 
+2025-07-20 15:22:52,468 [INFO] (model.py:671) Total Grad: 6.6190
+2025-07-20 15:22:52,564 [INFO] (workflow.py:108)  ---------- 1572 Start Learn ----------- 
+2025-07-20 15:22:53,616 [INFO] (model.py:671) Total Grad: 5.7651
+2025-07-20 15:22:53,729 [INFO] (workflow.py:108)  ---------- 1577 Start Learn ----------- 
+2025-07-20 15:22:54,604 [INFO] (model.py:671) Total Grad: 8.7764
+2025-07-20 15:22:54,712 [INFO] (workflow.py:108)  ---------- 1583 Start Learn ----------- 
+2025-07-20 15:22:55,417 [INFO] (model.py:671) Total Grad: 7.1351
+2025-07-20 15:22:55,531 [INFO] (workflow.py:108)  ---------- 1589 Start Learn ----------- 
+2025-07-20 15:22:55,820 [INFO] (model.py:671) Total Grad: 6.1944
+2025-07-20 15:22:55,926 [INFO] (workflow.py:108)  ---------- 1595 Start Learn ----------- 
+2025-07-20 15:22:56,987 [INFO] (model.py:671) Total Grad: 6.7924
+2025-07-20 15:22:57,092 [INFO] (workflow.py:108)  ---------- 1600 Start Learn ----------- 
+2025-07-20 15:22:57,796 [INFO] (model.py:671) Total Grad: 6.3438
+2025-07-20 15:22:57,922 [INFO] (workflow.py:108)  ---------- 1606 Start Learn ----------- 
+2025-07-20 15:22:58,459 [INFO] (model.py:671) Total Grad: 5.5570
+2025-07-20 15:22:58,463 [INFO] (workflow.py:115) reward 12.3810
+2025-07-20 15:22:58,570 [INFO] (workflow.py:108)  ---------- 1611 Start Learn ----------- 
+2025-07-20 15:22:59,579 [INFO] (model.py:671) Total Grad: 5.4978
+2025-07-20 15:22:59,699 [INFO] (workflow.py:108)  ---------- 1617 Start Learn ----------- 
+2025-07-20 15:23:00,848 [INFO] (model.py:671) Total Grad: 5.7781
+2025-07-20 15:23:00,951 [INFO] (workflow.py:108)  ---------- 1623 Start Learn ----------- 
+2025-07-20 15:23:01,656 [INFO] (model.py:671) Total Grad: 6.4867
+2025-07-20 15:23:01,760 [INFO] (workflow.py:108)  ---------- 1628 Start Learn ----------- 
+2025-07-20 15:23:02,102 [INFO] (model.py:671) Total Grad: 5.9338
+2025-07-20 15:23:02,199 [INFO] (workflow.py:108)  ---------- 1634 Start Learn ----------- 
+2025-07-20 15:23:03,518 [INFO] (model.py:671) Total Grad: 5.0303
+2025-07-20 15:23:03,633 [INFO] (workflow.py:108)  ---------- 1639 Start Learn ----------- 
+2025-07-20 15:23:04,527 [INFO] (model.py:671) Total Grad: 6.6518
+2025-07-20 15:23:04,527 [INFO] (workflow.py:115) reward 12.6970
+2025-07-20 15:23:04,633 [INFO] (workflow.py:108)  ---------- 1645 Start Learn ----------- 
+2025-07-20 15:23:05,316 [INFO] (model.py:671) Total Grad: 6.1589
+2025-07-20 15:23:05,419 [INFO] (workflow.py:108)  ---------- 1650 Start Learn ----------- 
+2025-07-20 15:23:05,716 [INFO] (model.py:671) Total Grad: 6.8617
+2025-07-20 15:23:05,858 [INFO] (workflow.py:108)  ---------- 1656 Start Learn ----------- 
+2025-07-20 15:23:07,142 [INFO] (model.py:671) Total Grad: 6.7426
+2025-07-20 15:23:07,245 [INFO] (workflow.py:108)  ---------- 1662 Start Learn ----------- 
+2025-07-20 15:23:08,043 [INFO] (model.py:671) Total Grad: 5.7876
+2025-07-20 15:23:08,152 [INFO] (workflow.py:108)  ---------- 1668 Start Learn ----------- 
+2025-07-20 15:23:08,690 [INFO] (model.py:671) Total Grad: 5.5805
+2025-07-20 15:23:08,792 [INFO] (workflow.py:108)  ---------- 1672 Start Learn ----------- 
+2025-07-20 15:23:09,708 [INFO] (model.py:671) Total Grad: 6.5445
+2025-07-20 15:23:09,822 [INFO] (workflow.py:108)  ---------- 1678 Start Learn ----------- 
+2025-07-20 15:23:10,934 [INFO] (model.py:671) Total Grad: 5.7436
+2025-07-20 15:23:10,934 [INFO] (workflow.py:115) reward 12.8462
+2025-07-20 15:23:11,036 [INFO] (workflow.py:108)  ---------- 1684 Start Learn ----------- 
+2025-07-20 15:23:11,783 [INFO] (model.py:671) Total Grad: 6.3071
+2025-07-20 15:23:11,931 [INFO] (workflow.py:108)  ---------- 1689 Start Learn ----------- 
+2025-07-20 15:23:12,232 [INFO] (model.py:671) Total Grad: 7.5176
+2025-07-20 15:23:12,333 [INFO] (workflow.py:108)  ---------- 1695 Start Learn ----------- 
+2025-07-20 15:23:13,604 [INFO] (model.py:671) Total Grad: 4.8673
+2025-07-20 15:23:13,715 [INFO] (workflow.py:108)  ---------- 1701 Start Learn ----------- 
+2025-07-20 15:23:14,632 [INFO] (model.py:671) Total Grad: 5.3359
+2025-07-20 15:23:14,755 [INFO] (workflow.py:108)  ---------- 1706 Start Learn ----------- 
+2025-07-20 15:23:15,265 [INFO] (model.py:671) Total Grad: 7.1806
+2025-07-20 15:23:15,379 [INFO] (workflow.py:108)  ---------- 1712 Start Learn ----------- 
+2025-07-20 15:23:16,769 [INFO] (model.py:671) Total Grad: 4.6637
+2025-07-20 15:23:16,867 [INFO] (workflow.py:108)  ---------- 1717 Start Learn ----------- 
+2025-07-20 15:23:18,177 [INFO] (model.py:671) Total Grad: 5.1464
+2025-07-20 15:23:18,177 [INFO] (workflow.py:115) reward 12.6667
+2025-07-20 15:23:18,271 [INFO] (workflow.py:108)  ---------- 1722 Start Learn ----------- 
+2025-07-20 15:23:19,086 [INFO] (model.py:671) Total Grad: 6.2970
+2025-07-20 15:23:19,190 [INFO] (workflow.py:108)  ---------- 1727 Start Learn ----------- 
+2025-07-20 15:23:19,663 [INFO] (model.py:671) Total Grad: 6.8845
+2025-07-20 15:23:19,769 [INFO] (workflow.py:108)  ---------- 1732 Start Learn ----------- 
+2025-07-20 15:23:21,039 [INFO] (model.py:671) Total Grad: 4.1817
+2025-07-20 15:23:21,139 [INFO] (workflow.py:108)  ---------- 1737 Start Learn ----------- 
+2025-07-20 15:23:22,207 [INFO] (model.py:671) Total Grad: 6.9397
+2025-07-20 15:23:22,320 [INFO] (workflow.py:108)  ---------- 1743 Start Learn ----------- 
+2025-07-20 15:23:23,288 [INFO] (model.py:671) Total Grad: 5.0164
+2025-07-20 15:23:23,412 [INFO] (workflow.py:108)  ---------- 1748 Start Learn ----------- 
+2025-07-20 15:23:23,811 [INFO] (model.py:671) Total Grad: 9.6732
+2025-07-20 15:23:23,908 [INFO] (workflow.py:108)  ---------- 1752 Start Learn ----------- 
+2025-07-20 15:23:25,081 [INFO] (model.py:671) Total Grad: 5.6227
+2025-07-20 15:23:25,081 [INFO] (workflow.py:115) reward 13.6857
+2025-07-20 15:23:25,193 [INFO] (workflow.py:108)  ---------- 1758 Start Learn ----------- 
+2025-07-20 15:23:26,084 [INFO] (model.py:671) Total Grad: 6.1747
+2025-07-20 15:23:26,214 [INFO] (workflow.py:108)  ---------- 1764 Start Learn ----------- 
+2025-07-20 15:23:26,709 [INFO] (model.py:671) Total Grad: 6.4821
+2025-07-20 15:23:26,821 [INFO] (workflow.py:108)  ---------- 1770 Start Learn ----------- 
+2025-07-20 15:23:28,093 [INFO] (model.py:671) Total Grad: 5.5843
+2025-07-20 15:23:28,191 [INFO] (workflow.py:108)  ---------- 1776 Start Learn ----------- 
+2025-07-20 15:23:29,248 [INFO] (model.py:671) Total Grad: 6.0813
+2025-07-20 15:23:29,352 [INFO] (workflow.py:108)  ---------- 1781 Start Learn ----------- 
+2025-07-20 15:23:30,175 [INFO] (model.py:671) Total Grad: 5.9049
+2025-07-20 15:23:30,272 [INFO] (workflow.py:108)  ---------- 1786 Start Learn ----------- 
+2025-07-20 15:23:30,765 [INFO] (model.py:671) Total Grad: 6.7781
+2025-07-20 15:23:30,867 [INFO] (workflow.py:108)  ---------- 1792 Start Learn ----------- 
+2025-07-20 15:23:32,038 [INFO] (model.py:671) Total Grad: 6.9363
+2025-07-20 15:23:32,038 [INFO] (workflow.py:115) reward 12.3000
+2025-07-20 15:23:32,173 [INFO] (workflow.py:108)  ---------- 1798 Start Learn ----------- 
+2025-07-20 15:23:33,401 [INFO] (model.py:671) Total Grad: 6.4201
+2025-07-20 15:23:33,504 [INFO] (workflow.py:108)  ---------- 1803 Start Learn ----------- 
+2025-07-20 15:23:34,083 [INFO] (model.py:671) Total Grad: 6.5053
+2025-07-20 15:23:34,190 [INFO] (workflow.py:108)  ---------- 1809 Start Learn ----------- 
+2025-07-20 15:23:34,428 [INFO] (model.py:671) Total Grad: 7.1914
+2025-07-20 15:23:34,531 [INFO] (workflow.py:108)  ---------- 1815 Start Learn ----------- 
+2025-07-20 15:23:35,836 [INFO] (model.py:671) Total Grad: 7.0510
+2025-07-20 15:23:35,950 [INFO] (workflow.py:108)  ---------- 1820 Start Learn ----------- 
+2025-07-20 15:23:36,738 [INFO] (model.py:671) Total Grad: 7.6917
+2025-07-20 15:23:36,839 [INFO] (workflow.py:108)  ---------- 1826 Start Learn ----------- 
+2025-07-20 15:23:37,347 [INFO] (model.py:671) Total Grad: 6.0627
+2025-07-20 15:23:37,449 [INFO] (workflow.py:108)  ---------- 1832 Start Learn ----------- 
+2025-07-20 15:23:38,860 [INFO] (model.py:671) Total Grad: 5.2111
+2025-07-20 15:23:38,865 [INFO] (workflow.py:115) reward 12.4750
+2025-07-20 15:23:38,992 [INFO] (workflow.py:108)  ---------- 1838 Start Learn ----------- 
+2025-07-20 15:23:40,156 [INFO] (model.py:671) Total Grad: 7.0555
+2025-07-20 15:23:40,254 [INFO] (workflow.py:108)  ---------- 1844 Start Learn ----------- 
+2025-07-20 15:23:40,969 [INFO] (model.py:671) Total Grad: 5.8277
+2025-07-20 15:23:41,072 [INFO] (workflow.py:108)  ---------- 1848 Start Learn ----------- 
+2025-07-20 15:23:41,463 [INFO] (model.py:671) Total Grad: 10.3755
+2025-07-20 15:23:41,570 [INFO] (workflow.py:108)  ---------- 1854 Start Learn ----------- 
+2025-07-20 15:23:42,610 [INFO] (model.py:671) Total Grad: 6.0713
+2025-07-20 15:23:42,731 [INFO] (workflow.py:108)  ---------- 1860 Start Learn ----------- 
+2025-07-20 15:23:43,768 [INFO] (model.py:671) Total Grad: 5.7839
+2025-07-20 15:23:43,881 [INFO] (workflow.py:108)  ---------- 1864 Start Learn ----------- 
+2025-07-20 15:23:44,546 [INFO] (model.py:671) Total Grad: 6.7501
+2025-07-20 15:23:44,666 [INFO] (workflow.py:108)  ---------- 1869 Start Learn ----------- 
+2025-07-20 15:23:45,745 [INFO] (model.py:671) Total Grad: 8.3143
+2025-07-20 15:23:45,745 [INFO] (workflow.py:115) reward 13.5676
+2025-07-20 15:23:45,869 [INFO] (workflow.py:108)  ---------- 1874 Start Learn ----------- 
+2025-07-20 15:23:46,801 [INFO] (model.py:671) Total Grad: 9.4882
+2025-07-20 15:23:46,915 [INFO] (workflow.py:108)  ---------- 1880 Start Learn ----------- 
+2025-07-20 15:23:47,897 [INFO] (model.py:671) Total Grad: 6.1395
+2025-07-20 15:23:47,998 [INFO] (workflow.py:108)  ---------- 1886 Start Learn ----------- 
+2025-07-20 15:23:48,443 [INFO] (model.py:671) Total Grad: 5.8923
+2025-07-20 15:23:48,549 [INFO] (workflow.py:108)  ---------- 1892 Start Learn ----------- 
+2025-07-20 15:23:49,577 [INFO] (model.py:671) Total Grad: 5.0372
+2025-07-20 15:23:49,677 [INFO] (workflow.py:108)  ---------- 1898 Start Learn ----------- 
+2025-07-20 15:23:50,685 [INFO] (model.py:671) Total Grad: 6.7041
+2025-07-20 15:23:50,796 [INFO] (workflow.py:108)  ---------- 1903 Start Learn ----------- 
+2025-07-20 15:23:51,520 [INFO] (model.py:671) Total Grad: 7.2189
+2025-07-20 15:23:51,630 [INFO] (workflow.py:108)  ---------- 1909 Start Learn ----------- 
+2025-07-20 15:23:51,897 [INFO] (model.py:671) Total Grad: 7.7020
+2025-07-20 15:23:51,897 [INFO] (workflow.py:115) reward 12.3250
+2025-07-20 15:23:52,002 [INFO] (workflow.py:108)  ---------- 1915 Start Learn ----------- 
+2025-07-20 15:23:53,420 [INFO] (model.py:671) Total Grad: 4.3329
+2025-07-20 15:23:53,533 [INFO] (workflow.py:108)  ---------- 1921 Start Learn ----------- 
+2025-07-20 15:23:54,726 [INFO] (model.py:671) Total Grad: 6.4292
+2025-07-20 15:23:54,889 [INFO] (workflow.py:108)  ---------- 1926 Start Learn ----------- 
+2025-07-20 15:23:55,527 [INFO] (model.py:671) Total Grad: 7.2023
+2025-07-20 15:23:55,637 [INFO] (workflow.py:108)  ---------- 1932 Start Learn ----------- 
+2025-07-20 15:23:56,906 [INFO] (model.py:671) Total Grad: 4.5940
+2025-07-20 15:23:57,029 [INFO] (workflow.py:108)  ---------- 1938 Start Learn ----------- 
+2025-07-20 15:23:58,188 [INFO] (model.py:671) Total Grad: 6.5644
+2025-07-20 15:23:58,188 [INFO] (workflow.py:115) reward 12.4483
+2025-07-20 15:23:58,282 [INFO] (workflow.py:108)  ---------- 1942 Start Learn ----------- 
+2025-07-20 15:23:59,029 [INFO] (model.py:671) Total Grad: 7.0803
+2025-07-20 15:23:59,133 [INFO] (workflow.py:108)  ---------- 1947 Start Learn ----------- 
+2025-07-20 15:23:59,499 [INFO] (model.py:671) Total Grad: 6.5615
+2025-07-20 15:23:59,618 [INFO] (workflow.py:108)  ---------- 1954 Start Learn ----------- 
+2025-07-20 15:24:01,009 [INFO] (model.py:671) Total Grad: 5.6045
+2025-07-20 15:24:01,118 [INFO] (workflow.py:108)  ---------- 1960 Start Learn ----------- 
+2025-07-20 15:24:02,223 [INFO] (model.py:671) Total Grad: 5.5231
+2025-07-20 15:24:02,333 [INFO] (workflow.py:108)  ---------- 1966 Start Learn ----------- 
+2025-07-20 15:24:02,937 [INFO] (model.py:671) Total Grad: 5.3289
+2025-07-20 15:24:03,051 [INFO] (workflow.py:108)  ---------- 1972 Start Learn ----------- 
+2025-07-20 15:24:03,327 [INFO] (model.py:671) Total Grad: 6.9428
+2025-07-20 15:24:03,428 [INFO] (workflow.py:108)  ---------- 1979 Start Learn ----------- 
+2025-07-20 15:24:04,647 [INFO] (model.py:671) Total Grad: 4.9355
+2025-07-20 15:24:04,647 [INFO] (workflow.py:115) reward 11.9268
+2025-07-20 15:24:04,762 [INFO] (workflow.py:108)  ---------- 1985 Start Learn ----------- 
+2025-07-20 15:24:05,499 [INFO] (model.py:671) Total Grad: 6.6331
+2025-07-20 15:24:05,606 [INFO] (workflow.py:108)  ---------- 1991 Start Learn ----------- 
+2025-07-20 15:24:06,044 [INFO] (model.py:671) Total Grad: 6.9662
+2025-07-20 15:24:06,142 [INFO] (workflow.py:108)  ---------- 1996 Start Learn ----------- 
+2025-07-20 15:24:07,492 [INFO] (model.py:671) Total Grad: 4.6909
+2025-07-20 15:24:07,596 [INFO] (workflow.py:108)  ---------- 2001 Start Learn ----------- 
+2025-07-20 15:24:08,812 [INFO] (model.py:671) Total Grad: 6.0106
+2025-07-20 15:24:08,934 [INFO] (workflow.py:108)  ---------- 2007 Start Learn ----------- 
+2025-07-20 15:24:09,449 [INFO] (model.py:671) Total Grad: 6.1934
+2025-07-20 15:24:09,565 [INFO] (workflow.py:108)  ---------- 2013 Start Learn ----------- 
+2025-07-20 15:24:09,909 [INFO] (model.py:671) Total Grad: 9.2876
+2025-07-20 15:24:10,071 [INFO] (workflow.py:108)  ---------- 2019 Start Learn ----------- 
+2025-07-20 15:24:11,127 [INFO] (model.py:671) Total Grad: 7.3387
+2025-07-20 15:24:11,129 [INFO] (workflow.py:115) reward 13.1750
+2025-07-20 15:24:11,240 [INFO] (workflow.py:108)  ---------- 2025 Start Learn ----------- 
+2025-07-20 15:24:11,973 [INFO] (model.py:671) Total Grad: 6.3481
+2025-07-20 15:24:12,082 [INFO] (workflow.py:108)  ---------- 2031 Start Learn ----------- 
+2025-07-20 15:24:12,466 [INFO] (model.py:671) Total Grad: 7.2613
+2025-07-20 15:24:12,573 [INFO] (workflow.py:108)  ---------- 2037 Start Learn ----------- 
+2025-07-20 15:24:13,679 [INFO] (model.py:671) Total Grad: 5.1204
+2025-07-20 15:24:13,802 [INFO] (workflow.py:108)  ---------- 2043 Start Learn ----------- 
+2025-07-20 15:24:14,930 [INFO] (model.py:671) Total Grad: 7.3872
+2025-07-20 15:24:15,047 [INFO] (workflow.py:108)  ---------- 2049 Start Learn ----------- 
+2025-07-20 15:24:15,657 [INFO] (model.py:671) Total Grad: 6.6196
+2025-07-20 15:24:15,758 [INFO] (workflow.py:108)  ---------- 2055 Start Learn ----------- 
+2025-07-20 15:24:16,734 [INFO] (model.py:671) Total Grad: 5.4662
+2025-07-20 15:24:16,840 [INFO] (workflow.py:108)  ---------- 2061 Start Learn ----------- 
+2025-07-20 15:24:18,009 [INFO] (model.py:671) Total Grad: 4.6651
+2025-07-20 15:24:18,009 [INFO] (workflow.py:115) reward 12.1429
+2025-07-20 15:24:18,109 [INFO] (workflow.py:108)  ---------- 2067 Start Learn ----------- 
+2025-07-20 15:24:18,958 [INFO] (model.py:671) Total Grad: 5.6648
+2025-07-20 15:24:19,058 [INFO] (workflow.py:108)  ---------- 2073 Start Learn ----------- 
+2025-07-20 15:24:19,427 [INFO] (model.py:671) Total Grad: 7.6151
+2025-07-20 15:24:19,537 [INFO] (workflow.py:108)  ---------- 2079 Start Learn ----------- 
+2025-07-20 15:24:20,569 [INFO] (model.py:671) Total Grad: 6.5768
+2025-07-20 15:24:20,677 [INFO] (workflow.py:108)  ---------- 2085 Start Learn ----------- 
+2025-07-20 15:24:21,801 [INFO] (model.py:671) Total Grad: 4.9019
+2025-07-20 15:24:21,902 [INFO] (workflow.py:108)  ---------- 2091 Start Learn ----------- 
+2025-07-20 15:24:22,608 [INFO] (model.py:671) Total Grad: 5.6554
+2025-07-20 15:24:22,717 [INFO] (workflow.py:108)  ---------- 2098 Start Learn ----------- 
+2025-07-20 15:24:22,955 [INFO] (model.py:671) Total Grad: 7.2897
+2025-07-20 15:24:23,053 [INFO] (workflow.py:108)  ---------- 2103 Start Learn ----------- 
+2025-07-20 15:24:24,216 [INFO] (model.py:671) Total Grad: 6.3749
+2025-07-20 15:24:24,219 [INFO] (workflow.py:115) reward 11.6905
+2025-07-20 15:24:24,323 [INFO] (workflow.py:108)  ---------- 2108 Start Learn ----------- 
+2025-07-20 15:24:25,245 [INFO] (model.py:671) Total Grad: 8.0134
+2025-07-20 15:24:25,351 [INFO] (workflow.py:108)  ---------- 2113 Start Learn ----------- 
+2025-07-20 15:24:25,854 [INFO] (model.py:671) Total Grad: 7.7182
+2025-07-20 15:24:25,950 [INFO] (workflow.py:108)  ---------- 2118 Start Learn ----------- 
+2025-07-20 15:24:27,437 [INFO] (model.py:671) Total Grad: 5.6438
+2025-07-20 15:24:27,553 [INFO] (workflow.py:108)  ---------- 2124 Start Learn ----------- 
+2025-07-20 15:24:28,709 [INFO] (model.py:671) Total Grad: 5.2645
+2025-07-20 15:24:28,808 [INFO] (workflow.py:108)  ---------- 2129 Start Learn ----------- 
+2025-07-20 15:24:29,521 [INFO] (model.py:671) Total Grad: 6.3004
+2025-07-20 15:24:29,638 [INFO] (workflow.py:108)  ---------- 2134 Start Learn ----------- 
+2025-07-20 15:24:30,091 [INFO] (model.py:671) Total Grad: 8.0588
+2025-07-20 15:24:30,209 [INFO] (workflow.py:108)  ---------- 2141 Start Learn ----------- 
+2025-07-20 15:24:31,530 [INFO] (model.py:671) Total Grad: 5.2831
+2025-07-20 15:24:31,530 [INFO] (workflow.py:115) reward 13.1316
+2025-07-20 15:24:31,649 [INFO] (workflow.py:108)  ---------- 2148 Start Learn ----------- 
+2025-07-20 15:24:32,587 [INFO] (model.py:671) Total Grad: 4.8781
+2025-07-20 15:24:32,702 [INFO] (workflow.py:108)  ---------- 2154 Start Learn ----------- 
+2025-07-20 15:24:33,153 [INFO] (model.py:671) Total Grad: 7.9536
+2025-07-20 15:24:33,254 [INFO] (workflow.py:108)  ---------- 2160 Start Learn ----------- 
+2025-07-20 15:24:34,692 [INFO] (model.py:671) Total Grad: 4.7592
+2025-07-20 15:24:34,807 [INFO] (workflow.py:108)  ---------- 2166 Start Learn ----------- 
+2025-07-20 15:24:35,797 [INFO] (model.py:671) Total Grad: 7.3746
+2025-07-20 15:24:35,907 [INFO] (workflow.py:108)  ---------- 2171 Start Learn ----------- 
+2025-07-20 15:24:36,693 [INFO] (model.py:671) Total Grad: 6.5796
+2025-07-20 15:24:36,819 [INFO] (workflow.py:108)  ---------- 2175 Start Learn ----------- 
+2025-07-20 15:24:37,244 [INFO] (model.py:671) Total Grad: 10.7733
+2025-07-20 15:24:37,354 [INFO] (workflow.py:108)  ---------- 2181 Start Learn ----------- 
+2025-07-20 15:24:38,488 [INFO] (model.py:671) Total Grad: 6.2567
+2025-07-20 15:24:38,488 [INFO] (workflow.py:115) reward 13.2250
+2025-07-20 15:24:38,598 [INFO] (workflow.py:108)  ---------- 2186 Start Learn ----------- 
+2025-07-20 15:24:39,555 [INFO] (model.py:671) Total Grad: 7.5696
+2025-07-20 15:24:39,654 [INFO] (workflow.py:108)  ---------- 2191 Start Learn ----------- 
+2025-07-20 15:24:40,095 [INFO] (model.py:671) Total Grad: 6.2144
+2025-07-20 15:24:40,211 [INFO] (workflow.py:108)  ---------- 2195 Start Learn ----------- 
+2025-07-20 15:24:41,461 [INFO] (model.py:671) Total Grad: 7.1936
+2025-07-20 15:24:41,569 [INFO] (workflow.py:108)  ---------- 2200 Start Learn ----------- 
+2025-07-20 15:24:42,572 [INFO] (model.py:671) Total Grad: 8.7876
+2025-07-20 15:24:42,683 [INFO] (workflow.py:108)  ---------- 2206 Start Learn ----------- 
+2025-07-20 15:24:43,335 [INFO] (model.py:671) Total Grad: 5.6996
+2025-07-20 15:24:43,450 [INFO] (workflow.py:108)  ---------- 2212 Start Learn ----------- 
+2025-07-20 15:24:43,725 [INFO] (model.py:671) Total Grad: 9.5029
+2025-07-20 15:24:43,836 [INFO] (workflow.py:108)  ---------- 2218 Start Learn ----------- 
+2025-07-20 15:24:45,144 [INFO] (model.py:671) Total Grad: 6.9475
+2025-07-20 15:24:45,144 [INFO] (workflow.py:115) reward 13.8649
+2025-07-20 15:24:45,269 [INFO] (workflow.py:108)  ---------- 2224 Start Learn ----------- 
+2025-07-20 15:24:46,074 [INFO] (model.py:671) Total Grad: 6.1294
+2025-07-20 15:24:46,174 [INFO] (workflow.py:108)  ---------- 2229 Start Learn ----------- 
+2025-07-20 15:24:46,707 [INFO] (model.py:671) Total Grad: 6.9847
+2025-07-20 15:24:46,809 [INFO] (workflow.py:108)  ---------- 2234 Start Learn ----------- 
+2025-07-20 15:24:48,031 [INFO] (model.py:671) Total Grad: 5.7413
+2025-07-20 15:24:48,157 [INFO] (workflow.py:108)  ---------- 2241 Start Learn ----------- 
+2025-07-20 15:24:48,909 [INFO] (model.py:671) Total Grad: 7.0810
+2025-07-20 15:24:49,028 [INFO] (workflow.py:108)  ---------- 2246 Start Learn ----------- 
+2025-07-20 15:24:49,660 [INFO] (model.py:671) Total Grad: 9.4040
+2025-07-20 15:24:49,761 [INFO] (workflow.py:108)  ---------- 2251 Start Learn ----------- 
+2025-07-20 15:24:50,116 [INFO] (model.py:671) Total Grad: 8.4706
+2025-07-20 15:24:50,229 [INFO] (workflow.py:108)  ---------- 2257 Start Learn ----------- 
+2025-07-20 15:24:51,398 [INFO] (model.py:671) Total Grad: 6.8045
+2025-07-20 15:24:51,398 [INFO] (workflow.py:115) reward 12.8974
+2025-07-20 15:24:51,508 [INFO] (workflow.py:108)  ---------- 2263 Start Learn ----------- 
+2025-07-20 15:24:52,516 [INFO] (model.py:671) Total Grad: 7.0714
+2025-07-20 15:24:52,641 [INFO] (workflow.py:108)  ---------- 2268 Start Learn ----------- 
+2025-07-20 15:24:53,440 [INFO] (model.py:671) Total Grad: 9.8371
+2025-07-20 15:24:53,545 [INFO] (workflow.py:108)  ---------- 2273 Start Learn ----------- 
+2025-07-20 15:24:54,778 [INFO] (model.py:671) Total Grad: 6.4510
+2025-07-20 15:24:54,875 [INFO] (workflow.py:108)  ---------- 2278 Start Learn ----------- 
+2025-07-20 15:24:56,068 [INFO] (model.py:671) Total Grad: 6.1281
+2025-07-20 15:24:56,185 [INFO] (workflow.py:108)  ---------- 2284 Start Learn ----------- 
+2025-07-20 15:24:56,925 [INFO] (model.py:671) Total Grad: 7.4615
+2025-07-20 15:24:57,032 [INFO] (workflow.py:108)  ---------- 2289 Start Learn ----------- 
+2025-07-20 15:24:57,323 [INFO] (model.py:671) Total Grad: 9.4394
+2025-07-20 15:24:57,417 [INFO] (workflow.py:115) reward 14.0556
+2025-07-20 15:24:57,433 [INFO] (workflow.py:108)  ---------- 2294 Start Learn ----------- 
+2025-07-20 15:24:58,715 [INFO] (model.py:671) Total Grad: 8.4723
+2025-07-20 15:24:58,823 [INFO] (workflow.py:108)  ---------- 2299 Start Learn ----------- 
+2025-07-20 15:24:59,687 [INFO] (model.py:671) Total Grad: 6.3095
+2025-07-20 15:24:59,789 [INFO] (workflow.py:108)  ---------- 2304 Start Learn ----------- 
+2025-07-20 15:25:00,342 [INFO] (model.py:671) Total Grad: 8.8512
+2025-07-20 15:25:00,458 [INFO] (workflow.py:108)  ---------- 2310 Start Learn ----------- 
+2025-07-20 15:25:01,690 [INFO] (model.py:671) Total Grad: 6.4001
+2025-07-20 15:25:01,793 [INFO] (workflow.py:108)  ---------- 2316 Start Learn ----------- 
+2025-07-20 15:25:02,740 [INFO] (model.py:671) Total Grad: 5.9615
+2025-07-20 15:25:02,903 [INFO] (workflow.py:108)  ---------- 2322 Start Learn ----------- 
+2025-07-20 15:25:03,933 [INFO] (model.py:671) Total Grad: 8.0196
+2025-07-20 15:25:03,933 [INFO] (workflow.py:115) reward 13.1379
+2025-07-20 15:25:04,048 [INFO] (workflow.py:108)  ---------- 2328 Start Learn ----------- 
+2025-07-20 15:25:04,291 [INFO] (model.py:671) Total Grad: 8.7506
+2025-07-20 15:25:04,388 [INFO] (workflow.py:108)  ---------- 2333 Start Learn ----------- 
+2025-07-20 15:25:05,200 [INFO] (model.py:671) Total Grad: 7.0930
+2025-07-20 15:25:05,315 [INFO] (workflow.py:108)  ---------- 2339 Start Learn ----------- 
+2025-07-20 15:25:06,089 [INFO] (model.py:671) Total Grad: 6.6323
+2025-07-20 15:25:06,203 [INFO] (workflow.py:108)  ---------- 2345 Start Learn ----------- 
+2025-07-20 15:25:06,786 [INFO] (model.py:671) Total Grad: 5.4683
+2025-07-20 15:25:06,915 [INFO] (workflow.py:108)  ---------- 2352 Start Learn ----------- 
+2025-07-20 15:25:08,116 [INFO] (model.py:671) Total Grad: 5.0219
+2025-07-20 15:25:08,229 [INFO] (workflow.py:108)  ---------- 2358 Start Learn ----------- 
+2025-07-20 15:25:09,115 [INFO] (model.py:671) Total Grad: 6.5887
+2025-07-20 15:25:09,234 [INFO] (workflow.py:108)  ---------- 2364 Start Learn ----------- 
+2025-07-20 15:25:10,025 [INFO] (model.py:671) Total Grad: 6.2257
+2025-07-20 15:25:10,038 [INFO] (workflow.py:115) reward 12.0714
+2025-07-20 15:25:10,165 [INFO] (workflow.py:108)  ---------- 2371 Start Learn ----------- 
+2025-07-20 15:25:10,419 [INFO] (model.py:671) Total Grad: 8.0312
+2025-07-20 15:25:10,534 [INFO] (workflow.py:108)  ---------- 2377 Start Learn ----------- 
+2025-07-20 15:25:11,735 [INFO] (model.py:671) Total Grad: 6.3429
+2025-07-20 15:25:11,857 [INFO] (workflow.py:108)  ---------- 2384 Start Learn ----------- 
+2025-07-20 15:25:12,643 [INFO] (model.py:671) Total Grad: 5.3443
+2025-07-20 15:25:12,798 [INFO] (workflow.py:108)  ---------- 2388 Start Learn ----------- 
+2025-07-20 15:25:13,322 [INFO] (model.py:671) Total Grad: 8.7973
+2025-07-20 15:25:13,486 [INFO] (workflow.py:108)  ---------- 2394 Start Learn ----------- 
+2025-07-20 15:25:14,546 [INFO] (model.py:671) Total Grad: 6.1891
+2025-07-20 15:25:14,642 [INFO] (workflow.py:108)  ---------- 2399 Start Learn ----------- 
+2025-07-20 15:25:15,669 [INFO] (model.py:671) Total Grad: 6.1664
+2025-07-20 15:25:15,785 [INFO] (workflow.py:108)  ---------- 2405 Start Learn ----------- 
+2025-07-20 15:25:16,381 [INFO] (model.py:671) Total Grad: 7.4182
+2025-07-20 15:25:16,381 [INFO] (workflow.py:115) reward 12.9024
+2025-07-20 15:25:16,491 [INFO] (workflow.py:108)  ---------- 2410 Start Learn ----------- 
+2025-07-20 15:25:16,734 [INFO] (model.py:671) Total Grad: 7.9612
+2025-07-20 15:25:16,858 [INFO] (workflow.py:108)  ---------- 2417 Start Learn ----------- 
+2025-07-20 15:25:18,364 [INFO] (model.py:671) Total Grad: 5.8753
+2025-07-20 15:25:18,487 [INFO] (workflow.py:108)  ---------- 2423 Start Learn ----------- 
+2025-07-20 15:25:19,175 [INFO] (model.py:671) Total Grad: 7.2878
+2025-07-20 15:25:19,284 [INFO] (workflow.py:108)  ---------- 2429 Start Learn ----------- 
+2025-07-20 15:25:19,685 [INFO] (model.py:671) Total Grad: 7.1193
+2025-07-20 15:25:19,799 [INFO] (workflow.py:108)  ---------- 2433 Start Learn ----------- 
+2025-07-20 15:25:21,108 [INFO] (model.py:671) Total Grad: 7.9692
+2025-07-20 15:25:21,221 [INFO] (workflow.py:108)  ---------- 2438 Start Learn ----------- 
+2025-07-20 15:25:22,251 [INFO] (model.py:671) Total Grad: 7.0789
+2025-07-20 15:25:22,359 [INFO] (workflow.py:108)  ---------- 2444 Start Learn ----------- 
+2025-07-20 15:25:23,027 [INFO] (model.py:671) Total Grad: 8.1798
+2025-07-20 15:25:23,027 [INFO] (workflow.py:115) reward 12.9487
+2025-07-20 15:25:23,143 [INFO] (workflow.py:108)  ---------- 2450 Start Learn ----------- 
+2025-07-20 15:25:23,386 [INFO] (model.py:671) Total Grad: 7.0847
+2025-07-20 15:25:23,488 [INFO] (workflow.py:108)  ---------- 2455 Start Learn ----------- 
+2025-07-20 15:25:24,892 [INFO] (model.py:671) Total Grad: 6.0704
+2025-07-20 15:25:25,016 [INFO] (workflow.py:108)  ---------- 2462 Start Learn ----------- 
+2025-07-20 15:25:25,656 [INFO] (model.py:671) Total Grad: 6.7669
+2025-07-20 15:25:25,765 [INFO] (workflow.py:108)  ---------- 2468 Start Learn ----------- 
+2025-07-20 15:25:26,364 [INFO] (model.py:671) Total Grad: 6.2998
+2025-07-20 15:25:26,486 [INFO] (workflow.py:108)  ---------- 2473 Start Learn ----------- 
+2025-07-20 15:25:27,796 [INFO] (model.py:671) Total Grad: 4.7435
+2025-07-20 15:25:27,924 [INFO] (workflow.py:108)  ---------- 2479 Start Learn ----------- 
+2025-07-20 15:25:28,938 [INFO] (model.py:671) Total Grad: 7.2986
+2025-07-20 15:25:29,043 [INFO] (workflow.py:115) reward 12.2750
+2025-07-20 15:25:29,060 [INFO] (workflow.py:108)  ---------- 2485 Start Learn ----------- 
+2025-07-20 15:25:29,756 [INFO] (model.py:671) Total Grad: 7.7791
+2025-07-20 15:25:29,865 [INFO] (workflow.py:108)  ---------- 2491 Start Learn ----------- 
+2025-07-20 15:25:30,116 [INFO] (model.py:671) Total Grad: 7.3407
+2025-07-20 15:25:30,223 [INFO] (workflow.py:108)  ---------- 2497 Start Learn ----------- 
+2025-07-20 15:25:31,613 [INFO] (model.py:671) Total Grad: 4.7315
+2025-07-20 15:25:31,723 [INFO] (workflow.py:108)  ---------- 2503 Start Learn ----------- 
+2025-07-20 15:25:32,540 [INFO] (model.py:671) Total Grad: 6.3896
+2025-07-20 15:25:32,668 [INFO] (workflow.py:108)  ---------- 2509 Start Learn ----------- 
+2025-07-20 15:25:33,235 [INFO] (model.py:671) Total Grad: 7.3018
+2025-07-20 15:25:33,341 [INFO] (workflow.py:108)  ---------- 2514 Start Learn ----------- 
+2025-07-20 15:25:34,251 [INFO] (model.py:671) Total Grad: 6.0954
+2025-07-20 15:25:34,352 [INFO] (workflow.py:108)  ---------- 2519 Start Learn ----------- 
+2025-07-20 15:25:35,541 [INFO] (model.py:671) Total Grad: 7.9502
+2025-07-20 15:25:35,541 [INFO] (workflow.py:115) reward 12.5429
+2025-07-20 15:25:35,667 [INFO] (workflow.py:108)  ---------- 2526 Start Learn ----------- 
+2025-07-20 15:25:36,462 [INFO] (model.py:671) Total Grad: 7.0181
+2025-07-20 15:25:36,581 [INFO] (workflow.py:108)  ---------- 2532 Start Learn ----------- 
+2025-07-20 15:25:36,906 [INFO] (model.py:671) Total Grad: 9.2640
+2025-07-20 15:25:37,011 [INFO] (workflow.py:108)  ---------- 2538 Start Learn ----------- 
+2025-07-20 15:25:38,194 [INFO] (model.py:671) Total Grad: 3.7363
+2025-07-20 15:25:38,305 [INFO] (workflow.py:108)  ---------- 2544 Start Learn ----------- 
+2025-07-20 15:25:39,123 [INFO] (model.py:671) Total Grad: 6.9824
+2025-07-20 15:25:39,244 [INFO] (workflow.py:108)  ---------- 2550 Start Learn ----------- 
+2025-07-20 15:25:39,866 [INFO] (model.py:671) Total Grad: 6.8407
+2025-07-20 15:25:39,970 [INFO] (workflow.py:108)  ---------- 2556 Start Learn ----------- 
+2025-07-20 15:25:41,057 [INFO] (model.py:671) Total Grad: 5.1681
+2025-07-20 15:25:41,170 [INFO] (workflow.py:108)  ---------- 2563 Start Learn ----------- 
+2025-07-20 15:25:42,531 [INFO] (model.py:671) Total Grad: 6.3460
+2025-07-20 15:25:42,531 [INFO] (workflow.py:115) reward 11.5227
+2025-07-20 15:25:42,635 [INFO] (workflow.py:108)  ---------- 2569 Start Learn ----------- 
+2025-07-20 15:25:43,306 [INFO] (model.py:671) Total Grad: 6.6966
+2025-07-20 15:25:43,403 [INFO] (workflow.py:108)  ---------- 2574 Start Learn ----------- 
+2025-07-20 15:25:43,781 [INFO] (model.py:671) Total Grad: 8.7041
+2025-07-20 15:25:43,889 [INFO] (workflow.py:108)  ---------- 2580 Start Learn ----------- 
+2025-07-20 15:25:44,958 [INFO] (model.py:671) Total Grad: 5.2232
+2025-07-20 15:25:45,065 [INFO] (workflow.py:108)  ---------- 2586 Start Learn ----------- 
+2025-07-20 15:25:46,102 [INFO] (model.py:671) Total Grad: 5.8908
+2025-07-20 15:25:46,217 [INFO] (workflow.py:108)  ---------- 2593 Start Learn ----------- 
+2025-07-20 15:25:46,847 [INFO] (model.py:671) Total Grad: 5.7993
+2025-07-20 15:25:46,963 [INFO] (workflow.py:108)  ---------- 2599 Start Learn ----------- 
+2025-07-20 15:25:47,138 [INFO] (model.py:671) Total Grad: 7.7978
+2025-07-20 15:25:47,234 [INFO] (workflow.py:108)  ---------- 2604 Start Learn ----------- 
+2025-07-20 15:25:49,031 [INFO] (model.py:671) Total Grad: 8.8726
+2025-07-20 15:25:49,032 [INFO] (workflow.py:115) reward 12.0000
+2025-07-20 15:25:49,138 [INFO] (workflow.py:108)  ---------- 2610 Start Learn ----------- 
+2025-07-20 15:25:50,143 [INFO] (model.py:671) Total Grad: 6.7437
+2025-07-20 15:25:50,254 [INFO] (workflow.py:108)  ---------- 2616 Start Learn ----------- 
+2025-07-20 15:25:50,697 [INFO] (model.py:671) Total Grad: 7.1455
+2025-07-20 15:25:50,814 [INFO] (workflow.py:108)  ---------- 2622 Start Learn ----------- 
+2025-07-20 15:25:52,042 [INFO] (model.py:671) Total Grad: 7.4767
+2025-07-20 15:25:52,152 [INFO] (workflow.py:108)  ---------- 2628 Start Learn ----------- 
+2025-07-20 15:25:53,384 [INFO] (model.py:671) Total Grad: 6.1436
+2025-07-20 15:25:53,489 [INFO] (workflow.py:108)  ---------- 2634 Start Learn ----------- 
+2025-07-20 15:25:54,208 [INFO] (model.py:671) Total Grad: 6.3007
+2025-07-20 15:25:54,324 [INFO] (workflow.py:108)  ---------- 2640 Start Learn ----------- 
+2025-07-20 15:25:54,633 [INFO] (model.py:671) Total Grad: 9.0568
+2025-07-20 15:25:54,731 [INFO] (workflow.py:108)  ---------- 2645 Start Learn ----------- 
+2025-07-20 15:25:55,610 [INFO] (model.py:671) Total Grad: 5.9804
+2025-07-20 15:25:55,610 [INFO] (workflow.py:115) reward 12.2927
+2025-07-20 15:25:55,720 [INFO] (workflow.py:108)  ---------- 2651 Start Learn ----------- 
+2025-07-20 15:25:56,918 [INFO] (model.py:671) Total Grad: 5.1864
+2025-07-20 15:25:57,031 [INFO] (workflow.py:108)  ---------- 2657 Start Learn ----------- 
+2025-07-20 15:25:57,477 [INFO] (model.py:671) Total Grad: 7.1879
+2025-07-20 15:25:57,584 [INFO] (workflow.py:108)  ---------- 2662 Start Learn ----------- 
+2025-07-20 15:25:57,746 [INFO] (model.py:671) Total Grad: 7.4960
+2025-07-20 15:25:57,851 [INFO] (workflow.py:108)  ---------- 2667 Start Learn ----------- 
+2025-07-20 15:25:59,410 [INFO] (model.py:671) Total Grad: 8.7246
+2025-07-20 15:25:59,554 [INFO] (workflow.py:108)  ---------- 2672 Start Learn ----------- 
+2025-07-20 15:26:00,392 [INFO] (model.py:671) Total Grad: 8.3002
+2025-07-20 15:26:00,518 [INFO] (workflow.py:108)  ---------- 2678 Start Learn ----------- 
+2025-07-20 15:26:00,975 [INFO] (model.py:671) Total Grad: 6.8377
+2025-07-20 15:26:01,088 [INFO] (workflow.py:108)  ---------- 2683 Start Learn ----------- 
+2025-07-20 15:26:02,765 [INFO] (model.py:671) Total Grad: 5.5294
+2025-07-20 15:26:02,765 [INFO] (workflow.py:115) reward 12.9211
+2025-07-20 15:26:02,892 [INFO] (workflow.py:108)  ---------- 2688 Start Learn ----------- 
+2025-07-20 15:26:04,041 [INFO] (model.py:671) Total Grad: 7.6978
+2025-07-20 15:26:04,142 [INFO] (workflow.py:108)  ---------- 2693 Start Learn ----------- 
+2025-07-20 15:26:04,765 [INFO] (model.py:671) Total Grad: 5.8433
+2025-07-20 15:26:04,919 [INFO] (workflow.py:108)  ---------- 2700 Start Learn ----------- 
+2025-07-20 15:26:06,449 [INFO] (model.py:671) Total Grad: 5.8646
+2025-07-20 15:26:06,561 [INFO] (workflow.py:108)  ---------- 2705 Start Learn ----------- 
+2025-07-20 15:26:07,512 [INFO] (model.py:671) Total Grad: 8.7574
+2025-07-20 15:26:07,630 [INFO] (workflow.py:108)  ---------- 2711 Start Learn ----------- 
+2025-07-20 15:26:08,511 [INFO] (model.py:671) Total Grad: 5.8329
+2025-07-20 15:26:08,617 [INFO] (workflow.py:108)  ---------- 2716 Start Learn ----------- 
+2025-07-20 15:26:09,329 [INFO] (model.py:671) Total Grad: 9.5840
+2025-07-20 15:26:09,329 [INFO] (workflow.py:115) reward 13.1212
+2025-07-20 15:26:09,460 [INFO] (workflow.py:108)  ---------- 2720 Start Learn ----------- 
+2025-07-20 15:26:09,580 [INFO] (model.py:671) Total Grad: 6.1854
+2025-07-20 15:26:09,685 [INFO] (workflow.py:108)  ---------- 2725 Start Learn ----------- 
+2025-07-20 15:26:10,666 [INFO] (model.py:671) Total Grad: 6.5938
+2025-07-20 15:26:10,798 [INFO] (workflow.py:108)  ---------- 2730 Start Learn ----------- 
+2025-07-20 15:26:11,921 [INFO] (model.py:671) Total Grad: 6.1903
+2025-07-20 15:26:12,020 [INFO] (workflow.py:108)  ---------- 2736 Start Learn ----------- 
+2025-07-20 15:26:12,410 [INFO] (model.py:671) Total Grad: 6.2898
+2025-07-20 15:26:12,545 [INFO] (workflow.py:108)  ---------- 2743 Start Learn ----------- 
+2025-07-20 15:26:13,476 [INFO] (model.py:671) Total Grad: 6.1045
+2025-07-20 15:26:13,588 [INFO] (workflow.py:108)  ---------- 2749 Start Learn ----------- 
+2025-07-20 15:26:14,602 [INFO] (model.py:671) Total Grad: 6.6901
+2025-07-20 15:26:14,717 [INFO] (workflow.py:108)  ---------- 2756 Start Learn ----------- 
+2025-07-20 15:26:15,297 [INFO] (model.py:671) Total Grad: 5.8465
+2025-07-20 15:26:15,337 [INFO] (workflow.py:115) reward 12.3095
+2025-07-20 15:26:15,417 [INFO] (workflow.py:108)  ---------- 2763 Start Learn ----------- 
+2025-07-20 15:26:16,444 [INFO] (model.py:671) Total Grad: 4.9726
+2025-07-20 15:26:16,554 [INFO] (workflow.py:108)  ---------- 2768 Start Learn ----------- 
+2025-07-20 15:26:17,564 [INFO] (model.py:671) Total Grad: 9.7863
+2025-07-20 15:26:17,669 [INFO] (workflow.py:108)  ---------- 2774 Start Learn ----------- 
+2025-07-20 15:26:18,434 [INFO] (model.py:671) Total Grad: 6.2968
+2025-07-20 15:26:18,537 [INFO] (workflow.py:108)  ---------- 2779 Start Learn ----------- 
+2025-07-20 15:26:18,837 [INFO] (model.py:671) Total Grad: 9.6346
+2025-07-20 15:26:18,947 [INFO] (workflow.py:108)  ---------- 2785 Start Learn ----------- 
+2025-07-20 15:26:20,237 [INFO] (model.py:671) Total Grad: 5.1579
+2025-07-20 15:26:20,347 [INFO] (workflow.py:108)  ---------- 2791 Start Learn ----------- 
+2025-07-20 15:26:21,492 [INFO] (model.py:671) Total Grad: 5.8580
+2025-07-20 15:26:21,492 [INFO] (workflow.py:115) reward 12.2727
+2025-07-20 15:26:21,603 [INFO] (workflow.py:108)  ---------- 2797 Start Learn ----------- 
+2025-07-20 15:26:22,218 [INFO] (model.py:671) Total Grad: 7.4641
+2025-07-20 15:26:22,329 [INFO] (workflow.py:108)  ---------- 2802 Start Learn ----------- 
+2025-07-20 15:26:22,619 [INFO] (model.py:671) Total Grad: 9.4545
+2025-07-20 15:26:22,720 [INFO] (workflow.py:108)  ---------- 2808 Start Learn ----------- 
+2025-07-20 15:26:23,827 [INFO] (model.py:671) Total Grad: 7.3508
+2025-07-20 15:26:23,943 [INFO] (workflow.py:108)  ---------- 2814 Start Learn ----------- 
+2025-07-20 15:26:24,778 [INFO] (model.py:671) Total Grad: 7.1625
+2025-07-20 15:26:24,896 [INFO] (workflow.py:108)  ---------- 2820 Start Learn ----------- 
+2025-07-20 15:26:25,492 [INFO] (model.py:671) Total Grad: 8.1752
+2025-07-20 15:26:25,640 [INFO] (workflow.py:108)  ---------- 2826 Start Learn ----------- 
+2025-07-20 15:26:26,698 [INFO] (model.py:671) Total Grad: 7.9820
+2025-07-20 15:26:26,801 [INFO] (workflow.py:108)  ---------- 2832 Start Learn ----------- 
+2025-07-20 15:26:27,682 [INFO] (model.py:671) Total Grad: 6.8613
+2025-07-20 15:26:27,682 [INFO] (workflow.py:115) reward 12.2195
+2025-07-20 15:26:27,799 [INFO] (workflow.py:108)  ---------- 2837 Start Learn ----------- 
+2025-07-20 15:26:28,509 [INFO] (model.py:671) Total Grad: 8.8511
+2025-07-20 15:26:28,616 [INFO] (workflow.py:108)  ---------- 2842 Start Learn ----------- 
+2025-07-20 15:26:28,877 [INFO] (model.py:671) Total Grad: 9.4271
+2025-07-20 15:26:28,986 [INFO] (workflow.py:108)  ---------- 2848 Start Learn ----------- 
+2025-07-20 15:26:30,289 [INFO] (model.py:671) Total Grad: 4.3748
+2025-07-20 15:26:30,394 [INFO] (workflow.py:108)  ---------- 2853 Start Learn ----------- 
+2025-07-20 15:26:31,205 [INFO] (model.py:671) Total Grad: 6.9473
+2025-07-20 15:26:31,320 [INFO] (workflow.py:108)  ---------- 2859 Start Learn ----------- 
+2025-07-20 15:26:31,863 [INFO] (model.py:671) Total Grad: 5.9619
+2025-07-20 15:26:31,973 [INFO] (workflow.py:108)  ---------- 2864 Start Learn ----------- 
+2025-07-20 15:26:33,227 [INFO] (model.py:671) Total Grad: 6.9030
+2025-07-20 15:26:33,342 [INFO] (workflow.py:108)  ---------- 2870 Start Learn ----------- 
+2025-07-20 15:26:34,481 [INFO] (model.py:671) Total Grad: 8.2638
+2025-07-20 15:26:34,482 [INFO] (workflow.py:115) reward 13.0789
+2025-07-20 15:26:34,585 [INFO] (workflow.py:108)  ---------- 2876 Start Learn ----------- 
+2025-07-20 15:26:35,337 [INFO] (model.py:671) Total Grad: 7.9688
+2025-07-20 15:26:35,446 [INFO] (workflow.py:108)  ---------- 2882 Start Learn ----------- 
+2025-07-20 15:26:35,869 [INFO] (model.py:671) Total Grad: 7.0283
+2025-07-20 15:26:35,967 [INFO] (workflow.py:108)  ---------- 2887 Start Learn ----------- 
+2025-07-20 15:26:37,076 [INFO] (model.py:671) Total Grad: 6.2317
+2025-07-20 15:26:37,192 [INFO] (workflow.py:108)  ---------- 2894 Start Learn ----------- 
+2025-07-20 15:26:38,387 [INFO] (model.py:671) Total Grad: 5.5763
+2025-07-20 15:26:38,510 [INFO] (workflow.py:108)  ---------- 2901 Start Learn ----------- 
+2025-07-20 15:26:39,162 [INFO] (model.py:671) Total Grad: 5.1887
+2025-07-20 15:26:39,268 [INFO] (workflow.py:108)  ---------- 2906 Start Learn ----------- 
+2025-07-20 15:26:39,446 [INFO] (model.py:671) Total Grad: 6.9599
+2025-07-20 15:26:39,557 [INFO] (workflow.py:108)  ---------- 2912 Start Learn ----------- 
+2025-07-20 15:26:40,765 [INFO] (model.py:671) Total Grad: 7.3913
+2025-07-20 15:26:40,765 [INFO] (workflow.py:115) reward 12.1905
+2025-07-20 15:26:40,867 [INFO] (workflow.py:108)  ---------- 2918 Start Learn ----------- 
+2025-07-20 15:26:41,762 [INFO] (model.py:671) Total Grad: 7.2364
+2025-07-20 15:26:41,905 [INFO] (workflow.py:108)  ---------- 2924 Start Learn ----------- 
+2025-07-20 15:26:42,611 [INFO] (model.py:671) Total Grad: 7.9865
+2025-07-20 15:26:42,751 [INFO] (workflow.py:108)  ---------- 2929 Start Learn ----------- 
+2025-07-20 15:26:44,104 [INFO] (model.py:671) Total Grad: 6.8955
+2025-07-20 15:26:44,198 [INFO] (workflow.py:108)  ---------- 2934 Start Learn ----------- 
+2025-07-20 15:26:45,231 [INFO] (model.py:671) Total Grad: 9.2833
+2025-07-20 15:26:45,349 [INFO] (workflow.py:108)  ---------- 2939 Start Learn ----------- 
+2025-07-20 15:26:45,853 [INFO] (model.py:671) Total Grad: 7.7238
+2025-07-20 15:26:45,965 [INFO] (workflow.py:108)  ---------- 2945 Start Learn ----------- 
+2025-07-20 15:26:47,370 [INFO] (model.py:671) Total Grad: 7.2866
+2025-07-20 15:26:47,370 [INFO] (workflow.py:115) reward 13.0000
+2025-07-20 15:26:47,479 [INFO] (workflow.py:108)  ---------- 2950 Start Learn ----------- 
+2025-07-20 15:26:48,627 [INFO] (model.py:671) Total Grad: 7.7258
+2025-07-20 15:26:48,740 [INFO] (workflow.py:108)  ---------- 2956 Start Learn ----------- 
+2025-07-20 15:26:49,575 [INFO] (model.py:671) Total Grad: 7.3753
+2025-07-20 15:26:49,677 [INFO] (workflow.py:108)  ---------- 2962 Start Learn ----------- 
+2025-07-20 15:26:50,107 [INFO] (model.py:671) Total Grad: 6.2778
+2025-07-20 15:26:50,202 [INFO] (workflow.py:108)  ---------- 2967 Start Learn ----------- 
+2025-07-20 15:26:51,289 [INFO] (model.py:671) Total Grad: 6.1250
+2025-07-20 15:26:51,398 [INFO] (workflow.py:108)  ---------- 2972 Start Learn ----------- 
+2025-07-20 15:26:52,604 [INFO] (model.py:671) Total Grad: 7.4005
+2025-07-20 15:26:52,710 [INFO] (workflow.py:108)  ---------- 2977 Start Learn ----------- 
+2025-07-20 15:26:53,369 [INFO] (model.py:671) Total Grad: 6.4777
+2025-07-20 15:26:53,371 [INFO] (workflow.py:115) reward 13.0938
+2025-07-20 15:26:53,488 [INFO] (workflow.py:108)  ---------- 2984 Start Learn ----------- 
+2025-07-20 15:26:53,822 [INFO] (model.py:671) Total Grad: 6.9861
+2025-07-20 15:26:53,925 [INFO] (workflow.py:108)  ---------- 2989 Start Learn ----------- 
+2025-07-20 15:26:55,036 [INFO] (model.py:671) Total Grad: 4.9344
+2025-07-20 15:26:55,150 [INFO] (workflow.py:108)  ---------- 2995 Start Learn ----------- 
+2025-07-20 15:26:56,071 [INFO] (model.py:671) Total Grad: 5.7349
+2025-07-20 15:26:56,149 [INFO] (workflow.py:130) Train Over
+2025-07-20 15:27:26,181 [INFO] (workflow.py:134) Training Time for 3000 episodes: 584.2419023513794 s

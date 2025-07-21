@@ -15,10 +15,47 @@ SampleData = create_cls("SampleData", rewards=None, dones=None)
 ObsData = create_cls("ObsData", feature=None, legal_actions=None)
 ActData = create_cls("ActData", action=None)
 
+def _to_ndarray(array: list | np.ndarray) -> np.ndarray:
+    array = np.array(array, dtype=np.float32)
+    return array
 
 @attached
-def sample_process(sample):
-    return SampleData(rewards=sample.rewards, dones=sample.dones)
+def sample_process(game_buffer):
+    list_sample_data = []
+    for i in range(len(game_buffer.features)):
+        # 统一 np.ndarray 并 float32 转换
+        features = _to_ndarray(game_buffer.features[i])
+        next_features = _to_ndarray(game_buffer.next_features[i])
+        actions = _to_ndarray(game_buffer.actions[i])
+        log_probs = _to_ndarray(game_buffer.log_probs[i])
+        rewards = _to_ndarray(game_buffer.rewards[i])
+        dones = _to_ndarray(game_buffer.dones[i])
+        values = _to_ndarray(game_buffer.values[i])
+        advantages = _to_ndarray(game_buffer.advantages[i])
+        hidden_states_pi = _to_ndarray(game_buffer.hidden_states_pi[i])
+        cell_states_pi = _to_ndarray(game_buffer.cell_states_pi[i])
+        hidden_states_vf = _to_ndarray(game_buffer.hidden_states_vf[i])
+        cell_states_vf = _to_ndarray(game_buffer.cell_states_vf[i])
+        
+        list_sample_data.append(
+            # 每个 SampleData 包含单个时间步下 n_envs 个并行环境的 sample 数据
+            SampleData( # (n_envs, dim)
+                features = features,
+                next_features = next_features,
+                actions = actions,
+                log_probs = log_probs,
+                rewards = rewards,
+                dones = dones,
+                values = values,
+                advantages = advantages,
+                hidden_states_pi = hidden_states_pi, 
+                cell_states_pi = cell_states_pi,
+                hidden_states_vf = hidden_states_vf,
+                cell_states_vf = cell_states_vf,
+            )
+        )
+
+    return list_sample_data
 
 class Map:
     def __init__(self, map_size=64):

@@ -1,5 +1,6 @@
 import time
 import os
+import tqdm
 
 from utils import create_cls
 from feature import (
@@ -12,7 +13,7 @@ from env import Env
 
 Frame = create_cls("Frame", rewards=None, dones=None)
 
-EPISODES = 300
+EPISODES = 3000
 REPORT_INTERVAL = 6
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 500
@@ -37,8 +38,10 @@ def workflow(envs, agents, logger=None, monitor=None):
         last_save_model_time = start_t
 
         max_steps = INIT_MAX_STEPS
+        episode_cnt = 0
         # 开始训练
-        for episode in range(EPISODES):
+        for episode in tqdm.tqdm(range(EPISODES)):
+            episode_cnt += 1
             agent.reset()
             # 重置游戏, 并获取初始状态
             obs, extra_info = env.reset() # TODO: 分布式
@@ -108,9 +111,11 @@ def workflow(envs, agents, logger=None, monitor=None):
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
                 if monitor:
-                    logger.info(f"reward {monitor_data['reward']}")
+                    monitor_data['reward'] = monitor_data['reward'] / episode_cnt
+                    logger.info(f"reward {monitor_data['reward']:.4f}")
                     monitor.put_data(monitor_data)
                     monitor_data['reward'] = 0
+                    episode_cnt = 0
 
                 last_report_monitor_time = now
             # 保存模型
@@ -127,8 +132,10 @@ def workflow(envs, agents, logger=None, monitor=None):
         agent.save_model(path="./Test/backup", id="latest")
         end_t = time.time()
         logger.info(f"Training Time for {EPISODES} episodes: {end_t - start_t} s")
+        monitor.draw()
 
     except Exception as e:
+        monitor.draw()
         raise RuntimeError(f"workflow error")
     
 
@@ -138,4 +145,3 @@ if __name__ == "__main__":
     envs = [Env()]
     agents = [Agent(agent_type="player", device="cpu", logger=logger, monitor=monitor)]
     workflow(envs, agents, logger, monitor)
-    monitor.draw()

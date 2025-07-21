@@ -624,6 +624,9 @@ class Model(nn.Module):
         total_norms = []
         for epoch in range(self.K_epochs):
             for rollout_data in self.buffer.get_batch_data(self.minibatch):
+                if torch.isnan(rollout_data.features).any():
+                    self.logger.error("NaN detected in features, skipping this batch.")
+                    continue
                 mask = rollout_data.mask > 1e-8
                 values, log_probs, entropies = self.policy.evaluate_actions(
                     rollout_data.features,
