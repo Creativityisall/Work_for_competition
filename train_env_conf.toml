@@ -66,7 +66,7 @@ talent_cooldown = 100
 # 宝箱是否随机, 布尔值，false - 固定宝箱，true - 随机宝箱。
 # 若开启固定，则使用treasure_pos生成固定宝箱。
 # 若开启随机，则使用treasure_count随机生成宝箱。
-treasure_random = false
+treasure_random = true
 
 # The number of treasure chests when generating random treasure chest list. This is only valid when treasure_random = true.
 # Integer, the value range is 0~13.
@@ -86,7 +86,7 @@ treasure_pos = []
 # Boolean value, false means fixed dynamic obstacle list, true means randomly generating a dynamic obstacle.
 # 是否生成随机动态障碍物。
 # 布尔值，false表示固定动态障碍物，true表示随机生成一个动态障碍物。
-obstacle_random = false
+obstacle_random = true
 
 # The id when generating a fixed dynamic obstacle list. It only works when obstacle_random = false.
 # An array containing 0 to 6 elements. The value range of the element is 1 to 6.
@@ -106,4 +106,4 @@ talent_type = 1
 # Integer, range is 1~2000.
 # 单局最大步数。
 # 整型，取值范围为1~2000。
-max_step = 1000
+max_step = 2000
