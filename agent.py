@@ -10,7 +10,7 @@ Author: Tencent AI Arena Authors
 import kaiwu_agent
 from kaiwu_agent.agent.base_agent import BaseAgent
 from kaiwu_agent.utils.common_func import create_cls
-import numpy as np
+from agent_diy.feature.definition import sample_process
 import os
 from kaiwu_agent.agent.base_agent import (
     learn_wrapper,
@@ -23,6 +23,8 @@ from kaiwu_agent.agent.base_agent import (
 from agent_diy.conf.conf import Config
 from agent_diy.model.model import Model
 import torch
+import numpy as np
+from collections import namedtuple
 
 ObsData = create_cls("ObsData", feature=None, legal_actions=None, done = None)
 ActData = create_cls("ActData", act=None)
@@ -45,13 +47,14 @@ class Agent(BaseAgent):
             lstm_num_layers = Config.LSTM_HIDDEN_LAYERS
         )
         self.gamma = Config.GAMMA
-        self._POS_MEANS = np.array([32.0, 32.0], dtype=np.float32)
-        self._POS_STDS = np.array([10.67, 10.67], dtype=np.float32)
+        self._POS_MEANS = np.array([63.5, 63.5], dtype=np.float32)
+        self._POS_STDS = np.array([36.66, 36.66], dtype=np.float32)
+        self.sample_process = sample_process
 
         # 相对距离 (end_treasure_dists) 范围: [0, 6]
         # 假设 raw_obs["feature"] 只有一个元素 (即只有一个距离值)
-        self._END_TREASURE_DISTS_MEANS = np.array([3.0], dtype=np.float32)
-        self._END_TREASURE_DISTS_STDS = np.array([1.0], dtype=np.float32)
+        #self._END_TREASURE_DISTS_MEANS = np.array([3.0], dtype=np.float32)
+        #self._END_TREASURE_DISTS_STDS = np.array([1.0], dtype=np.float32)
     def reset(self):
         """重置智能体内部模型的状态"""
         if hasattr(self.model, 'reset'):
@@ -81,129 +84,113 @@ class Agent(BaseAgent):
         return act
 
     @learn_wrapper
-    def learn(self, list_sample_data):
-        return self.model.learn(list_sample_data , list_sample_data.last_state, list_sample_data.done[-1])
+    def learn(self, list_game_data):
+        """
+        这个方法在Actor端被调用，用于在数据收集后打包数据。
+        真正的 self.model.learn 在Learner端被调用。
+        """
+        # 从 list_game_data 中提取 learn 方法所需的参数
+        # 注意: list_game_data 在这里是原始的、由 predict 逐步收集的样本列表
+        last_state = list_game_data[-1].obs.feature
+        episode = list_game_data[-1].episode
 
-    import numpy as np
-    import torch  # 假设这里会用到torch，尽管目前代码片段没有直接使用
-    from collections import namedtuple
-
-    # 定义一个简单的ObsData结构，以便函数能够返回
-    ObsData = namedtuple("ObsData", ["feature", "legal_actions", "done"])
-
-    # --- Z-score 归一化统计量 (请根据您的实际数据进行替换!) ---
-    # 假设 pos_x 和 pos_z 的范围可能是相对较大，比如 0 到 100
-    # 假设 end_treasure_dists 可能是 0 到 100 左右的距离
-    # 这些值应该从您的训练数据集中计算得出！
-    # 例如：
-    # mean_pos_x, std_pos_x = 50.0, 20.0
-    # mean_pos_z, std_pos_z = 50.0, 20.0
-    # mean_end_treasure_dists = np.array([50.0, 50.0, 50.0]) # 假设有3个距离特征
-    # std_end_treasure_dists = np.array([20.0, 20.0, 20.0])
-
-    # 示例统计量 - **请务必替换为您的实际数据统计量！**
-    # 如果您不确定，可以先运行几轮环境收集一些数据，然后计算这些统计量。
-    # 例如，如果 pos_x, pos_z 范围是 [0, 100]，end_treasure_dists 范围是 [0, 50]，
-    # 那么简单的估计可以是：
-    # mean = (min + max) / 2
-    # std = (max - min) / 6 (基于经验法则，覆盖99.7%数据在均值±3标准差内)
-    # 所以 pos 维度 (假设两个坐标都在 [0,100]): mean=50, std=33.3 (100/3)
-    # end_treasure_dists 维度 (假设在 [0,50]): mean=25, std=16.6 (50/3)
-
-    # 假设 pos 有 2 个维度，end_treasure_dists 有 3 个维度 (请根据实际情况调整)
-    # 您需要根据 raw_obs["feature"] 的实际维度来确定 end_treasure_dists_means/stds 的长度
-    # 如果 raw_obs["feature"] 只有一个元素，那么只需要一个 mean 和 std
-    _POS_MEANS = np.array([32.0, 32.0], dtype=np.float32)
-    _POS_STDS = np.array([10.67, 10.67], dtype=np.float32)
-
-    # 假设 end_treasure_dists 只有 1 个维度，即 raw_obs["feature"] 的长度是 1
-    # 如果 raw_obs["feature"] 实际上是多个距离的列表，请调整这里的维度和均值/标准差
-    _END_TREASURE_DISTS_MEANS = np.array([25.0], dtype=np.float32)  # 假设它是一个长度为1的数组
-    _END_TREASURE_DISTS_STDS = np.array([16.6], dtype=np.float32)
+        # 调用我们修改后的 sample_process，并传入 self.model
+        sample_data_obj = self.sample_process(
+            self.model, 
+            list_game_data, 
+            self.gamma, 
+            last_state, 
+            episode
+        )
+        
+        # sample_process 现在可能会返回 None，所以 learn wrapper 需要返回这个值
+        # 框架的序列化/反序列化流程会处理 None
+        return sample_data_obj
 
     # --- 归一化函数 ---
     def _normalize_feature(self, value, mean, std):
-        """ 对特征进行 Z-score 归一化，作为内部辅助方法 """
-        # 避免除以0，如果标准差为0，则保持原样或设为0 (意味着该维度是常数)
-        # 将为0的标准差替换为1，避免除零并确保计算可行
         if np.any(std == 0):
             std = np.where(std == 0, 1.0, std)
-            # 可以在这里添加日志或警告，提醒用户某些特征的标准差为零
-            # print("Warning: Standard deviation is zero for some features during normalization. Check your data.")
         return (value - mean) / std
+
+    def _normalize_feature(self, feature, means, stds):
+        # Simple normalization based on pre-calculated means and stds
+        return (feature - means) / (stds + 1e-8)
 
     def observation_process(self, done, raw_obs, extra_info):
         game_info = extra_info["game_info"]
-        pos = np.array([game_info["pos_x"], game_info["pos_z"]], dtype=np.float32)
+        map_info = raw_obs["map_info"]
+        pos = np.array([game_info["pos"]["x"], game_info["pos"]["z"]], dtype=np.float32)
 
-        # 智能体当前位置相对于宝箱的距离(离散化)
-        # 确保 end_treasure_dists 也是 np.array 类型
-        end_treasure_dists = np.array(raw_obs["feature"], dtype=np.float32)
-
-        # --- 对 pos 和 end_treasure_dists 进行归一化，使用类成员变量 ---
+        # --- Normalizing pos and end_treasure_dists using class member variables ---
         normalized_pos = self._normalize_feature(pos, self._POS_MEANS, self._POS_STDS)
-        normalized_end_treasure_dists = self._normalize_feature(end_treasure_dists, self._END_TREASURE_DISTS_MEANS, self._END_TREASURE_DISTS_STDS)
-        # --- 归一化结束 ---
+        # --- Normalization end ---
 
         # Feature #5: Graph features generation (obstacle information, treasure information, endpoint information)
-        # 图特征生成(障碍物信息, 宝箱信息, 终点信息)
-        grid_size = 5
-        local_view_grid = [game_info["local_view"][i * grid_size : (i + 1) * grid_size] for i in range(grid_size)]
+        # Graph feature generation (obstacle information, treasure information, endpoint information)
+        grid_size = 11
+        # Reconstruct the 2D local view grid
+        local_view_grid = [map_info[i]["values"] for i in range(grid_size)]
 
-        agent_row, agent_col = 2, 2
+        agent_row, agent_col = 5, 5 # Assuming agent is always at the center of the 11x11 local view
 
         legal_actions = []
 
-        # 检查向上 (动作 0)
-        if agent_row - 1 >= 0:
-            target_cell_value = local_view_grid[agent_row - 1][agent_col]
-            if target_cell_value != 0:
-                legal_actions.append(0)
+        move_directions = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
 
-        # 检查向下 (动作 1)
-        if agent_row + 1 < grid_size:
-            target_cell_value = local_view_grid[agent_row + 1][agent_col]
-            if target_cell_value != 0:
-                legal_actions.append(1)
+        for action_idx, (dr, dc) in enumerate(move_directions):
+            target_row, target_col = agent_row + dr, agent_col + dc
 
-        # 检查向左 (动作 2)
-        if agent_col - 1 >= 0:
-            target_cell_value = local_view_grid[agent_row][agent_col - 1]
-            if target_cell_value != 0:
-                legal_actions.append(2)
+            # Check if target cell is within grid boundaries
+            if 0 <= target_row < grid_size and 0 <= target_col < grid_size:
+                target_cell_value = local_view_grid[target_row][target_col]
+                # Assuming value 0 indicates an obstacle (impassable)
+                if target_cell_value != 0:
+                    legal_actions.append(action_idx)
 
-        # 检查向右 (动作 3)
-        if agent_col + 1 < grid_size:
-            target_cell_value = local_view_grid[agent_row][agent_col + 1]
-            if target_cell_value != 0:
-                legal_actions.append(3)
-
-        local_view = [game_info["local_view"][i : i + 5] for i in range(0, len(game_info["local_view"]), 5)]
-        obstacle_map, treasure_map, end_map = [], [], []
-        for sub_list in local_view:
-            obstacle_map.append([1 if i == 0 else 0 for i in sub_list])
-            treasure_map.append([1 if i == 4 else 0 for i in sub_list])
-            end_map.append([1 if i == 3 else 0 for i in sub_list])
+        legal_act = raw_obs["legal_act"]
+        if legal_act[1] == 1:
+            legal_actions.extend(list(range(8, 16)))
 
         # Feature #6: Conversion of graph features into vector features
-        obstacle_flat, treasure_flat, end_flat = [], [], []
-        for i in obstacle_map:
-            obstacle_flat.extend(i)
-        for i in treasure_map:
-            treasure_flat.extend(i)
-        for i in end_map:
-            end_flat.extend(i)
+        # local_view is already created above as local_view_grid
+        obstacle_map, treasure_map, end_map, buff_map = [], [], [], []
+        for r_idx in range(grid_size):
+            obstacle_row = []
+            treasure_row = []
+            end_row = []
+            buff_row = []
+            for c_idx in range(grid_size):
+                cell_value = local_view_grid[r_idx][c_idx]
+                obstacle_row.append(1 if cell_value == 0 else 0)
+                treasure_row.append(1 if cell_value == 4 else 0)
+                end_row.append(1 if cell_value == 3 else 0)
+                buff_row.append(1 if cell_value == 6 else 0)
+            obstacle_map.append(obstacle_row)
+            treasure_map.append(treasure_row)
+            end_map.append(end_row)
+            buff_map.append(buff_row)
+
+        obstacle_flat, treasure_flat, end_flat, buff_flat= [], [], [], []
+        for row in obstacle_map:
+            obstacle_flat.extend(row)
+        for row in treasure_map:
+            treasure_flat.extend(row)
+        for row in end_map:
+            end_flat.extend(row)
+        for row in buff_map:
+            buff_flat.extend(row)
 
         feature = np.concatenate(
             [
-                normalized_pos,  # 使用归一化后的位置
-                normalized_end_treasure_dists,  # 使用归一化后的宝箱距离
+                normalized_pos,  # Using normalized position
                 obstacle_flat,
                 treasure_flat,
                 end_flat,
+                buff_flat
             ]
         )
-        #print(feature)
+        #print("length", len(feature)) # Uncomment for debugging
         return ObsData(feature=feature, legal_actions=legal_actions, done=done)
 
     def action_process(self, act_data):
