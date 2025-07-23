@@ -1,159 +1,142 @@
+# agent_diy/train/train.py
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-###########################################################################
+############################################################################
 # Copyright © 1998 - 2025 Tencent. All Rights Reserved.
 ###########################################################################
 """
 Author: Tencent AI Arena Authors
 """
-
-from agent_diy.feature.definition import (
-    sample_process,
-    reward_shaping,
-    RewardStateTracker,
-    RewardConfig
-)
-from kaiwu_agent.utils.common_func import Frame
+import numpy as np
+import time
+import os
+import torch
 from kaiwu_agent.utils.common_func import attached
 from tools.train_env_conf_validate import read_usr_conf
-import time
-import math
-import os
 
-EPISODES = 300
-REPORT_INTERVAL = 60
-SAVE_INTERVAL = 300
-INIT_MAX_STEPS = 2000
-
+# 导入新的SampleManager和修改后的数据结构
+from agent_diy.feature.definition import SampleManager, RewardStateTracker, reward_shaping
+from agent_diy.conf.conf import Config
 
 @attached
 def workflow(envs, agents, logger=None, monitor=None):
     """
-    Users can define their own training workflows here
-    用户可以在此处自行定义训练工作流
+    新的训练工作流，使用解耦的SampleManager。
     """
-
     try:
+        env, agent = envs[0], agents[0]
+        # 注意：这里的参数应从配置文件读取
+        episode_num_every_epoch = Config.episodes 
+        last_save_model_time = time.time()
+        last_put_data_time = time.time()
+
         # Read and validate configuration file
         # 配置文件读取和校验
         usr_conf = read_usr_conf("agent_diy/conf/train_env_conf.toml", logger)
         if usr_conf is None:
-            logger.error("usr_conf is None, please check agent_diy/conf/train_env_conf.toml")
+            logger.error(f"usr_conf is None, please check agent_diy/conf/train_env_conf.toml")
             return
-        env, agent = envs[0], agents[0]
-        # Initializing monitoring data
-        # 监控数据初始化
-        monitor_data = {
-            "reward": 0,
-            "terminated": 0
-        }
-        last_report_monitor_time = time.time()
 
-        logger.info("Start Training...")
-        start_t = time.time()
-        last_save_model_time = start_t
+        while True:
+            # run_episodes现在会yield一个完整的、处理好的SampleData对象
+            for g_data, monitor_data in run_episodes(episode_num_every_epoch, env, agent, usr_conf, logger, monitor):
+                if g_data:
+                    agent.learn(g_data)
 
-        total_reward, steps_cnt = 0, 0
-        max_steps = INIT_MAX_STEPS
-        reward_state_stack = RewardStateTracker(0)
-        # 开始训练
-        for episode in range(EPISODES):
-            # 重置agent
-            agent.reset()
-            print("episode:",episode)
-            time.sleep(3)
-            obs, extra_info = env.reset(usr_conf=usr_conf)
-            #print(obs)
-            #print(extra_info)
-            reward_state_stack.reset(obs["score_info"]["buff_count"])
-            if extra_info["result_code"] != 0:
-                logger.error(
-                    f"env.reset result_code is {extra_info['result_code']}, result_message is {extra_info['result_message']}"
-                )
-                raise RuntimeError(extra_info["result_message"])
-            done = False
-            obs_data = agent.observation_process(done, obs, extra_info)
-            sample_buffer = []
-
-            # print(obs["feature"])
-            # 进行采样
-            for step in range(max_steps):
-                steps_cnt += 1
-                if done:
-                    break
-                # 预测动作
-                list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
-                act_data = list_act_data[0]
-                # 处理动作数据
-                act = agent.action_process(act_data)
-                # print(act)
-                # 环境交互
-                frame_no, _obs, terminated, truncated, _extra_info = env.step(act)
-                # print("obs:",_obs)
-                # print(_extra_info)
-                # print("frame_state:",_extra_info["frame_state"]["legal_act"])
-                if _extra_info["result_code"] != 0:
-                    logger.error(
-                        f"extra_info.result_code is {_extra_info['result_code']}, \
-                        extra_info.result_message is {_extra_info['result_message']}"
-                    )
-                    break
-
-                score = _obs["score_info"]["score"]
-                reward = reward_shaping(reward_state_stack, frame_no, score, terminated, truncated, obs, _obs, extra_info, _extra_info,
-                                        step)
-                obs = _obs
-                extra_info = _extra_info
-                done = terminated or truncated
-                # print(done)
-                # 记录采样信息
-                sample = Frame(
-                    reward=reward,
-                    done=done
-                )
-                sample_buffer.append(sample)
-                total_reward += reward
-                # if done:
-                #    break
-                # print("observation:",frame_no)
-                # print("observation:",obs)
-                # print("observation:",terminated)
-                # print("observation:",truncated)
-                # print("observation:",_extra_info)
-                obs_data = agent.observation_process(done, obs, _extra_info)
-                #print(agent.model.buffer)
-            # max_steps += 100
-            # 采样数据处理
-            sample_data = sample_process(agent.model, sample_buffer, agent.gamma, obs, episode)
-            # 学习数据
-            last_state = obs_data.feature
-            sample_data.last_state = last_state
-            agent.learn([sample_data])
-            sample_buffer = []
-
-            # print(1)
             now = time.time()
-            # 记录参数
-            if now - last_report_monitor_time > REPORT_INTERVAL:
-                avg_reward = total_reward / steps_cnt
-                monitor_data["reward"] = avg_reward
-                if monitor:
-                    monitor.put_data({os.getpid(): monitor_data})
-                total_reward = 0
-                steps_cnt = 0
-                last_report_monitor_time = now
-            # 保存模型
-            if now - last_save_model_time > SAVE_INTERVAL:
-                agent.save_model(id=str(episode + 1))
+            # 定期保存模型
+            if now - last_save_model_time >= 1800:
+                agent.save_model(path=os.environ.get('KAIWU_AGENT_MODEL_PATH'), id='your_model_id') # 路径和ID应配置
                 last_save_model_time = now
-            # print("OK")
-            time.sleep(1)
 
-        # eval(env, agent, logger, usr_conf)
-        end_t = time.time()
-        logger.info(f"Training Time for {episode + 1} episodes: {end_t - start_t} s")
-
-        agent.save_model(id="latest")
+            # 定期上报监控
+            if monitor and now - last_put_data_time >= 60:
+                monitor.put_data({os.getpid(): monitor_data})
+                last_put_data_time = now
 
     except Exception as e:
-        raise RuntimeError(f"workflow error")
+        logger.error(f"Workflow failed: {e}", exc_info=True)
+        raise RuntimeError(f"workflow error: {e}")
+
+def run_episodes(n_episode, env, agent, usr_conf, logger, monitor):
+    """
+    运行n个回合，收集数据，处理并返回。
+    """
+    try:
+        for episode in range(n_episode):
+            # 1. 在每回合开始时，创建一个新的数据收集器
+            collector = SampleManager(gamma=Config.GAMMA, gae_lambda=Config.GAE_LAMDA) # GAE参数应从Config获取
+            reward_tracker = RewardStateTracker(buff_count=1) # buff数量应从配置获取
+            time.sleep(3)
+            obs, extra_info = env.reset(usr_conf=usr_conf)
+            # 错误处理
+            if extra_info.get("result_code", 0) < 0:
+                logger.error(f"Env reset failed: {extra_info.get('result_message')}")
+                continue
+
+            agent.reset()
+            agent.load_model(id="latest")
+
+            done, truncated, terminated = False, False, False
+            step = 0
+            
+            while not done:
+                # 2. 特征处理
+                obs_data = agent.observation_process(done, obs, extra_info)
+
+                # 3. Agent进行推理，获取预测所需的所有信息
+                # model.predict现在返回 (action, log_prob, value, state_seq, action_seq)
+                pred_outputs = agent.predict([obs_data])
+                #print(pred_outputs[0][0])
+                action_tensor, log_prob, value, state_seq, action_seq = pred_outputs[0][0]
+                act = agent.action_process(action_tensor)
+                
+                # 4. 与环境交互
+                step_no, _obs, _terminated, _truncated, _extra_info = env.step(act)
+                
+                # 更新状态
+                terminated, truncated = _terminated, _truncated
+                done = terminated or truncated
+
+                # 5. 计算奖励
+                reward = reward_shaping(reward_tracker, step_no, terminated, truncated, obs, _obs, extra_info, _extra_info, step)
+                
+                # 6. 将所有数据显式地添加到收集器
+                collector.add(
+                    state_seq=state_seq,
+                    action_seq=action_seq,
+                    action=action_tensor,
+                    logprob=log_prob,
+                    value=value,
+                    reward=reward,
+                    done=float(done) # 将bool转为float
+                )
+
+                # 更新状态和步数
+                obs, extra_info = _obs, _extra_info
+                step += 1
+
+            # 7. 回合结束，处理最后一帧并计算GAE
+            if done:
+                # 获取最后一帧的状态价值，用于GAE计算
+                with torch.no_grad():
+                    last_obs_data = agent.observation_process(done, obs, extra_info)
+                    # 调用模型获取价值，但不收集数据
+                    _, _, last_value, _, _ = agent.model.predict(last_obs_data.feature, done, last_obs_data.legal_actions)
+                    last_value = last_value.cpu().item()
+
+                # 触发GAE和Returns的计算
+                collector.process_last_frame(last_value, float(done))
+
+                # 获取打包好的数据
+                sample_data = collector.get_data()
+
+                # 监控数据
+                monitor_data = {"total_score": extra_info["game_info"]["total_score"]}
+                
+                # 使用yield返回数据
+                yield sample_data, monitor_data
+
+    except Exception as e:
+        logger.error(f"Run_episodes failed: {e}", exc_info=True)
+        raise RuntimeError(f"run_episodes error: {e}")
