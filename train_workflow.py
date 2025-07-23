@@ -7,10 +7,11 @@
 Author: Tencent AI Arena Authors
 """
 
-
 from agent_diy.feature.definition import (
     sample_process,
     reward_shaping,
+    RewardStateTracker,
+    RewardConfig
 )
 from kaiwu_agent.utils.common_func import Frame
 from kaiwu_agent.utils.common_func import attached
@@ -23,6 +24,7 @@ EPISODES = 300
 REPORT_INTERVAL = 60
 SAVE_INTERVAL = 300
 INIT_MAX_STEPS = 2000
+
 
 @attached
 def workflow(envs, agents, logger=None, monitor=None):
@@ -43,7 +45,7 @@ def workflow(envs, agents, logger=None, monitor=None):
         # 监控数据初始化
         monitor_data = {
             "reward": 0,
-            "terminated":0
+            "terminated": 0
         }
         last_report_monitor_time = time.time()
 
@@ -53,11 +55,17 @@ def workflow(envs, agents, logger=None, monitor=None):
 
         total_reward, steps_cnt = 0, 0
         max_steps = INIT_MAX_STEPS
+        reward_state_stack = RewardStateTracker(0)
         # 开始训练
         for episode in range(EPISODES):
-            #重置agent
+            # 重置agent
             agent.reset()
+            print("episode:",episode)
+            time.sleep(3)
             obs, extra_info = env.reset(usr_conf=usr_conf)
+            #print(obs)
+            #print(extra_info)
+            reward_state_stack.reset(obs["score_info"]["buff_count"])
             if extra_info["result_code"] != 0:
                 logger.error(
                     f"env.reset result_code is {extra_info['result_code']}, result_message is {extra_info['result_message']}"
@@ -66,8 +74,8 @@ def workflow(envs, agents, logger=None, monitor=None):
             done = False
             obs_data = agent.observation_process(done, obs, extra_info)
             sample_buffer = []
-            
-            #print(obs["feature"])
+
+            # print(obs["feature"])
             # 进行采样
             for step in range(max_steps):
                 steps_cnt += 1
@@ -78,25 +86,26 @@ def workflow(envs, agents, logger=None, monitor=None):
                 act_data = list_act_data[0]
                 # 处理动作数据
                 act = agent.action_process(act_data)
-                #print(act)
+                # print(act)
                 # 环境交互
                 frame_no, _obs, terminated, truncated, _extra_info = env.step(act)
-                #print("obs:",_obs)
-                #print(_extra_info)
-                #print("frame_state:",_extra_info["frame_state"]["legal_act"])
+                # print("obs:",_obs)
+                # print(_extra_info)
+                # print("frame_state:",_extra_info["frame_state"]["legal_act"])
                 if _extra_info["result_code"] != 0:
                     logger.error(
                         f"extra_info.result_code is {_extra_info['result_code']}, \
                         extra_info.result_message is {_extra_info['result_message']}"
                     )
                     break
-                
-                score = _extra_info["score_info"]["score"]
-                reward = reward_shaping(frame_no, score, terminated, truncated, obs, _obs, extra_info, _extra_info, step)
+
+                score = _obs["score_info"]["score"]
+                reward = reward_shaping(reward_state_stack, frame_no, score, terminated, truncated, obs, _obs, extra_info, _extra_info,
+                                        step)
                 obs = _obs
                 extra_info = _extra_info
                 done = terminated or truncated
-                #print(done)
+                # print(done)
                 # 记录采样信息
                 sample = Frame(
                     reward=reward,
@@ -104,25 +113,25 @@ def workflow(envs, agents, logger=None, monitor=None):
                 )
                 sample_buffer.append(sample)
                 total_reward += reward
-                #if done:
+                # if done:
                 #    break
-                #print("observation:",frame_no)
-                #print("observation:",obs)
-                #print("observation:",terminated)
-                #print("observation:",truncated)
-                #print("observation:",_extra_info)
+                # print("observation:",frame_no)
+                # print("observation:",obs)
+                # print("observation:",terminated)
+                # print("observation:",truncated)
+                # print("observation:",_extra_info)
                 obs_data = agent.observation_process(done, obs, _extra_info)
-                #print(step)
-            #max_steps += 100
+                #print(agent.model.buffer)
+            # max_steps += 100
             # 采样数据处理
-            sample_data = sample_process(sample_buffer, agent.gamma, obs, episode)
+            sample_data = sample_process(agent.model, sample_buffer, agent.gamma, obs, episode)
             # 学习数据
             last_state = obs_data.feature
             sample_data.last_state = last_state
-            agent.learn(sample_data, last_state)
+            agent.learn([sample_data])
             sample_buffer = []
 
-            #print(1)
+            # print(1)
             now = time.time()
             # 记录参数
             if now - last_report_monitor_time > REPORT_INTERVAL:
@@ -137,10 +146,10 @@ def workflow(envs, agents, logger=None, monitor=None):
             if now - last_save_model_time > SAVE_INTERVAL:
                 agent.save_model(id=str(episode + 1))
                 last_save_model_time = now
-            #print("OK")
+            # print("OK")
             time.sleep(1)
 
-        #eval(env, agent, logger, usr_conf)
+        # eval(env, agent, logger, usr_conf)
         end_t = time.time()
         logger.info(f"Training Time for {episode + 1} episodes: {end_t - start_t} s")
 
