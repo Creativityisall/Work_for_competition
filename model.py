@@ -12,7 +12,8 @@ from torch import nn
 from torch.distributions import Categorical
 import torch.nn.functional as F
 import numpy as np
-from torch.optim.lr_scheduler import CosineAnnealingLR # 导入调度器
+from torch.optim.lr_scheduler import CosineAnnealingLR  # 导入调度器
+
 
 def orthogonal_init(layer, gain=1.0):
     if isinstance(layer, nn.Linear):
@@ -28,7 +29,11 @@ def orthogonal_init(layer, gain=1.0):
             if 'weight' in name:
                 nn.init.orthogonal_(param, gain=gain)
             elif 'bias' in name:
-                nn.init.constant_(param, 0) # LSTM偏置通常初始化为0，或根据门控机制初始化为小正值
+                nn.init.constant_(param, 0)
+    elif isinstance(layer, nn.Sequential):
+        for sub_layer in layer:
+            orthogonal_init(sub_layer, gain)
+
 
 # --- DualLSTM 类 (修改后) ---
 class DualLSTM(nn.Module):
@@ -38,7 +43,7 @@ class DualLSTM(nn.Module):
     """
 
     def __init__(self, state_input_dim, output_dim,
-                 num_layers=1, hidden_dim=64, num_actions=4, action_embedding_dim=8, use_orthogonal_init=True):
+                 num_layers=1, hidden_dim=64, num_actions=16, action_embedding_dim=32, use_orthogonal_init=True):
         super(DualLSTM, self).__init__()
         self.state_lstm = nn.LSTM(
             input_size=state_input_dim,
@@ -53,13 +58,11 @@ class DualLSTM(nn.Module):
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
 
-        # 应用正交初始化
         if use_orthogonal_init:
             print("------Applying orthogonal init to DualLSTM------")
             orthogonal_init(self.state_lstm)
             orthogonal_init(self.fusion_fc1)
             orthogonal_init(self.fusion_fc2)
-            # Embedding层通常不需要正交初始化，它们的权重通常随机初始化，并在训练中学习
 
     def _init_hidden(self, batch_size):
         return (torch.zeros(self.num_layers, batch_size, self.hidden_dim),
@@ -87,61 +90,54 @@ class ActorCritic(nn.Module):
 
     def __init__(self, input_dim, output_dim, num_layers=1, hidden_dim=64, use_orthogonal_init=True):
         super(ActorCritic, self).__init__()
-        self.dual_lstm = DualLSTM(input_dim, output_dim, num_layers, hidden_dim, use_orthogonal_init=use_orthogonal_init)
+        self.dual_lstm = DualLSTM(input_dim, output_dim, num_layers, hidden_dim,
+                                  use_orthogonal_init=use_orthogonal_init)
 
-        self.actor_output_layer = nn.Linear(hidden_dim, output_dim)
-        self.critic_output_layer = nn.Linear(hidden_dim, 1)
+        # 修改为多层感知机结构
+        # Actor 输出层
+        self.actor_output_layer = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),  # 可以根据需要调整中间层维度
+            nn.Tanh(),
+            nn.Linear(hidden_dim // 2, output_dim)
+        )
+        # Critic 输出层
+        self.critic_output_layer = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.Tanh(),
+            nn.Linear(hidden_dim // 2, 1)
+        )
 
         # 应用正交初始化
         if use_orthogonal_init:
-            #print("------Applying orthogonal init to ActorCritic layers------")
-            # Actor 输出层使用 gain=0.01
-            orthogonal_init(self.actor_output_layer, gain=0.01)
-            # Critic 输出层使用默认 gain=1.0
-            orthogonal_init(self.critic_output_layer)
+            print("------Applying orthogonal init to ActorCritic layers------")
+            orthogonal_init(self.actor_output_layer[0], gain=1.0)
+            orthogonal_init(self.actor_output_layer[2], gain=0.01)
+
+            orthogonal_init(self.critic_output_layer[0], gain=1.0)
+            orthogonal_init(self.critic_output_layer[2], gain=1.0)
 
     def forward(self, state_seq, action_seq):
         features = self.dual_lstm(state_seq, action_seq)
-        action_probs = torch.softmax(self.actor_output_layer(features), dim=-1) # Softmax应用于输出层
+        action_probs = self.actor_output_layer(features)
         state_value = self.critic_output_layer(features)
         return action_probs, state_value
 
     def evaluate(self, state_seq, action_seq, action):
         action_probs, state_value = self.forward(state_seq, action_seq)
-        dist = Categorical(action_probs)
+        dist = Categorical(logits=action_probs)
         action_logprobs = dist.log_prob(action)
         dist_entropy = dist.entropy()
         return action_logprobs, state_value, dist_entropy
 
     def exploit(self, state_seq, action_seq, legal_actions):
-        # 选择最优动作
         action_probs, _ = self.forward(state_seq, action_seq)
-        action_probs = action_probs.detach()
-
-        # 根据合法动作进行过滤和重新归一化
-        mask = torch.zeros_like(action_probs)
-        for i in legal_actions:
-            mask[0][i] = 1.0 # 确保合法动作的mask为1
-
-        action_probs_masked = action_probs * mask
-
-        current_sum = torch.sum(action_probs_masked)
-        if current_sum > 0:
-            action_probs_masked = action_probs_masked / current_sum
-        else:
-            # 如果所有合法动作概率都是0（例如，被masking后），则均匀分配给合法动作
-            # 避免除以零和不确定的行为
-            if len(legal_actions) > 0:
-                for i in legal_actions:
-                    action_probs_masked[0][i] = 1.0 / len(legal_actions)
-            else:
-                # 如果没有合法动作，则可能采取一个默认动作或报错
-                # 这里假设至少有一个合法动作，或者模型会处理这种情况
-                pass # 根据实际需求处理无合法动作的情况
-
-        dist = Categorical(action_probs_masked)
-        action = dist.sample()
-        return action.detach()
+        mask = torch.ones_like(action_probs, dtype=torch.float32) * (-1e9)  # 初始化为负无穷大
+        if legal_actions:
+            mask[0, legal_actions] = 0.0  # 合法动作位置设置为0，不影响原始logits
+        # action_probs 是 logits，直接在 logits 上进行掩码操作
+        masked_logits = action_probs + mask
+        action = torch.argmax(masked_logits, dim=-1)
+        return action
 
 
 # --- Model 类 (添加调度器) ---
@@ -157,12 +153,12 @@ class Model(nn.Module):
             gamma=0.99,  # GAE新增：折扣因子
             gae_lambda=0.95,  # GAE新增：GAE的lambda参数
             eps_clip=0.2,
-            K_epochs=4,
-            loss_weight={'actor': 0.6, 'critic': 0.6, 'entropy': 1},#0.015
+            K_epochs=6,
+            loss_weight={'actor': 0.6, 'critic': 0.6, 'entropy': 0.015},  # 0.015
             lstm_hidden_dim=64,
             lstm_num_layers=1,
-            use_orthogonal_init=True, # 新增参数
-            total_training_steps=300 # 新增：用于调度器的总训练步数（或回合数）
+            use_orthogonal_init=True,  # 新增参数
+            total_training_steps=300  # 新增：用于调度器的总训练步数（或回合数）
     ):
         super().__init__()
         self.input_dim = input_dim
@@ -176,17 +172,23 @@ class Model(nn.Module):
         self.lstm_hidden_dim = lstm_hidden_dim
 
         # 将 use_orthogonal_init 传递给 ActorCritic
-        self.policy = ActorCritic(input_dim, output_dim, lstm_num_layers, lstm_hidden_dim, use_orthogonal_init=use_orthogonal_init)
+        self.policy = ActorCritic(input_dim, output_dim, lstm_num_layers, lstm_hidden_dim,
+                                  use_orthogonal_init=use_orthogonal_init)
+
+        # 优化器参数分组需要调整以适应新的 MLP 结构
+        # 遍历 Actor 和 Critic MLP 的子层以获取参数
+        actor_params = [p for layer in self.policy.actor_output_layer for p in layer.parameters()]
+        critic_params = [p for layer in self.policy.critic_output_layer for p in layer.parameters()]
+
         self.optimizer = torch.optim.Adam([
-            {'params': self.policy.actor_output_layer.parameters(), 'lr': lr_actor}, # 更改为 actor_output_layer
-            {'params': self.policy.critic_output_layer.parameters(), 'lr': lr_critic}, # 更改为 critic_output_layer
+            {'params': actor_params, 'lr': lr_actor},
+            {'params': critic_params, 'lr': lr_critic},
             {'params': self.policy.dual_lstm.parameters(), 'lr': lr_lstm}
         ])
 
         # 初始化学习率调度器
         # 我们使用 CosineAnnealingLR，T_max 设置为总训练步数/回合数
         self.scheduler = CosineAnnealingLR(self.optimizer, T_max=total_training_steps)
-
 
         self.state_seq = torch.zeros(1, seq_length, input_dim)
         self.action_seq = torch.zeros(1, seq_length, output_dim)
@@ -236,38 +238,30 @@ class Model(nn.Module):
 
     def exploit(self, state, legal_actions):
         state_seq = self._state_progress(state)
-        action = self.policy.exploit(state_seq, self.action_seq, legal_actions)
+        action = self.policy.exploit(state_seq, self.action_seq, legal_actions)  # 修正：传递 action_seq
         self._action_process(action)
         return action.detach()
 
     def predict(self, state, done, legal_actions):
-        """探索策略（采样动作，用于训练），并存储GAE所需信息"""
         state_seq = self._state_progress(state)
+        # 在 Model.predict 中
+        action_logits, state_value = self.policy(state_seq, self.action_seq)  # 修正：返回 logits
 
-        action_probs, state_value = self.policy(state_seq, self.action_seq)
+        # 创建一个负无穷大张量来屏蔽不合法动作
+        illegal_action_mask = torch.ones_like(action_logits) * (-1e9)
+        # 将合法动作位置设置为0，不影响原始logits
+        if legal_actions:
+            illegal_action_mask[0, legal_actions] = 0.0
+        # 对 logits 应用掩码：将不合法动作的 logits 设置为一个非常小的负数 (趋近于负无穷)
+        # 这样它们在 softmax 后对应的概率将趋近于 0
+        masked_logits = action_logits + illegal_action_mask
 
-        action_probs_detached = action_probs.detach()
-        mask = torch.zeros_like(action_probs_detached)
-        for i in legal_actions:
-            mask[0][i] = 1.0
-
-        action_probs_masked = action_probs_detached * mask
-
-        # 重新归一化概率
-        current_sum = torch.sum(action_probs_masked)
-        if current_sum > 0:
-            action_probs_masked /= current_sum
-        else:
-            # 如果所有合法动作概率都为0，均匀分配给合法动作
-            if len(legal_actions) > 0:
-                for i in legal_actions:
-                    action_probs_masked[0][i] = 1.0 / len(legal_actions)
-            else:
-                pass # 同 exploit 方法中的处理
-
-        dist = Categorical(action_probs_masked)
+        dist = Categorical(logits=masked_logits)  # 使用 logits
         action = dist.sample()
-        log_prob = Categorical(action_probs).log_prob(action) # 从原始分布计算log_prob
+
+        # 使用原始（未屏蔽的）概率分布计算log_prob，以获得正确的梯度
+        # 或者更准确地，使用masked_logits来计算log_prob，因为这也是你用于采样的方式
+        log_prob = Categorical(logits=masked_logits).log_prob(action)  # 修正：使用 masked_logits
 
         action_seq = self._action_process(action)
 
@@ -277,7 +271,6 @@ class Model(nn.Module):
         self.buffer['logprobs'].append(log_prob.detach())
         self.buffer['values'].append(state_value.detach())
         self.buffer['dones'].append(torch.tensor(done, dtype=torch.float32))
-
         return action.detach()
 
     def _compute_gae_and_returns(self, rewards, dones, last_value):
@@ -308,9 +301,9 @@ class Model(nn.Module):
         adv_std = np.std(advantages) + 1e-8
         advantages = (advantages - adv_mean) / adv_std
 
-        #returns_mean = np.mean(returns)
-        #returns_std = np.std(returns) + 1e-8
-        #returns = (returns - returns_mean) / returns_std
+        returns_mean = np.mean(returns)
+        returns_std = np.std(returns) + 1e-8
+        returns = (returns - returns_mean) / returns_std
 
         return torch.tensor(advantages, dtype=torch.float32), torch.tensor(returns, dtype=torch.float32)
 
@@ -318,7 +311,7 @@ class Model(nn.Module):
     # def _calc_advantages(self, rewards, values): ...
 
     # _calc_loss 已更新，直接接收计算好的 advantages 和 returns
-    def _calc_loss(self,episode, returns, advantages, logprobs, new_logprobs, new_values, entropy):
+    def _calc_loss(self, episode, returns, advantages, logprobs, new_logprobs, new_values, entropy):
         """
         计算PPO损失。
         Args:
@@ -327,7 +320,8 @@ class Model(nn.Module):
             ... (其他参数不变)
         """
         # 计算策略比率
-        ratios = torch.exp(new_logprobs - logprobs)
+        clip_lowerbound = 0.001
+        ratios = torch.exp(new_logprobs - logprobs.detach())
 
         # 归一化优势函数 (可选，但通常能稳定训练)
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
@@ -336,53 +330,49 @@ class Model(nn.Module):
         surr1 = ratios * advantages
         surr2 = torch.clamp(ratios, 1 - self.eps_clip, 1 + self.eps_clip) * advantages
         actor_loss = -torch.min(surr1, surr2).mean()
+        #dual clip
+        #actor_loss = -torch.max(min(surr1, surr2), clip_lowerbound * advantages).mean()
 
         # 计算 Critic 损失 (MSE)，目标是GAE计算出的 returns
-        critic_loss = F.mse_loss(new_values.squeeze(), returns)
+        critic_loss = F.mse_loss(new_values.squeeze(), returns.detach())
 
         # 总损失
         loss = (self.loss_weight['actor'] * actor_loss
                 + self.loss_weight['critic'] * critic_loss
-                - self.loss_weight['entropy']/ (episode + 1) * entropy.mean())
+                - self.loss_weight['entropy'] / (episode + 1) * entropy.mean())
         return loss
 
     # learn方法已重构，以集成GAE计算
     def learn(self, sample, last_state, last_done):
-        """
-        训练PPO模型。
-        Args:
-            sample: 从外部传入的样本数据，我们主要使用 sample.rewards。
-            last_state: 序列收集完成后，环境返回的最后一个状态。用于计算bootstrap value。
-            last_done: 最后一个状态是否是终止状态。
-        """
-        # 1. 准备训练数据
+
+        if sample is None or not hasattr(sample, 'actions') or not sample.actions:
+            # print("Skipping training cycle: no data received.")
+            return
+
         rewards = np.array(sample.rewards, dtype=np.float32)
-        dones = np.array([b.item() for b in self.buffer['dones']], dtype=np.float32)
+        # dones_np = np.array([b.item() for b in sample.dones], dtype=np.float32) # 如果dones是tensor列表
+        dones_np = sample.dones.cpu().numpy() # 如果dones是单个tensor
 
-        state_seqs = torch.stack(self.buffer['state_seqs'])
-        action_seqs = torch.stack(self.buffer['action_seqs'])
-        actions = torch.stack(self.buffer['actions']).squeeze()
-        logprobs = torch.stack(self.buffer['logprobs']).squeeze()
-
-        # 2. 计算 GAE 和 Returns
-        # 首先，需要计算最后一个状态的价值(bootstrap value)，用于GAE计算
+        state_seqs = sample.state_seqs
+        action_seqs = sample.action_seqs
+        actions = sample.actions
+        logprobs = sample.logprobs
+        
+        # 1. 计算 GAE 和 Returns
         with torch.no_grad():
-            # 需要为 last_state 构建它对应的 state_seq 和 action_seq
-            last_state_seq = self._state_progress(last_state)  # 这会更新 self.state_seq
-            # 注意：last_action_seq 理论上应该是导致 last_state 的那个动作的序列，
-            # self.action_seq 此时已经包含了最后一个真实动作，所以可以直接使用。
+            self.buffer['values'] = sample.values # GAE计算需要用到values
+            # 注意：last_state 和 last_done 也应该从 sample 对象中获取
+            last_state_from_sample = sample.last_state
+            last_done_from_sample = sample.last_done
+
+            last_state_seq = self._state_progress(last_state_from_sample)
             _, last_value_tensor = self.policy(last_state_seq, self.action_seq)
             last_value = last_value_tensor.cpu().item()
 
-        advantages, returns = self._compute_gae_and_returns(rewards, dones, last_value)
-
-        # 将数据移动到设备
-        # device = next(self.parameters()).device
-        # advantages = advantages.to(device)
-        # returns = returns.to(device)
-
+        advantages, returns = self._compute_gae_and_returns(rewards, dones_np, last_value)
+        
         # 3. 多轮更新（PPO核心）
-        data_size = len(self.buffer['actions'])
+        data_size = len(actions)
         minibatch_size = 512
 
         for _ in range(self.K_epochs):
@@ -405,32 +395,29 @@ class Model(nn.Module):
                 new_logprobs, new_values, entropy = self.policy.evaluate(
                     mb_state_seqs, mb_action_seqs, mb_actions
                 )
-                episode = sample.episode
+                
                 # 计算损失并反向传播
-                loss = self._calc_loss(episode, mb_returns, mb_advantages, mb_logprobs,
-                                         new_logprobs, new_values, entropy)
+                loss = self._calc_loss(sample.episode, mb_returns, mb_advantages, mb_logprobs,
+                                        new_logprobs, new_values, entropy)
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=2.0)
                 self.optimizer.step()
 
-        # 在每次学习迭代后，更新学习率调度器
         self.scheduler.step()
-
-        # 清空缓冲区，准备下一轮收集经验
         self._clear_buffer()
 
     def save_model(self, path=None, id="1"):
         model_file_path = f"{path}/model.ckpt-{str(id)}.pt"
         torch.save({
             "policy": self.policy.state_dict(),
-            "optimizer": self.optimizer.state_dict(), # 保存优化器状态
-            "scheduler": self.scheduler.state_dict() # 保存调度器状态
+            "optimizer": self.optimizer.state_dict(),  # 保存优化器状态
+            "scheduler": self.scheduler.state_dict()  # 保存调度器状态
         }, model_file_path)
 
     def load_model(self, path):
         checkpoint = torch.load(path)
         self.policy.load_state_dict(checkpoint["policy"])
-        self.optimizer.load_state_dict(checkpoint["optimizer"]) # 加载优化器状态
-        self.scheduler.load_state_dict(checkpoint["scheduler"]) # 加载调度器状态
+        self.optimizer.load_state_dict(checkpoint["optimizer"])  # 加载优化器状态
+        self.scheduler.load_state_dict(checkpoint["scheduler"])  # 加载调度器状态
