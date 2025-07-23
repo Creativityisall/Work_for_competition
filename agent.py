@@ -10,7 +10,8 @@ Author: Tencent AI Arena Authors
 import kaiwu_agent
 from kaiwu_agent.agent.base_agent import BaseAgent
 from kaiwu_agent.utils.common_func import create_cls
-from agent_diy.feature.definition import sample_process
+# 导入新的SampleData, ObsData, ActData，注意这里不再需要SampleManager，因为它只在train.py中直接使用
+from agent_diy.feature.definition import SampleData, ObsData, ActData 
 import os
 from kaiwu_agent.agent.base_agent import (
     learn_wrapper,
@@ -26,8 +27,9 @@ import torch
 import numpy as np
 from collections import namedtuple
 
-ObsData = create_cls("ObsData", feature=None, legal_actions=None, done = None)
-ActData = create_cls("ActData", act=None)
+# ObsData 和 ActData 已经在 feature/definition.py 中定义，此处重复定义会导致警告或覆盖，建议移除
+# ObsData = create_cls("ObsData", feature=None, legal_actions=None, done = None)
+# ActData = create_cls("ActData", act=None)
 
 
 class Agent(BaseAgent):
@@ -49,12 +51,13 @@ class Agent(BaseAgent):
         self.gamma = Config.GAMMA
         self._POS_MEANS = np.array([63.5, 63.5], dtype=np.float32)
         self._POS_STDS = np.array([36.66, 36.66], dtype=np.float32)
-        self.sample_process = sample_process
+        # self.sample_process = sample_process # 移除：sample_process 已被 SampleManager 取代
 
         # 相对距离 (end_treasure_dists) 范围: [0, 6]
         # 假设 raw_obs["feature"] 只有一个元素 (即只有一个距离值)
         #self._END_TREASURE_DISTS_MEANS = np.array([3.0], dtype=np.float32)
         #self._END_TREASURE_DISTS_STDS = np.array([1.0], dtype=np.float32)
+
     def reset(self):
         """重置智能体内部模型的状态"""
         if hasattr(self.model, 'reset'):
@@ -64,8 +67,13 @@ class Agent(BaseAgent):
     def predict(self, list_obs_data):
         state = list_obs_data[0].feature
         legal_actions = list_obs_data[0].legal_actions
-        act = self.model.predict(state, list_obs_data[0].done, legal_actions)
-        return [ActData(act=act)]
+        done = list_obs_data[0].done # 获取done状态
+
+        # model.predict 现在返回 (action, log_prob, value, state_seq, action_seq)
+        action_tensor, log_prob, value, state_seq, action_seq = self.model.predict(state, done, legal_actions)
+        
+        # Agent的predict方法返回这些原始数据，供外部的SampleManager收集
+        return [(action_tensor, log_prob, value, state_seq, action_seq)]
 
     @exploit_wrapper
     def exploit(self, list_obs_data):
@@ -84,30 +92,19 @@ class Agent(BaseAgent):
         return act
 
     @learn_wrapper
-    def learn(self, list_game_data):
+    def learn(self, sample_data_obj):
         """
-        这个方法在Actor端被调用，用于在数据收集后打包数据。
-        真正的 self.model.learn 在Learner端被调用。
+        这个方法在Learner端被调用，接收由SampleManager处理好的SampleData对象。
+        它直接将该对象传递给 self.model.learn。
         """
-        # 从 list_game_data 中提取 learn 方法所需的参数
-        # 注意: list_game_data 在这里是原始的、由 predict 逐步收集的样本列表
-        last_state = list_game_data[-1].obs.feature
-        episode = list_game_data[-1].episode
-
-        # 调用我们修改后的 sample_process，并传入 self.model
-        sample_data_obj = self.sample_process(
-            self.model, 
-            list_game_data, 
-            self.gamma, 
-            last_state, 
-            episode
-        )
+        # 此时 sample_data_obj 已经是 SampleManager 处理好的 SampleData 对象
+        # 包含 advantages 和 returns
+        self.model.learn(sample_data_obj)
         
-        # sample_process 现在可能会返回 None，所以 learn wrapper 需要返回这个值
-        # 框架的序列化/反序列化流程会处理 None
-        return sample_data_obj
+        # learn wrapper 通常不返回数据，如果框架需要特定返回，则根据框架要求处理
+        return None # 或者返回 True/False 表示学习是否成功
 
-    # --- 归一化函数 ---
+    # --- 归一化函数 (保持不变) ---
     def _normalize_feature(self, value, mean, std):
         if np.any(std == 0):
             std = np.where(std == 0, 1.0, std)
@@ -194,7 +191,8 @@ class Agent(BaseAgent):
         return ObsData(feature=feature, legal_actions=legal_actions, done=done)
 
     def action_process(self, act_data):
-        return act_data.act.item()
+        # act_data 现在将是 model.predict 返回的 action_tensor，需要转换成Python原生int
+        return act_data.item()
 
     @save_model_wrapper
     def save_model(self, path=None, id="1"):
