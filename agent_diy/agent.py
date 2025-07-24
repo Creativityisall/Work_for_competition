@@ -178,7 +178,7 @@ class Agent(BaseAgent):
         for row in buff_map:
             buff_flat.extend(row)
 
-        feature = np.concatenate(
+        feature = np.concatenate(#这里实际上不是很合理，这些信息应该加到reward中去，而不是特征提取
             [
                 normalized_pos,  # Using normalized position
                 obstacle_flat,
