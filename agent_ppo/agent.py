@@ -38,7 +38,7 @@ def random_choice(p):
 
 def max_choice(p):
 
-    max_prob = -1.0 
+    max_prob = -1.0
     max_index = -1
 
     for i in range(len(p)):
@@ -110,7 +110,7 @@ class Agent(BaseAgent):
         feature = obs_data.feature
         legal_action = obs_data.legal_action
         probs, value = self.predict_process(feature, legal_action)#TODO:使用state
-        action, prob = max_choice(probs)#TODO:改成确定性输出
+        action, prob = random_choice(probs)#TODO:改成确定性输出
         act = self.action_process(ActData(probs=probs, value=value, action=action, prob=prob))
         return act
 

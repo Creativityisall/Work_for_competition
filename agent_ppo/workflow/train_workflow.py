@@ -37,7 +37,7 @@ def workflow(envs, agents, logger=None, monitor=None):
             logger.error(f"usr_conf is None, please check agent_ppo/conf/train_env_conf.toml")
             return
 
-        while episode < 5000:
+        while episode < 9000:
             for g_data, monitor_data in run_episodes(episode_num_every_epoch, env, agent, usr_conf, logger, monitor):
                 agent.learn(g_data)
                 g_data.clear()

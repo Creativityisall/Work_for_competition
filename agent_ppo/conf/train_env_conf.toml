@@ -72,7 +72,7 @@ treasure_random = true
 # Integer, the value range is 0~13.
 # 生成随机宝箱时的宝箱数量，仅在treasure_random = true时生效。
 # 整型，取值范围为0~13。
-treasure_count = 13
+treasure_count = 8
 
 # The location of the treasure chests when generating a fixed treasure chest list. This is only valid when treasure_random = false.
 # A two-dimensional array containing 0 to 13 elements, each element is an array, which are x and y coordinates, ranging from 0 to 127
