@@ -18,11 +18,14 @@ from agent_ppo.feature.definition import (
 )
 from tools.metrics_utils import get_training_metrics
 
+from agent_ppo.agent import Agent
+
 
 @attached
 def workflow(envs, agents, logger=None, monitor=None):
     try:
-        env, agent = envs[0], agents[0]
+        env = envs[0]
+        agent : Agent = agents[0]
         episode_num_every_epoch = 1
         last_save_model_time = 0
         last_put_data_time = 0
@@ -57,7 +60,7 @@ def workflow(envs, agents, logger=None, monitor=None):
         raise RuntimeError(f"workflow error")
 
 
-def run_episodes(n_episode, env, agent, usr_conf, logger, monitor):
+def run_episodes(n_episode, env, agent : Agent, usr_conf, logger, monitor):
     try:
         for episode in range(n_episode):
             collector = SampleManager()
@@ -88,7 +91,7 @@ def run_episodes(n_episode, env, agent, usr_conf, logger, monitor):
 
             done = False
             step = 0
-            diy_1 = 0
+            win_rate = 0
             diy_2 = 0
             diy_3 = 0
             diy_4 = 0
@@ -128,7 +131,7 @@ def run_episodes(n_episode, env, agent, usr_conf, logger, monitor):
                 collector.sample_process(
                     feature=obs_data.feature,
                     legal_action=obs_data.legal_action,
-                    prob=[act_data[0].prob],
+                    log_prob=[act_data[0].log_prob],
                     action=[act_data[0].action],
                     value=act_data[0].value,
                     reward=np.array(reward),
@@ -157,7 +160,7 @@ def run_episodes(n_episode, env, agent, usr_conf, logger, monitor):
                 if done:
                     if monitor:
                         monitor_data = {
-                            "diy_1": win_rate,
+                            "win_rate": win_rate,
                             "diy_2": diy_2,
                             "diy_3": diy_3,
                             "diy_4": diy_4,

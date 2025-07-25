@@ -12,30 +12,6 @@ Author: Tencent AI Arena Authors
 # The last few configurations in the file are for the Kaiwu platform to use and should not be changed.
 # 配置，包含维度设置，算法参数设置，文件的最后一些配置是开悟平台使用不要改动
 class Config:
-
-    # Discount factor GAMMA in RL
-    # RL中的回报折扣GAMMA
-    GAMMA = 0.99
-
-    # tdlambda
-    TDLAMBDA = 0.95
-
-    # Initial learning rate
-    # 初始的学习率
-    START_LR = 0.0003
-
-    # entropy regularization coefficient
-    # 熵正则化系数
-    BETA_START = 0.0005
-
-    # clip parameter
-    # 裁剪参数
-    CLIP_PARAM = 0.2
-
-    # value function loss coefficient
-    # 价值函数损失的系数
-    VF_COEF = 1
-
     # actions
     # 动作
     ACTION_LEN = 1
@@ -71,3 +47,50 @@ class Config:
     # learner上reverb样本的输入维度
     # **注意**，此项必须正确配置，应该与definition.py中的NumpyData2SampleData函数数据对齐，否则可能报样本维度错误
     SAMPLE_DIM = data_len
+
+
+
+
+
+
+    #### PPO Paramaters ####
+    # Discount factor GAMMA
+    GAMMA = 0.99
+
+    # tdlambda (gae-lambda)
+    TDLAMBDA = 0.95
+
+    # Initial learning rate
+    START_LR = 0.0003
+
+    # entropy regularization coefficient
+    BETA_START = 0.0005
+
+    # clip parameter (policy)
+    CLIP_PARAM = 0.2
+
+    # value function loss coefficient
+    VF_COEF = 1
+
+    # value clip
+    VALUE_CLIP = 0.2
+
+    # Training settings
+    N_EPOCH = 10 # number of epochs 
+    MINIBATCH_SIZE = 64
+        # In configure_app.toml 
+        # # replay_buffer_capacity = 4096
+        # # batch_size = 256
+    DUAL_CLIP = 3.0
+
+
+    #######################
+
+
+    #### Network Settings ####
+    # Whether to use tanh activation function in MLP
+    tanh_mlp = True
+
+
+
+

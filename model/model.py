@@ -50,9 +50,14 @@ class NetworkModelBase(nn.Module):
         # Main MLP network
         # 主MLP网络
         self.main_fc_dim_list = [self.feature_len, 128, 256]
-        self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity_last=True)
-        self.label_mlp = MLP([256, 64, self.label_size], "label_mlp")
-        self.value_mlp = MLP([256, 64, self.value_num], "value_mlp")
+        if Config.tanh_mlp:
+            self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity=nn.Tanh(), non_linearity_last=True)
+            self.label_mlp = MLP([256, 64, self.label_size], "label_mlp", non_linearity=nn.Tanh())
+            self.value_mlp = MLP([256, 64, self.value_num], "value_mlp", non_linearity=nn.Tanh())
+        else:
+            self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity_last=True)
+            self.label_mlp = MLP([256, 64, self.label_size], "label_mlp")
+            self.value_mlp = MLP([256, 64, self.value_num], "value_mlp")
 
     def process_legal_action(self, label, legal_action):
         label_max, _ = torch.max(label * legal_action, 1, True)
@@ -71,10 +76,10 @@ class NetworkModelBase(nn.Module):
         label_mlp_out = self.label_mlp(fc_mlp_out)
         label_out = self.process_legal_action(label_mlp_out, legal_action)
 
-        prob = torch.nn.functional.softmax(label_out, dim=1)
+        log_prob = torch.nn.functional.log_softmax(label_out, dim=1)
         value = self.value_mlp(fc_mlp_out)
 
-        return prob, value
+        return log_prob, value # NOTE 自动支持批处理
 
 
 class NetworkModelActor(NetworkModelBase):

@@ -25,12 +25,12 @@ ObsData = create_cls(
 
 ActData = create_cls(
     "ActData",
-    probs=None,
+    log_probs=None,
     value=None,
     target=None,
     predict=None,
     action=None,
-    prob=None,
+    log_prob=None,
 )
 
 SampleData = create_cls("SampleData", npdata=None)
@@ -62,6 +62,7 @@ def reward_process(end_dist, history_dist, feature_vector=None, target_info=None
         total_treasures = 1 # 从游戏开始到当前步骤，Agent探索发现的宝箱总数
         collection_progress = 0 # 收集进度比例
 
+    end_reward = -0.02 * end_dist
     # 根据目标类型和收集进度设计奖励
     if target_type == 'treasure':
         # 宝箱目标：适中的奖励鼓励收集
@@ -164,7 +165,7 @@ class SampleManager:
         self.tdlambda = Config.TDLAMBDA
 
         self.feature = []
-        self.probs = []
+        self.log_probs = []
         self.actions = []
         self.reward = []
         self.value = []
@@ -174,10 +175,10 @@ class SampleManager:
         self.count = 0
         self.samples = []
 
-    def add(self, feature, legal_action, prob, action, value, reward):
+    def add(self, feature, legal_action, log_prob, action, value, reward):
         self.feature.append(feature)
         self.legal_action.append(legal_action)
-        self.probs.append(prob)
+        self.log_probs.append(log_prob)
         self.actions.append(action)
         self.value.append(value)
         self.reward.append(reward)
@@ -200,8 +201,8 @@ class SampleManager:
             self.adv[i] = last_gae
             self.tdlamret[i] = last_gae + val
 
-    def sample_process(self, feature, legal_action, prob, action, value, reward):
-        self.add(feature, legal_action, prob, action, value, reward)
+    def sample_process(self, feature, legal_action, log_prob, action, value, reward):
+        self.add(feature, legal_action, log_prob, action, value, reward)
 
     def process_last_frame(self, reward):
         self.add_last_reward(reward)
@@ -217,7 +218,7 @@ class SampleManager:
 
     def _get_game_data(self):
         feature = np.array(self.feature).transpose()
-        probs = np.array(self.probs).transpose()
+        log_probs = np.array(self.log_probs).transpose()
         actions = np.array(self.actions).transpose()
         reward = np.array(self.reward[:-1]).transpose()
         value = np.array(self.value[:-1]).transpose()
@@ -225,7 +226,7 @@ class SampleManager:
         adv = np.array(self.adv).transpose()
         tdlamret = np.array(self.tdlamret).transpose()
 
-        data = np.concatenate([feature, reward, value, tdlamret, adv, actions, probs, legal_action]).transpose()
+        data = np.concatenate([feature, reward, value, tdlamret, adv, actions, log_probs, legal_action]).transpose()
 
         samples = []
         for i in range(0, self.count):

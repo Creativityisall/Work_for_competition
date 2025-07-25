@@ -27,14 +27,16 @@ from agent_ppo.feature.definition import SampleData, ObsData, ActData, SampleMan
 from agent_ppo.feature.preprocessor import Preprocessor
 
 
-def random_choice(p):
+def random_choice(log_p):
+    p = np.exp(log_p - np.max(log_p))  # softmax
+    p /= np.sum(p)
     r = random.random() * sum(p)
     s = 0
     for i in range(len(p)):
         if r > s and r <= s + p[i]:
-            return i, p[i]
+            return i, p[i].item().log()
         s += p[i]
-    return len(p) - 1, p[len(p) - 1]
+    return len(p) - 1, p[len(p) - 1].item().log()
 
 
 @attached
@@ -58,8 +60,8 @@ class Agent(BaseAgent):
 
     def _predict(self, obs, legal_action):
         with torch.no_grad():
-            inputs = self.model.format_data(obs, legal_action)
-            output_list = self.model(*inputs)
+            inputs = self.model.format_data(obs, legal_action) # send an array to model's format_data method, which turns array into tensor directly
+            output_list = self.model(*inputs) # forward pass, which returns lots of useless info for "Actor" (actor and learner share the same network structure)
 
         np_output_list = []
         for output in output_list:
@@ -68,12 +70,21 @@ class Agent(BaseAgent):
         return np_output_list
 
     def predict_process(self, obs, legal_action):
-        obs = np.array([obs])
+        obs = np.array([obs]) # obs : dict -> array (only 1 element in array `obs`, which is a dictionary)
         legal_action = np.array([legal_action])
-        probs, value = self._predict(obs, legal_action)
-        return probs, value
+        log_probs, value = self._predict(obs, legal_action)
+        return log_probs, value
 
     def observation_process(self, obs, extra_info=None):
+        """
+        基于当前帧观测信息+转移到当前帧的动作（上一动作），计算当前：
+        1. 特征向量
+        2. 合法动作
+        3. 奖励
+        并包装到 ObsData 中返回。
+        
+        注意：extra_info 不要用，因为 exploit 不能用它。只能提取 obs 里的信息。数据结构参考协议。
+        """
         feature, legal_action, reward = self.preprocessor.process([obs, extra_info], self.last_action)
 
         return ObsData(
@@ -86,9 +97,13 @@ class Agent(BaseAgent):
     def predict(self, list_obs_data):
         feature = list_obs_data[0].feature
         legal_action = list_obs_data[0].legal_action
-        probs, value = self.predict_process(feature, legal_action)
-        action, prob = random_choice(probs)
-        return [ActData(probs=probs, value=value, action=action, prob=prob)]
+        log_probs, value = self.predict_process(feature, legal_action)
+
+        assert log_probs.shape() == (1, len(legal_action)), "log_probs shape mismatch with legal_action"
+        assert value.shape() == (1, 1), "value shape mismatch, should be (1, 1)"
+        
+        action, log_prob = random_choice(log_probs.squeeze(0).numpy())
+        return [ActData(log_probs=log_probs, value=value, action=action, log_prob=log_prob)]
 
     def action_process(self, act_data):
         return act_data.action
@@ -98,9 +113,9 @@ class Agent(BaseAgent):
         obs_data = self.observation_process(observation["obs"], observation["extra_info"])
         feature = obs_data.feature
         legal_action = obs_data.legal_action
-        probs, value = self.predict_process(feature, legal_action)
-        action, prob = random_choice(probs)
-        act = self.action_process(ActData(probs=probs, value=value, action=action, prob=prob))
+        log_probs, value = self.predict_process(feature, legal_action)
+        action, log_prob = random_choice(log_probs)
+        act = self.action_process(ActData(log_probs=log_probs, value=value, action=action, log_prob=log_prob))
         return act
 
     def reset(self):

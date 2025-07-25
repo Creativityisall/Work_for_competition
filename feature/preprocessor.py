@@ -36,6 +36,19 @@ class Preprocessor:
         self.bad_move_ids = set()
 
     def _get_pos_feature(self, found, cur_pos, target_pos):
+        """
+        获取当前位置和目标位置的特征向量
+        Args:
+            found: 是否找到目标位置（目标是否是随机取的）
+            cur_pos: 当前坐标 (x, z)
+            target_pos: 目标坐标 (x, z)
+        Returns:
+            feature: 特征向量，包括：
+            - found;
+            - norm_x_relative, norm_z_relative;
+            - norm_target_x, norm_target_z;
+            - norm_distance.
+        """
         relative_pos = tuple(y - x for x, y in zip(cur_pos, target_pos))
         dist = np.linalg.norm(relative_pos)
         target_pos_norm = norm(target_pos, 127, 0)
@@ -110,20 +123,20 @@ class Preprocessor:
         if len(self.history_pos) > 10:
             self.history_pos.pop(0)
 
-        # 选择目标的新逻辑
-        self._select_target(target_candidates)
-
-        self.last_pos_norm = self.cur_pos_norm
-        # self.cur_pos_norm = norm(self.cur_pos, 128, -128)
-        self.cur_pos_norm = norm(self.cur_pos, 127, 0)
+        # 选择目标
+        self._select_target(target_candidates) # NOTE this will modify self.end_pos, self.is_end_pos_found etc. 
         self.feature_end_pos = self._get_pos_feature(self.is_end_pos_found, self.cur_pos, self.end_pos)
+
+        # update position norm (cur & last)
+        self.last_pos_norm = self.cur_pos_norm
+        self.cur_pos_norm = norm(self.cur_pos, 127, 0)
 
         # History position feature
         # 历史位置特征
         self.feature_history_pos = self._get_pos_feature(1, self.cur_pos, self.history_pos[0])
 
-        self.move_usable = True
-        self.last_action = last_action
+        # self.move_usable = True           # XXX REDUNDANT! 
+        self.last_action = last_action      # NOTE 右边是 agent 的 last_action，作为参数传入 pb2struct；左边是 preprocessor(collector) 记录的 last_action
             
     
     def _select_target(self, target_candidates):
@@ -260,12 +273,16 @@ class Preprocessor:
         else:
             self.bad_move_ids = set()
 
-        legal_action = [self.move_usable] * self.move_action_num
+        # legal_action = [self.move_usable] * self.move_action_num
+        legal_action = [True] * self.move_action_num
         for move_id in self.bad_move_ids:
             legal_action[move_id] = 0
 
-        if self.move_usable not in legal_action:
+        # if self.move_usable not in legal_action:
+        if True not in legal_action:
+            # 如果没有可用的移动动作，则将所有移动动作设置为可用
             self.bad_move_ids = set()
-            return [self.move_usable] * self.move_action_num
+            # return [self.move_usable] * self.move_action_num
+            return [True] * self.move_action_num
 
         return legal_action
