@@ -36,43 +36,35 @@ ActData = create_cls(
 SampleData = create_cls("SampleData", npdata=None)
 
 
-def reward_process(end_dist, history_dist):
+# TODO better reward design ??? Keep it simple.
+
+def reward_process(
+        step_no, 
+        cur_pos,
+        detected_area,
+        treasure_pos_list, 
+        destination_pos, 
+        # TODO more parameters
+    ):
     """
     改进的奖励函数设计
     
     Args:
-        end_dist: 到终点的归一化距离 [0,1]
-        history_dist: 到历史位置的归一化距离 [0,1] 
-        feature_vector: 完整的20维特征向量 
+        cur_pos: 智能体当前坐标。
+        map: 智能体存储的全局地图探索情况：-1 表示未探索，0表示已探索，1表示障碍物。
+        treasure_pos_list: 智能体存储的宝藏位置列表，包含所有宝藏的坐标。
+        destination_pos: 智能体存储的目标位置坐标（没找到则为 None）。
     """
     # step reward
     # 1. 基础步数惩罚 - 鼓励快速完成
     step_reward = -0.001
 
 
-    # 2. 奖励靠近目标 NOTE 死胡同怎么办？
-    end_reward = -0.02 * end_dist
-    if end_dist < 1e-4:
-        end_reward = 0.1
-
-    # 3. 探索奖励 - 鼓励远离历史位置
-    exploration_reward = min(0.001, 0.02 * history_dist)
-    
-
-    # 4. 历史轨迹奖励 - 鼓励保持合理的探索模式
-    trajectory_reward = 0
-    if 0.1 < history_dist < 0.5:  # 保持适中的探索距离
-        trajectory_reward = 0.001
+    # 2. 探索奖励 - 鼓励探索未探索区域    
+    # ...
 
     # 计算总奖励
-    total_reward = (
-        step_reward +           # -0.001
-        end_reward +            # 主要奖励 [-0.05, +0.3]
-        exploration_reward +    # [0, +0.005] 鼓励远离历史距离
-        trajectory_reward       # [0, +0.001] 适中的探索距离，加分
-    )
-    
-    # 14. 奖励裁剪，防止异常值
+    total_reward = 0
     total_reward = max(-0.2, min(0.5, total_reward))
 
     return [total_reward]

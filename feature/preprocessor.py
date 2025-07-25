@@ -26,17 +26,22 @@ class Preprocessor:
         self.reset()
 
     def reset(self):
-        self.target_pos_list = [(26, 87), (85, 114), (32, 24), (101, 40), (59, 64)]
         self.step_no = 0
         self.cur_pos = (0, 0)
         self.cur_pos_norm = np.array((0, 0))
-        self.end_pos = None
-        self.is_end_pos_found = False
-        self.history_pos = []
+        
+        # self.history_pos = []
         self.bad_move_ids = set()
 
-        self.has_set_random_target = False
-        self.random_target_pos = None
+        self.global_map = np.full((128, 128), -1, dtype=int)  # 全局地图探索情况
+        self.undetected_area = 128 * 128
+        self.treasure_pos_list = []
+        self.buff_pos_list = []
+        self.dest_pos = None
+        self.is_dest_pos_found = False
+
+        self.talent_available = False  # 初始尚未加载穿墙技能
+        self.talent_cd = float("inf")  # 剩余冷却时间初始置为无穷大
 
     def _get_pos_feature(self, found, cur_pos, target_pos):
         """
@@ -55,7 +60,7 @@ class Preprocessor:
         relative_pos = tuple(y - x for x, y in zip(cur_pos, target_pos))
         dist = np.linalg.norm(relative_pos)
         target_pos_norm = norm(target_pos, 127, 0)
-        feature = np.array(
+        pos_feature = np.array(
             (
                 found,
                 norm(relative_pos[0] / max(dist, 1e-4), 1, -1),
@@ -65,171 +70,118 @@ class Preprocessor:
                 norm(dist, 1.41 * 128),
             ),
         )
-        return feature
+        return pos_feature
     
-    def _generate_target_candidates(self, obs):
-        target_candidates = []
-        for organ in obs["frame_state"]["organs"]:
-            if organ["status"] != 1:
-                continue  # 物品可用
-            else:
-                pos = (organ["pos"]["x"], organ["pos"]["z"])
-
-                if organ["sub_type"] == 4:  # 终点 - 最高优先级
-                    target_candidates.append({
-                        'pos': pos,
-                        'priority': 1,
-                        'type': 'end_point',
-                        'weight': 1.0
-                    })
-                elif organ["sub_type"] == 1:  # 宝箱 - 高优先级
-                    target_candidates.append({
-                        'pos': pos,
-                        'priority': 2,
-                        'type': 'treasure',
-                        'weight': 0.8
-                    })
-                elif organ["sub_type"] == 2:  # Buff点 - 中等优先级
-                    target_candidates.append({
-                        'pos': pos,
-                        'priority': 3,
-                        'type': 'buff',
-                        'weight': 0.6
-                    })
-        if len(target_candidates) > 0:
-            # 有非随机目标了，重置随机目标
-            self.has_set_random_target = False
-            self.random_target_pos = None
-            return target_candidates
-        
-        # 如果没有目标，检查是否已经设置随机目标
-        if not self.has_set_random_target:
-            def _get_diagonal_target(current_pos, map_size):
-                """
-                获取对角线方向的远距离目标点
-                """                    
-                # 计算到四个角的距离，选择最远的角
-                corners = [
-                    (20, 20),           # 左下角
-                    (map_size-20, 20),  # 右下角
-                    (20, map_size-20),  # 左上角
-                    (map_size-20, map_size-20)  # 右上角
-                ]
-                
-                max_distance = 0
-                best_corner = corners[0]
-                
-                for corner in corners:
-                    distance = np.linalg.norm(tuple(y - x for x, y in zip(current_pos, corner)))
-                    if distance > max_distance:
-                        max_distance = distance
-                        best_corner = corner
-                
-                return best_corner
-            def _generate_distant_target():
-                # 尝试 10 次生成较远随机目标
-                for _ in range(10):
-                    target = (np.random.randint(10, 117), np.random.randint(10, 117))
-                    if np.linalg.norm(tuple(y - x for x, y in zip(self.cur_pos, target))) > 40:
-                        return {
-                            'pos': target,
-                            'priority': 4,
-                            'type': 'random',
-                            'weight': 0.5
-                        }
-                # 若失败，则选择最佳角落位置作为目标
-                return {
-                    'pos': _get_diagonal_target(self.cur_pos, 128),
-                    'priority': 4,
-                    'type': 'random',
-                    'weight': 0.5
-                }
-            self.has_set_random_target = True
-            self.random_target_pos = _generate_distant_target()
-        else:
-            # 如果已经设置了随机目标，则使用它
-            pass 
-        assert self.random_target_pos is not None and self.has_set_random_target, "Random target should be set if no other targets are available."               
-        target_candidates.append(self.random_target_pos)
-        assert len(target_candidates) == 1, "There should always be at least one target candidate."
-        return target_candidates
-    
-    def _select_target(self, target_candidates):
-        best_target = None
-        min_distance = float('inf')
-        for target in target_candidates:
-            distance = np.linalg.norm(tuple(y - x for x, y in zip(self.cur_pos, target['pos'])))
-            
-            if target['type'] == 'random':
-                assert len(target_candidates) == 1, "If the target is random, it should be the only candidate."
-                best_target = target
-                break
-            elif target['type'] == 'end_point':
-                best_target = target
-                break
-            elif target['type'] == 'treasure':
-                if min_distance > distance:
-                    min_distance = distance
-                    best_target = target
-            elif target['type'] == 'buff':
-                if min_distance > distance:
-                    min_distance = distance
-                    best_target = target
-
-        assert best_target is not None, "There should always be a best target selected."
-        return best_target
-
-    def pb2struct(self, frame_state, last_action):
-        obs, _ = frame_state
-        # Record step_no
-        self.step_no = obs["frame_state"]["step_no"]
-
+    def update_pos(self, obs, hero):
         # Update current position
         # Update position norm (cur & last)
-        hero = obs["frame_state"]["heroes"][0]
+        
         self.cur_pos = (hero["pos"]["x"], hero["pos"]["z"])
         self.last_pos_norm = self.cur_pos_norm
         self.cur_pos_norm = norm(self.cur_pos, 127, 0)
 
-        # Choose target
-        target_candidates = self._generate_target_candidates(obs)
-        best_target = self._select_target(target_candidates)
-        self.end_pos = best_target['pos']            
-        self.is_end_pos_found = True if best_target['type'] == 'end_point' else False  # 真实游戏目标标记为已找到
-        self.feature_end_pos = self._get_pos_feature(self.is_end_pos_found, self.cur_pos, self.end_pos)
-
-        # Update history position feature
-        # 更新历史位置及其特征
-        self.history_pos.append(self.cur_pos)
-        if len(self.history_pos) > 10:
-            self.history_pos.pop(0)
-        self.feature_history_pos = self._get_pos_feature(1, self.cur_pos, self.history_pos[0]) # NOTE history here means 10 steps before
-
-        # Record last action
-        self.last_action = last_action      # NOTE 右边是 agent 的 last_action，作为参数传入 pb2struct；左边是 preprocessor(collector) 记录的 last_action
+        # # Update history position feature
+        # # 更新历史位置及其特征
+        # self.history_pos.append(self.cur_pos)
+        # if len(self.history_pos) > 10:
+        #     self.history_pos.pop(0)
+        # self.feature_history_pos = self._get_pos_feature(1, self.cur_pos, self.history_pos[0]) # NOTE history here means 10 steps before
             
-       
+    def update_view(self, obs):
+        """
+        Map Protocol:
+        -1 : 未探索
+        0 : 障碍物
+        1 : 空地（见论坛）
+        2 : treasure
+        3 : buff
+        4 : destination
+        """   
+        # update detected area
+        map_info = obs["frame_state"]["map"]
+        cnt_new_detected = 0
+        x0, z0 = self.cur_pos
+        for i in range(-25, 25):
+            for j in range(-25, 25):
+                x, z = x0 + i, z0 + j
+                if 0 <= x < 128 and 0 <= z < 128:                    
+                    if self.global_map[x, z] == -1:
+                        cnt_new_detected += 1
+                    self.global_map[x, z] = map_info[x][z] # 0 or 1
+        
+        # self.detected_area = np.argwhere(self.global_map != -1)
+        self.undetected_area -= cnt_new_detected
+        assert self.undetected_area == np.sum(self.global_map == -1), \
+            f"undetected_area {self.undetected_area} != np.sum(self.global_map == -1) {np.sum(self.global_map == -1)}"
+
+        # update treasure position list
+        organs = obs["frame_state"]["organs"]
+        for organ in organs:
+            if organ["sub_type"] == 1 and organ["status"] == 1:  # treasure
+                # XXX 我怀疑取过的宝箱，再经过时还是会看到，只不过状态为 0（不可取）。
+                pos = organ["pos"]
+                if pos not in self.treasure_pos_list:
+                    self.treasure_pos_list.append(pos)    
+            elif organ["sub_type"] == 2 and organ["status"] == 1:   # buff
+                pos = organ["pos"]
+                if pos not in self.buff_pos_list:
+                    self.buff_pos_list.append(pos)
+        
+        # TODO 
+
+        # TODO History ?
+        # self.treasure_pos_list = np.argwhere(self.global_map == 2)
+        # if self.treasure_pos_list.size > 0:
+            # self.dest_pos = self.treasure_pos_list[0]
+        # else:
+            # self.dest_pos = None
+
     def process(self, frame_state, last_action):
-        # Process the frame state and last action to update self's attributes
-        self.pb2struct(frame_state, last_action)
+        obs, _ = frame_state
+        hero = obs["frame_state"]["heroes"][0]
+        
+        # Record step_no
+        self.step_no = obs["frame_state"]["step_no"]
 
-        # Legal action
-        legal_action = self.get_legal_action()
+        # Process legal action
+        self.last_action = last_action 
+        self.talent_available = hero["talent"]["status"]
+        self.talent_cd = hero["talent"]["cooldown"]
+        legal_action = self.get_legal_action(obs) # TODO how to process talent? how to design action space?
 
-        # Feature
-        feature = np.concatenate([self.cur_pos_norm, self.feature_end_pos, self.feature_history_pos, legal_action])
+        # Process frame state: update self's attributes
+        self.update_pos(obs, hero)
+        self.update_view(obs)
+
+
+        # Feature TODO
+
+        # NOTE I think the following should be encoded into feature:
+        # 1. 'detected map' 
+        # 2. current (normalized) position
+        # 3. organ detection status (MAX_TREASURE_NUM bits for treasures + 1 bit for destination + ? bits for buffs + normalized cd for talent)
+        # 4. ?? history position feature (10 steps before) ?? 
+        # 5. legal action (16 bits for 16 actions, 1 bit for move action)
+        feature = np.concatenate([self.cur_pos_norm, self.feature_end_pos , legal_action])
+        # XXX modify conf.py !!
 
         return (
             feature,
             legal_action,
             reward_process(
-                self.feature_end_pos[-1],       # 鼓励靠近目标（目标选取是之前的工作）
-                self.feature_history_pos[-1],   # 鼓励远离 10 步之前的历史位置
-            ),
+                step_no=self.step_no,
+                cur_pos=self.cur_pos,
+                detected_area=self.detected_area,
+                treasure_pos_list=self.treasure_pos_list,
+                destination_pos=self.dest_pos
+                # TODO MORE ??
+            ),  
         )
         
 
     def get_legal_action(self):
+        # TODO better legal action design?? talent, action space, conf.py ...
+        
         # if last_action is move and current position is the same as last position, add this action to bad_move_ids
         # 如果上一步的动作是移动，且当前位置与上一步位置相同，则将该动作加入到bad_move_ids中
         if (

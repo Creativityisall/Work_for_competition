@@ -26,51 +26,7 @@ from agent_ppo.algorithm.algorithm import Algorithm
 from agent_ppo.feature.definition import SampleData, ObsData, ActData, SampleManager
 from agent_ppo.feature.preprocessor import Preprocessor
 
-# def my_trace(func):
-#     """装饰器：打印函数输入/输出的类型、形状（如果是数组/张量）"""
-#     def wrapper(*args, **kwargs):
-#         # 打印函数名和输入信息
-#         func_name = func.__name__
-#         print(f"\n[TRACE] 函数 {func_name}() 输入:")
-        
-#         # 打印位置参数 (args)
-#         for i, arg in enumerate(args):
-#             arg_info = _get_arg_info(arg)
-#             print(f"  - 参数 {i}: {arg_info}")
-        
-#         # 打印关键字参数 (kwargs)
-#         for k, v in kwargs.items():
-#             arg_info = _get_arg_info(v)
-#             print(f"  - {k}: {arg_info}")
-        
-#         # 执行函数
-#         result = func(*args, **kwargs)
-        
-#         # 打印输出信息
-#         result_info = _get_arg_info(result)
-#         print(f"[TRACE] 函数 {func_name}() 输出: {result_info}")
-        
-#         return result
-#     return wrapper
-
-# def _get_arg_info(arg):
-#     """获取变量的类型和形状/长度信息"""
-#     if isinstance(arg, (np.ndarray, torch.Tensor)):
-#         return f"{type(arg).__name__} {_get_shape(arg)}"
-#     elif isinstance(arg, (list, tuple, dict, set)):
-#         return f"{type(arg).__name__} len={len(arg)}"
-#     else:
-#         return f"{type(arg).__name__} (值: {str(arg)[:50]})"
-
-# def _get_shape(x):
-#     """获取数组/张量的形状"""
-#     if isinstance(x, np.ndarray):
-#         return f"shape={x.shape}"
-#     elif isinstance(x, torch.Tensor):
-#         return f"shape={x.shape} (dtype={x.dtype}, device={x.device})"
-#     else:
-#         return ""
-
+###############################################
 import inspect
 import numpy as np
 import torch
