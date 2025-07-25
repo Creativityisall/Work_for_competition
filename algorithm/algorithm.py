@@ -52,11 +52,11 @@ class Algorithm:
         list_npdata = [torch.as_tensor(sample_data.npdata, device=self.device) for sample_data in list_sample_data]
         _input_datas = torch.stack(list_npdata, dim=0)
 
-        data_list = self.model.format_data(_input_datas)
+        data_list = list(self.model.format_data(_input_datas))
         if self.norm_adv:
             adv_idx = 4
             data_list[adv_idx] = (data_list[adv_idx] - data_list[adv_idx].mean()) / (data_list[adv_idx].std() + 1e-8)
-        
+        data_list = tuple(data_list)
         # total_loss, info_list = self.compute_loss(data_list, rst_list)
         # results["total_loss"] = total_loss.item()
         # total_loss.backward()
@@ -86,9 +86,6 @@ class Algorithm:
         b_inds = np.arange(batch_size)
         for epoch in range(self.n_epoch):
             np.random.shuffle(b_inds)
-
-            # data_list = self.model.format_data(_input_datas)
-            rst_list = self.model(data_list)
             
             for start in range(0, batch_size, self.minibatch_size):
                 end = start + self.minibatch_size
@@ -96,11 +93,13 @@ class Algorithm:
                 mb_inds_tensor = torch.from_numpy(mb_inds).to(self.device)
 
                 mb_data_list = [d[mb_inds_tensor] for d in data_list]
-                mb_rst_list = [r[mb_inds_tensor] for r in rst_list]
+                # 每个minibatch都重新计算前向传播，避免计算图重复使用
+                mb_rst_list = self.model(mb_data_list)
                 total_loss, info_list = self.compute_loss(mb_data_list, mb_rst_list)
 
                 #### Monitor Data ####
-                results["total_loss"] = total_loss.item()
+                with torch.no_grad():
+                    results["total_loss"] = total_loss.item()
                 ######################
 
                 
@@ -111,23 +110,24 @@ class Algorithm:
 
 
                 #### Monitor Data ####
-                _info_list = []
-                for info in info_list:
-                    if isinstance(info, list):
-                        _info = [i.detach().cpu().item() if torch.is_tensor(i) else i for i in info]
-                    else:
-                        _info = info.detach().mean().cpu().item() if torch.is_tensor(info) else info
-                    _info_list.append(_info)
+                with torch.no_grad():
+                    _info_list = []
+                    for info in info_list:
+                        if isinstance(info, list):
+                            _info = [i.detach().cpu().item() if torch.is_tensor(i) else i for i in info]
+                        else:
+                            _info = info.detach().mean().cpu().item() if torch.is_tensor(info) else info
+                        _info_list.append(_info)
 
-                if self.monitor:
-                    now = time.time()
-                    if now - self.last_report_monitor_time >= 60:
-                        results["value_loss"] = round(_info_list[1], 2)
-                        results["policy_loss"] = round(_info_list[2], 2)
-                        results["entropy_loss"] = round(_info_list[3], 2)
-                        results["reward"] = _info_list[-1]
-                        self.monitor.put_data({os.getpid(): results})
-                        self.last_report_monitor_time = now
+                    if self.monitor:
+                        now = time.time()
+                        if now - self.last_report_monitor_time >= 60:
+                            results["value_loss"] = round(_info_list[1], 2)
+                            results["policy_loss"] = round(_info_list[2], 2)
+                            results["entropy_loss"] = round(_info_list[3], 2)
+                            results["reward"] = _info_list[-1]
+                            self.monitor.put_data({os.getpid(): results})
+                            self.last_report_monitor_time = now
                 ######################
 
                 

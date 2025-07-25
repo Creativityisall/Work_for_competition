@@ -106,11 +106,11 @@ def run_episodes(n_episode, env, agent : Agent, usr_conf, logger, monitor):
 
                 # Agent performs inference, gets the predicted action for the next frame
                 # Agent 进行推理, 获取下一帧的预测动作
-                act_data, model_version = agent.predict(list_obs_data=[obs_data])
+                list_act_data, model_version = agent.predict(list_obs_data=[obs_data])
 
                 # Unpack ActData into action
                 # ActData 解包成动作
-                act = agent.action_process(act_data[0])
+                act = agent.action_process(list_act_data[0])
 
                 # Interact with the environment, execute actions, get the next state
                 # 与环境交互, 执行动作, 获取下一步的状态
@@ -131,9 +131,9 @@ def run_episodes(n_episode, env, agent : Agent, usr_conf, logger, monitor):
                 collector.sample_process(
                     feature=obs_data.feature,
                     legal_action=obs_data.legal_action,
-                    log_prob=[act_data[0].log_prob],
-                    action=[act_data[0].action],
-                    value=act_data[0].value,
+                    log_prob=[list_act_data[0].log_prob],
+                    action=[list_act_data[0].action],
+                    value=list_act_data[0].value,
                     reward=np.array(reward),
                 )
 
@@ -160,7 +160,7 @@ def run_episodes(n_episode, env, agent : Agent, usr_conf, logger, monitor):
                 if done:
                     if monitor:
                         monitor_data = {
-                            "win_rate": win_rate,
+                            "diy_1": win_rate,
                             "diy_2": diy_2,
                             "diy_3": diy_3,
                             "diy_4": diy_4,

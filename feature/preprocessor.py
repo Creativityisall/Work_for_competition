@@ -35,6 +35,9 @@ class Preprocessor:
         self.history_pos = []
         self.bad_move_ids = set()
 
+        self.has_set_random_target = False
+        self.random_target_pos = None
+
     def _get_pos_feature(self, found, cur_pos, target_pos):
         """
         获取当前位置和目标位置的特征向量
@@ -63,22 +66,13 @@ class Preprocessor:
             ),
         )
         return feature
-
-    def pb2struct(self, frame_state, last_action):
-        obs, _ = frame_state
-        self.step_no = obs["frame_state"]["step_no"]
-
-        hero = obs["frame_state"]["heroes"][0]
-        self.cur_pos = (hero["pos"]["x"], hero["pos"]["z"])
-
-        # 动态统计当前步骤中发现的宝箱总数
-        current_treasures_in_view = 0
-        treasure_positions = set()
-
-        # 初始化目标列表和优先级
+    
+    def _generate_target_candidates(self, obs):
         target_candidates = []
         for organ in obs["frame_state"]["organs"]:
-            if organ["status"] == 1:  # 物品可用
+            if organ["status"] != 1:
+                continue  # 物品可用
+            else:
                 pos = (organ["pos"]["x"], organ["pos"]["z"])
 
                 if organ["sub_type"] == 4:  # 终点 - 最高优先级
@@ -89,8 +83,6 @@ class Preprocessor:
                         'weight': 1.0
                     })
                 elif organ["sub_type"] == 1:  # 宝箱 - 高优先级
-                    current_treasures_in_view += 1  # 添加这行
-                    treasure_positions.add(pos)     # 添加这行
                     target_candidates.append({
                         'pos': pos,
                         'priority': 2,
@@ -104,159 +96,135 @@ class Preprocessor:
                         'type': 'buff',
                         'weight': 0.6
                     })
-        # 更新历史发现的宝箱总数（累计最大值）
-        if not hasattr(self, 'total_treasures_discovered'):
-            self.total_treasures_discovered = current_treasures_in_view
-            self.discovered_treasure_positions = treasure_positions.copy()
+        if len(target_candidates) > 0:
+            # 有非随机目标了，重置随机目标
+            self.has_set_random_target = False
+            self.random_target_pos = None
+            return target_candidates
+        
+        # 如果没有目标，检查是否已经设置随机目标
+        if not self.has_set_random_target:
+            def _get_diagonal_target(current_pos, map_size):
+                """
+                获取对角线方向的远距离目标点
+                """                    
+                # 计算到四个角的距离，选择最远的角
+                corners = [
+                    (20, 20),           # 左下角
+                    (map_size-20, 20),  # 右下角
+                    (20, map_size-20),  # 左上角
+                    (map_size-20, map_size-20)  # 右上角
+                ]
+                
+                max_distance = 0
+                best_corner = corners[0]
+                
+                for corner in corners:
+                    distance = np.linalg.norm(tuple(y - x for x, y in zip(current_pos, corner)))
+                    if distance > max_distance:
+                        max_distance = distance
+                        best_corner = corner
+                
+                return best_corner
+            def _generate_distant_target():
+                # 尝试 10 次生成较远随机目标
+                for _ in range(10):
+                    target = (np.random.randint(10, 117), np.random.randint(10, 117))
+                    if np.linalg.norm(tuple(y - x for x, y in zip(self.cur_pos, target))) > 40:
+                        return {
+                            'pos': target,
+                            'priority': 4,
+                            'type': 'random',
+                            'weight': 0.5
+                        }
+                # 若失败，则选择最佳角落位置作为目标
+                return {
+                    'pos': _get_diagonal_target(self.cur_pos, 128),
+                    'priority': 4,
+                    'type': 'random',
+                    'weight': 0.5
+                }
+            self.has_set_random_target = True
+            self.random_target_pos = _generate_distant_target()
         else:
-            # 合并新发现的宝箱位置
-            self.discovered_treasure_positions.update(treasure_positions)
-            # 更新总数为发现过的宝箱总数
-            self.total_treasures_discovered = len(self.discovered_treasure_positions)
-        
-        # 从score_info获取已收集的宝箱数量
-        score_info = obs.get("score_info", {})
-        self.treasures_collected = score_info.get("treasure_collected_count", 0)
-        
-        # 更新历史位置
-        self.history_pos.append(self.cur_pos)
-        if len(self.history_pos) > 10:
-            self.history_pos.pop(0)
-
-        # 选择目标
-        self._select_target(target_candidates) # NOTE this will modify self.end_pos, self.is_end_pos_found etc. 
-        self.feature_end_pos = self._get_pos_feature(self.is_end_pos_found, self.cur_pos, self.end_pos)
-
-        # update position norm (cur & last)
-        self.last_pos_norm = self.cur_pos_norm
-        self.cur_pos_norm = norm(self.cur_pos, 127, 0)
-
-        # History position feature
-        # 历史位置特征
-        self.feature_history_pos = self._get_pos_feature(1, self.cur_pos, self.history_pos[0])
-
-        # self.move_usable = True           # XXX REDUNDANT! 
-        self.last_action = last_action      # NOTE 右边是 agent 的 last_action，作为参数传入 pb2struct；左边是 preprocessor(collector) 记录的 last_action
-            
+            # 如果已经设置了随机目标，则使用它
+            pass 
+        assert self.random_target_pos is not None and self.has_set_random_target, "Random target should be set if no other targets are available."               
+        target_candidates.append(self.random_target_pos)
+        assert len(target_candidates) == 1, "There should always be at least one target candidate."
+        return target_candidates
     
     def _select_target(self, target_candidates):
-        if not target_candidates:
-            random_target = None
-        
-            if len(self.target_pos_list) > 0:
-                # 从预设的目标位置列表中随机选择一个
-                random_index = random.randrange(len(self.target_pos_list))
-                random_pos = self.target_pos_list[random_index]
-            else:
-                # 如果目标位置列表也为空，设置一个默认的随机位置
-                # 在地图范围内随机生成一个位置 (坐标范围 0-127)
-                random_x = random.randint(10, 117)  # 避免边界
-                random_z = random.randint(10, 117)  # 避免边界
-                random_pos = (random_x, random_z)
-            
-            # 创建随机目标并加入候选列表
-            random_target = {
-                'pos': random_pos,
-                'priority': 4,  # 随机目标优先级最低
-                'type': 'random',
-                'weight': 0.3
-            }
-            target_candidates.append(random_target)
-        
-        # 计算收集进度
-        total_treasures = getattr(self, 'total_treasures_discovered', 1)
-        treasures_collected = getattr(self, 'treasures_collected', 0)
-        collection_progress = treasures_collected / max(total_treasures, 1)
-        # 按优先级排序目标候选列表
-        target_candidates.sort(key=lambda x: x['priority'])
-        
-        # 距离计算和目标选择
         best_target = None
-        best_score = -float('inf')
-
+        min_distance = float('inf')
         for target in target_candidates:
             distance = np.linalg.norm(tuple(y - x for x, y in zip(self.cur_pos, target['pos'])))
             
-            # 计算综合得分：优先级权重 - 距离惩罚 + 类型奖励
-            distance_penalty = distance / (1.41 * 128)  # 归一化距离
-            
-            if target['type'] == 'end_point':
-            # 终点：只有收集足够多宝箱后才高优先级
-                if collection_progress >= 0.8:
-                    score = target['weight'] * (3.0 - distance_penalty)
-                elif collection_progress >= 0.5:
-                    score = target['weight'] * (1.0 - distance_penalty)
-                else:
-                    score = target['weight'] * (0.2 - distance_penalty)
-            elif target['type'] == 'treasure':
-                # 宝箱：平衡距离和收益
-                if collection_progress < 0.8:
-                    score = target['weight'] * (2.0 - distance_penalty)
-                else:
-                    score = target['weight'] * (0.5 - distance_penalty)
-            elif target['type'] == 'buff':
-                # Buff点：中等吸引力
-                score = target['weight'] * (0.6 - 0.3 * distance_penalty)
-            elif target['type'] == 'random':
-                # 随机目标：最低吸引力，主要用于探索
-                score = target['weight'] * (0.4 - 0.2 * distance_penalty)
-            else:
-                # 其他类型目标
-                score = target['weight'] * (0.4 - 0.2 * distance_penalty)
-            
-            # 如果当前目标类型相同，给予连续性奖励
-            if hasattr(self, 'current_target_type') and target['type'] == self.current_target_type:
-                score += 0.1  # 连续性奖励
-            
-            if score > best_score:
-                best_score = score
+            if target['type'] == 'random':
+                assert len(target_candidates) == 1, "If the target is random, it should be the only candidate."
                 best_target = target
-        
-        # 更新目标
-        if best_target:
-            old_target = getattr(self, 'end_pos', None)
-            self.end_pos = best_target['pos']
-            self.current_target_type = best_target['type']
-            self.target_priority = best_target['priority']
-            self.target_weight = best_target['weight']
-            
-            # 设置found状态
-            if best_target['type'] == 'end_point':
-                self.is_end_pos_found = True  # 真实游戏目标标记为已找到
-            else:
-                self.is_end_pos_found = False   # 随机目标标记为未找到真实终点
+                break
+            elif target['type'] == 'end_point':
+                best_target = target
+                break
+            elif target['type'] == 'treasure':
+                if min_distance > distance:
+                    min_distance = distance
+                    best_target = target
+            elif target['type'] == 'buff':
+                if min_distance > distance:
+                    min_distance = distance
+                    best_target = target
+
+        assert best_target is not None, "There should always be a best target selected."
+        return best_target
+
+    def pb2struct(self, frame_state, last_action):
+        obs, _ = frame_state
+        # Record step_no
+        self.step_no = obs["frame_state"]["step_no"]
+
+        # Update current position
+        # Update position norm (cur & last)
+        hero = obs["frame_state"]["heroes"][0]
+        self.cur_pos = (hero["pos"]["x"], hero["pos"]["z"])
+        self.last_pos_norm = self.cur_pos_norm
+        self.cur_pos_norm = norm(self.cur_pos, 127, 0)
+
+        # Choose target
+        target_candidates = self._generate_target_candidates(obs)
+        best_target = self._select_target(target_candidates)
+        self.end_pos = best_target['pos']            
+        self.is_end_pos_found = True if best_target['type'] == 'end_point' else False  # 真实游戏目标标记为已找到
+        self.feature_end_pos = self._get_pos_feature(self.is_end_pos_found, self.cur_pos, self.end_pos)
+
+        # Update history position feature
+        # 更新历史位置及其特征
+        self.history_pos.append(self.cur_pos)
+        if len(self.history_pos) > 10:
+            self.history_pos.pop(0)
+        self.feature_history_pos = self._get_pos_feature(1, self.cur_pos, self.history_pos[0]) # NOTE history here means 10 steps before
+
+        # Record last action
+        self.last_action = last_action      # NOTE 右边是 agent 的 last_action，作为参数传入 pb2struct；左边是 preprocessor(collector) 记录的 last_action
             
        
     def process(self, frame_state, last_action):
+        # Process the frame state and last action to update self's attributes
         self.pb2struct(frame_state, last_action)
 
         # Legal action
-        # 合法动作
         legal_action = self.get_legal_action()
 
         # Feature
-        # 特征
         feature = np.concatenate([self.cur_pos_norm, self.feature_end_pos, self.feature_history_pos, legal_action])
-
-        target_info = {
-            'type': getattr(self, 'current_target_type', 'random'),
-            'weight': getattr(self, 'target_weight', 0.3),
-            'priority': getattr(self, 'target_priority', 4),
-            'treasures_collected': getattr(self, 'treasures_collected', 0),
-            'total_treasures': getattr(self, 'total_treasures_discovered', 1),
-            'treasure_score': getattr(self, 'treasure_score', 0),
-            'step_no': getattr(self, 'step_no', 0),
-            'collection_progress': getattr(self, 'treasures_collected', 0) / max(getattr(self, 'total_treasures_discovered', 1), 1)
-        }
 
         return (
             feature,
             legal_action,
             reward_process(
-                self.feature_end_pos[-1], 
-                self.feature_history_pos[-1], 
-                feature_vector=feature,
-                target_info=target_info
+                self.feature_end_pos[-1],       # 鼓励靠近目标（目标选取是之前的工作）
+                self.feature_history_pos[-1],   # 鼓励远离 10 步之前的历史位置
             ),
         )
         

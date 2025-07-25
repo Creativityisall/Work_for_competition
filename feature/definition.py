@@ -36,7 +36,7 @@ ActData = create_cls(
 SampleData = create_cls("SampleData", npdata=None)
 
 
-def reward_process(end_dist, history_dist, feature_vector=None, target_info=None):
+def reward_process(end_dist, history_dist):
     """
     改进的奖励函数设计
     
@@ -44,96 +44,22 @@ def reward_process(end_dist, history_dist, feature_vector=None, target_info=None
         end_dist: 到终点的归一化距离 [0,1]
         history_dist: 到历史位置的归一化距离 [0,1] 
         feature_vector: 完整的20维特征向量 
-        game_state: 游戏状态信息 
     """
     # step reward
     # 1. 基础步数惩罚 - 鼓励快速完成
     step_reward = -0.001
 
-    # 获取动态统计的宝箱信息
-    if target_info:
-        target_type = target_info.get('type', 'random') #默认值是后者
-        treasures_collected = target_info.get('treasures_collected', 0)
-        total_treasures = target_info.get('total_treasures', 1)
-        collection_progress = target_info.get('collection_progress', 0)
-    else:
-        target_type = 'random' #  当前Agent追求的目标类型
-        treasures_collected = 0 # Agent已经收集到的宝箱数量
-        total_treasures = 1 # 从游戏开始到当前步骤，Agent探索发现的宝箱总数
-        collection_progress = 0 # 收集进度比例
 
+    # 2. 奖励靠近目标 NOTE 死胡同怎么办？
     end_reward = -0.02 * end_dist
-    # 根据目标类型和收集进度设计奖励
-    if target_type == 'treasure':
-        # 宝箱目标：适中的奖励鼓励收集
-        if end_dist < 0.05:
-            treasure_reward = 0.1  # 收集宝箱奖励 (原来0.5 -> 0.1)
-        elif end_dist < 0.2:
-            treasure_reward = 0.02 - 0.1 * end_dist  # 适中的梯度
-        else:
-            treasure_reward = -0.005 * end_dist
-        end_reward = treasure_reward
-        
-    elif target_type == 'end_point':
-        # 终点目标：根据收集进度决定，但奖励更平衡
-        if collection_progress >= 0.8:  # 收集了80%以上
-            if end_dist < 0.05:
-                end_reward = 0.3  # 完成游戏奖励 (原来1.0 -> 0.3)
-            elif end_dist < 0.1:
-                end_reward = 0.15 - 0.75 * end_dist  # 线性递减
-            else:
-                end_reward = -0.005 * end_dist
-        elif collection_progress >= 0.5:  # 收集了50-80%
-            if end_dist < 0.05:
-                end_reward = 0.05  # 中等奖励 (原来0.2 -> 0.05)
-            else:
-                end_reward = -0.008 * end_dist
-        else:  # 收集不足50%，适度惩罚过早到达终点
-            end_reward = -0.05 * (1 - collection_progress) - 0.005 * end_dist  # 减轻惩罚
-            
-    elif target_type == 'buff':
-        if end_dist < 0.05:
-            end_reward = 0.02  # Buff奖励 (原来0.1 -> 0.02)
-        else:
-            end_reward = -0.002 * end_dist
+    if end_dist < 1e-4:
+        end_reward = 0.1
 
     # 3. 探索奖励 - 鼓励远离历史位置
     exploration_reward = min(0.001, 0.02 * history_dist)
     
-    # # 4. 进度奖励 - 基于是否找到真正的终点
-    # if feature_vector is not None and len(feature_vector) >= 7:
-    #     end_found = feature_vector[2]  # self.feature_end_pos[0]
-    #     if end_found > 0.99:  # 找到真正的终点
-    #         progress_reward = 0.01
-    #     else:
-    #         progress_reward = -0.005  # 轻微惩罚没找到终点
-    # else:
-    #     progress_reward = 0
 
-    # 5. 卡住惩罚 - 基于合法动作数量
-    
-    # 6. 方向一致性奖励 - 鼓励朝目标方向移动
-    direction_reward = 0
-    if feature_vector is not None and len(feature_vector) >= 7:
-        # feature_end_pos[1:3] 是归一化的方向向量
-        direction_consistency = abs(feature_vector[3]) + abs(feature_vector[4])
-        direction_reward = 0.001 * direction_consistency
-
-    # 7. 阶段性策略奖励
-    phase_reward = 0
-    if collection_progress < 0.8 and target_type == 'treasure':
-        # 收集阶段：额外鼓励寻找宝箱
-        phase_reward = 0.005
-    elif collection_progress >= 0.8 and target_type == 'end_point':
-        # 完成阶段：额外鼓励到达终点
-        phase_reward = 0.01
-
-    # 8. 收集效率奖励
-    efficiency_reward = 0
-    if treasures_collected > 0 and total_treasures > 0:
-        efficiency_reward = min(0.005, treasures_collected * 0.001)
-
-    # 9. 历史轨迹奖励 - 鼓励保持合理的探索模式
+    # 4. 历史轨迹奖励 - 鼓励保持合理的探索模式
     trajectory_reward = 0
     if 0.1 < history_dist < 0.5:  # 保持适中的探索距离
         trajectory_reward = 0.001
@@ -142,11 +68,8 @@ def reward_process(end_dist, history_dist, feature_vector=None, target_info=None
     total_reward = (
         step_reward +           # -0.001
         end_reward +            # 主要奖励 [-0.05, +0.3]
-        exploration_reward +    # [0, +0.005] 探索奖励
-        direction_reward +      # [0, +0.002] 方向奖励   
-        phase_reward +          # [0, +0.01] 阶段奖励
-        efficiency_reward +     # [0, +0.005] 效率奖励
-        trajectory_reward       # [0, +0.001] 轨迹奖励
+        exploration_reward +    # [0, +0.005] 鼓励远离历史距离
+        trajectory_reward       # [0, +0.001] 适中的探索距离，加分
     )
     
     # 14. 奖励裁剪，防止异常值

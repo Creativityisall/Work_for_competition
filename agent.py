@@ -26,7 +26,132 @@ from agent_ppo.algorithm.algorithm import Algorithm
 from agent_ppo.feature.definition import SampleData, ObsData, ActData, SampleManager
 from agent_ppo.feature.preprocessor import Preprocessor
 
+# def my_trace(func):
+#     """装饰器：打印函数输入/输出的类型、形状（如果是数组/张量）"""
+#     def wrapper(*args, **kwargs):
+#         # 打印函数名和输入信息
+#         func_name = func.__name__
+#         print(f"\n[TRACE] 函数 {func_name}() 输入:")
+        
+#         # 打印位置参数 (args)
+#         for i, arg in enumerate(args):
+#             arg_info = _get_arg_info(arg)
+#             print(f"  - 参数 {i}: {arg_info}")
+        
+#         # 打印关键字参数 (kwargs)
+#         for k, v in kwargs.items():
+#             arg_info = _get_arg_info(v)
+#             print(f"  - {k}: {arg_info}")
+        
+#         # 执行函数
+#         result = func(*args, **kwargs)
+        
+#         # 打印输出信息
+#         result_info = _get_arg_info(result)
+#         print(f"[TRACE] 函数 {func_name}() 输出: {result_info}")
+        
+#         return result
+#     return wrapper
 
+# def _get_arg_info(arg):
+#     """获取变量的类型和形状/长度信息"""
+#     if isinstance(arg, (np.ndarray, torch.Tensor)):
+#         return f"{type(arg).__name__} {_get_shape(arg)}"
+#     elif isinstance(arg, (list, tuple, dict, set)):
+#         return f"{type(arg).__name__} len={len(arg)}"
+#     else:
+#         return f"{type(arg).__name__} (值: {str(arg)[:50]})"
+
+# def _get_shape(x):
+#     """获取数组/张量的形状"""
+#     if isinstance(x, np.ndarray):
+#         return f"shape={x.shape}"
+#     elif isinstance(x, torch.Tensor):
+#         return f"shape={x.shape} (dtype={x.dtype}, device={x.device})"
+#     else:
+#         return ""
+
+import inspect
+import numpy as np
+import torch
+from collections.abc import Iterable  # 兼容更多可迭代对象
+from functools import wraps
+
+def my_trace(func):
+    """装饰器：显示参数名、返回值名及深度类型信息"""
+    @wraps(func)  # 保留原函数元信息
+    def wrapper(*args, **kwargs):
+        func_name = func.__name__
+        sig = inspect.signature(func)
+        bound_args = sig.bind(*args, **kwargs)
+        bound_args.apply_defaults()  # 填充默认参数
+
+        # 打印输入信息（带参数名）
+        print(f"\n[TRACE] 函数 {func_name}() 输入:")
+        for name, value in bound_args.arguments.items():
+            print(f"  - 参数 {name}: {_get_deep_arg_info(value, indent=4)}")
+
+        # 执行函数并捕获返回值
+        result = func(*args, **kwargs)
+
+        # 打印输出信息（尝试获取返回值变量名）
+        result_name = _get_return_var_name(func)
+        print(f"[TRACE] 函数 {func_name}() 输出 {'-> ' + result_name + ': ' if result_name else ''}{_get_deep_arg_info(result)}")
+        return result
+    return wrapper
+
+def _get_deep_arg_info(arg, indent=0, max_elements=5):
+    """递归获取变量及其子元素的类型和结构信息"""
+    indent_str = ' ' * indent
+    info = []
+    
+    # 处理数组/张量
+    if isinstance(arg, np.ndarray):
+        info.append(f"ndarray shape={arg.shape}")
+    elif isinstance(arg, torch.Tensor):
+        info.append(f"Tensor shape={arg.shape} (dtype={arg.dtype}, device={arg.device})")
+    
+    # 处理列表/元组（递归检查元素）
+    elif isinstance(arg, (list, tuple)):
+        info.append(f"{type(arg).__name__} len={len(arg)} [")
+        for i, item in enumerate(arg[:max_elements]):  # 限制打印的元素数量
+            item_info = _get_deep_arg_info(item, indent + 4)
+            info.append(f"{indent_str}  [{i}]: {item_info}")
+        if len(arg) > max_elements:
+            info.append(f"{indent_str}  ... (仅显示前 {max_elements}/{len(arg)} 个元素)")
+        info.append(f"{indent_str}]")
+    
+    # 处理字典（递归检查值）
+    elif isinstance(arg, dict):
+        info.append(f"dict len={len(arg)} {{")
+        for k, v in list(arg.items())[:max_elements]:
+            item_info = _get_deep_arg_info(v, indent + 4)
+            info.append(f"{indent_str}  '{k}': {item_info}")
+        if len(arg) > max_elements:
+            info.append(f"{indent_str}  ... (仅显示前 {max_elements}/{len(arg)} 个键值对)")
+        info.append(f"{indent_str}}}")
+    
+    # 其他类型（直接打印）
+    else:
+        info.append(f"{type(arg).__name__} (值: {str(arg)[:50]})")
+    
+    return '\n'.join(info)
+
+def _get_return_var_name(func):
+    """通过解析函数源码尝试获取返回值变量名（非100%准确）"""
+    try:
+        source = inspect.getsource(func)
+        lines = [line.strip() for line in source.split('\n')]
+        last_line = lines[-1]
+        if 'return ' in last_line:
+            return last_line.split('return ')[1].split(',')[0].strip()
+    except:
+        pass
+    return ""
+    
+#######################################
+
+# @my_trace
 def random_choice(log_p):
     p = np.exp(log_p - np.max(log_p))  # softmax
     p /= np.sum(p)
@@ -34,9 +159,9 @@ def random_choice(log_p):
     s = 0
     for i in range(len(p)):
         if r > s and r <= s + p[i]:
-            return i, p[i].item().log()
+            return i, np.log(p[i])
         s += p[i]
-    return len(p) - 1, p[len(p) - 1].item().log()
+    return len(p) - 1, np.log(p[len(p) - 1])
 
 
 @attached
@@ -58,6 +183,7 @@ class Agent(BaseAgent):
             self.win_history.pop(0)
         return sum(self.win_history) / len(self.win_history) if len(self.win_history) > 10 else 0
 
+    # @my_trace
     def _predict(self, obs, legal_action):
         with torch.no_grad():
             inputs = self.model.format_data(obs, legal_action) # send an array to model's format_data method, which turns array into tensor directly
@@ -69,10 +195,11 @@ class Agent(BaseAgent):
 
         return np_output_list
 
-    def predict_process(self, obs, legal_action):
-        obs = np.array([obs]) # obs : dict -> array (only 1 element in array `obs`, which is a dictionary)
+    # @my_trace
+    def predict_process(self, feature, legal_action):
+        feature = np.array([feature])
         legal_action = np.array([legal_action])
-        log_probs, value = self._predict(obs, legal_action)
+        log_probs, value = self._predict(feature, legal_action)
         return log_probs, value
 
     def observation_process(self, obs, extra_info=None):
@@ -98,11 +225,8 @@ class Agent(BaseAgent):
         feature = list_obs_data[0].feature
         legal_action = list_obs_data[0].legal_action
         log_probs, value = self.predict_process(feature, legal_action)
-
-        assert log_probs.shape() == (1, len(legal_action)), "log_probs shape mismatch with legal_action"
-        assert value.shape() == (1, 1), "value shape mismatch, should be (1, 1)"
         
-        action, log_prob = random_choice(log_probs.squeeze(0).numpy())
+        action, log_prob = random_choice(log_probs)
         return [ActData(log_probs=log_probs, value=value, action=action, log_prob=log_prob)]
 
     def action_process(self, act_data):
