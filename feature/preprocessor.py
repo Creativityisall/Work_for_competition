@@ -251,6 +251,7 @@ class Preprocessor:
                 # has_found_dest=self.is_dest_pos_found,
                 
                 # legal_action=self.legal_action,
+                is_last_action_talent=self.last_action >= 8, # XXX
                 # talent_available=self.talent_available,
                 # talent_cd=self.talent_cd,
             ),  
