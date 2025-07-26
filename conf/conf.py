@@ -79,8 +79,8 @@ class Config:
     VALUE_CLIP = 0.2
 
     # Training settings
-    N_EPOCH = 10 # number of epochs 
-    MINIBATCH_SIZE = 64
+    N_EPOCH = 2 # number of epochs 
+    MINIBATCH_SIZE = 128
         # In configure_app.toml 
         # # replay_buffer_capacity = 4096
         # # batch_size = 256
