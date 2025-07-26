@@ -68,21 +68,36 @@ def reward_process(
     """
     # step reward
     # 1. 基础步数惩罚 - 鼓励快速完成
+
+    total_reward = 0
+
+    # 1. 基础步数惩罚 - 鼓励快速完成
     step_reward = -0.001
+    total_reward += step_reward
 
-    # 2. 探索奖励 - 鼓励探索未探索区域    
-    explore_reward = 0.005 * cnt_new_detected
-
-    # 3.靠近奖励
-    dist_reward = -0.001
-    if dist_goal_norm is not None:
-        if dist_goal_norm > 0.2:
-            dist_reward = 0.005 - 0.005 * dist_goal_norm
-        elif 0.05<= dist_goal_norm <= 0.2:
-            dist_reward = 0.02 - 0.01 * dist_goal_norm
-        else:
-            dist_reward = 0.1-0.1 * dist_goal_norm
+    # 2. 若小范围内没有目标，则探索奖励；若小范围内有目标，则奖励抓取目标  
     
+    # dist_reward = -0.001
+    # if dist_goal_norm is not None:
+    #     if dist_goal_norm > 0.2:
+    #         dist_reward = 0.005 - 0.005 * dist_goal_norm
+    #     elif 0.05<= dist_goal_norm <= 0.2:
+    #         dist_reward = 0.02 - 0.01 * dist_goal_norm
+    #     else:
+    #         dist_reward = 0.1-0.1 * dist_goal_norm
+
+    # if dist_goal_norm is None:
+    #     explore_reward = 0.005 * min(200, cnt_new_detected) 
+    #     total_reward += explore_reward
+    # else:
+    #     if last_goal_dist is not None:
+    #         dist_reward = last_goal_dist - dist_goal_norm 
+    #         total_reward += dist_reward  
+    #     else:
+
+
+
+
     # 4.使用talent奖励
     if is_last_action_talent:
         talent_reward = 0.01
@@ -91,13 +106,7 @@ def reward_process(
 
     # 计算总奖励
     total_reward = 0
-    total_reward =(
-        step_reward
-        + explore_reward
-        + dist_reward
-        + talent_reward
-    )
-    total_reward = max(-0.1, min(0.1, total_reward))
+    # total_reward = max(-0.1, min(0.1, total_reward))
 
     #调试信息
     # print(f"Reward Components: explore_reward={explore_reward:.3f}, dist_reward={dist_reward:.3f}, talent_reward={talent_reward:.3f}, step_reward={step_reward:.3f}")

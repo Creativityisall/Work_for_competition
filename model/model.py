@@ -53,9 +53,38 @@ class NetworkModelBase(nn.Module):
 
         self.data_len = Config.data_len
 
+        self.cnn_input_dim = 128 * 128
+        self.cnn_output_dim = 256
+
         # Main MLP network
         # 主MLP网络
-        self.main_fc_dim_list = [self.feature_len, 128, 256]
+        self.cnn_net = nn.Sequential(
+            # 将128*128展开为128x128的单通道图像
+            nn.Unflatten(-1, (1, 128, 128)),
+            
+            # 第一个卷积层
+            nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # 64x64
+            
+            # 第二个卷积层
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # 32x32
+            
+            # 第三个卷积层
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # 16x16
+            
+            # 展平并全连接
+            nn.Flatten(),
+            nn.Linear(128 * 16 * 16, 512),
+            nn.ReLU(),
+            nn.Linear(512, self.cnn_output_dim),
+            nn.ReLU()
+        )
+        self.main_fc_dim_list = [self.feature_len - self.cnn_input_dim + self.cnn_output_dim, 128, 256]
 
         self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity_last=True)
         self.label_mlp = MLP([256, 64, self.label_size], "label_mlp")
@@ -69,9 +98,21 @@ class NetworkModelBase(nn.Module):
         return label
 
     def forward(self, feature, legal_action):
+        # Slice out the CNN input
+        # 切片出CNN输入
+        front_feature = feature[:, :self.cnn_input_dim]
+        cnn_feature = feature[:, -self.cnn_input_dim:]
+
+        # CNN processing
+        # CNN处理
+        cnn_feature = self.cnn_net(cnn_feature)
+
+        # Concatenate CNN output with the rest of the feature
+        combined_feature = torch.cat([front_feature, cnn_feature], dim=1)
+        
         # Main MLP processing
         # 主MLP处理
-        fc_mlp_out = self.main_mlp_net(feature)
+        fc_mlp_out = self.main_mlp_net(combined_feature)
 
         # Action and value processing
         # 处理动作和值
