@@ -39,43 +39,72 @@ SampleData = create_cls("SampleData", npdata=None)
 # TODO better reward design ??? Keep it simple.
 
 def reward_process(
-    step_no,
-    cur_pos,
-    cur_pos_norm,
+    # step_no,
+    # cur_pos,
+    # cur_pos_norm,
 
-    undetected_area,
+    # undetected_area,
     cnt_new_detected,
+    is_exploration_finished,
+    dist_goal_norm,
+    is_last_action_talent,
     
-    treasure_buf_pos_list,
-    destination_pos,
-    has_found_dest,
+    # treasure_buf_pos_list,
+    # destination_pos,
+    # has_found_dest,
 
-    legal_action,
-    talent_available,
-    talent_cd
+    # legal_action,
+    # talent_available,
+    # talent_cd
 ):
     """
     改进的奖励函数设计
     
     Args:
-        cur_pos: 智能体当前坐标。
-        map: 智能体存储的全局地图探索情况：-1 表示未探索，0表示已探索，1表示障碍物。
-        treasure_pos_list: 智能体存储的宝藏位置列表，包含所有宝藏的坐标。
-        destination_pos: 智能体存储的目标位置坐标（没找到则为 None）。
+    cur_pos: 智能体当前坐标。
+    map: 智能体存储的全局地图探索情况：-1 表示未探索，0表示已探索，1表示障碍物。
+    treasure_pos_list: 智能体存储的宝藏位置列表，包含所有宝藏的坐标。
+    destination_pos: 智能体存储的目标位置坐标（没找到则为 None）。
     """
     # step reward
     # 1. 基础步数惩罚 - 鼓励快速完成
     step_reward = -0.001
 
 
-    # 2. 探索奖励 - 鼓励探索未探索区域    
-    # ...
+    # 2. 探索奖励 - 鼓励探索未探索区域    
+    explore_reward = 0.0002 * cnt_new_detected
+
+    # 3.靠近奖励
+    dist_reward = -0.001
+    if dist_goal_norm is not None:
+        if dist_goal_norm > 0.2:
+            dist_reward = 0.005 - 0.005 * dist_goal_norm
+        elif 0.05<= dist_goal_norm <= 0.2:
+            dist_reward = 0.02 - 0.01 * dist_goal_norm
+        else:
+            dist_reward = 0.1-0.1 * dist_goal_norm
+    
+    # 4.使用talent奖励
+    if is_last_action_talent:
+        talent_reward = 0.01
+    else:
+        talent_reward = 0.0
 
     # 计算总奖励
     total_reward = 0
-    total_reward = max(-0.2, min(0.5, total_reward))
+    total_reward =(
+        step_reward
+        + explore_reward
+        + dist_reward
+        + talent_reward
+    )
+    total_reward = max(-0.1, min(0.1, total_reward))
 
+    #调试信息
+    print(f"Reward Components: explore_reward={explore_reward:.3f}, dist_reward={dist_reward:.3f}, talent_reward={talent_reward:.3f}, step_reward={step_reward:.3f}")
     return [total_reward]
+
+
 
 
 class SampleManager:

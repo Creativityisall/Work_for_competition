@@ -106,18 +106,15 @@ class Preprocessor:
     def update_pos(self, obs, hero):
         # Update current position
         # Update position norm (cur & last)
-        self.cur_pos = hero["pos"]
+        self.cur_pos = (hero["pos"]["x"], hero["pos"]["z"])
         self.last_pos_norm = self.cur_pos_norm
-        self.cur_pos_norm = norm(self.cur_pos, 127, 0)
+        self.cur_pos_norm = (
+            norm(self.cur_pos[0], 127, 0),
+            norm(self.cur_pos[1], 127, 0),
+        )
     
     def get_legal_action(self, obs):
-        assert len(self.legal_action) == self.move_action_num and all(self.legal_action), \
-            f"self.legal_action should be {self.move_action_num} Trues (should have been resetted), but got {self.legal_action}"
-
-
-        if not self.talent_available:
-            for i in range(8):
-                self.legal_action[i+8] = False
+        self.legal_action = [True] * (self.move_action_num // 2) + [self.talent_available] * (self.move_action_num // 2) 
 
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
@@ -128,8 +125,7 @@ class Preprocessor:
                 assert 0 <= x < 128 and 0 <= z < 128, \
                     f"8 grids around cur_pos {self.cur_pos} + ({i}, {j}) should be within the map"
                 
-                map = obs["frame_state"]["map"]
-                if map[x][z] == T_OBSTICAL:
+                if self.global_map[x][z] == T_OBSTICAL:
                     self.legal_action[self._ij2direction(i, j)] = False    
     
     def update_view(self, obs):
@@ -138,16 +134,16 @@ class Preprocessor:
         """   
 
         ######## update detected area ########
-        map_info = obs["frame_state"]["map"]
+        map_info = obs["map_info"]
         self.cnt_new_detected = 0
         x0, z0 = self.cur_pos
-        for i in range(-25, 25):
-            for j in range(-25, 25):
+        for i in range(-25, 25 + 1):
+            for j in range(-25, 25 + 1):
                 x, z = x0 + i, z0 + j
                 if 0 <= x < 128 and 0 <= z < 128:                    
                     if self.global_map[x, z] == -1:
                         self.cnt_new_detected += 1
-                        self.global_map[x, z] = map_info[x][z] # 0 or 1
+                        self.global_map[x, z] = map_info[25-j]["values"][25+i] # 0 for T_OBSTICAL, 1 for T_FREE2GO
         
         self.undetected_area -= self.cnt_new_detected
         assert self.undetected_area == np.sum(self.global_map == -1), \
@@ -156,7 +152,7 @@ class Preprocessor:
         ######## update treasure_bu list & destination ########
         organs = obs["frame_state"]["organs"]
         for organ in organs:
-            pos = organ["pos"]
+            pos = (organ["pos"]["x"], organ["pos"]["z"])
             config_id=organ["config_id"]
             if organ["sub_type"] == T_TREASURE:  # treasure
                 # XXX 我怀疑取过的宝箱，再经过时还是会看到，只不过状态为 0（不可取）。
@@ -194,7 +190,7 @@ class Preprocessor:
             min_dist = float("inf")
             for organ in self.treasure_buf_list:
                 if organ is not None and organ["status"] == 1:  # only consider reachable organs
-                    pos = organ["pos"]
+                    pos = (organ["pos"]["x"], organ["pos"]["z"])
                     dist = self._manhattan_distance(self.cur_pos, pos)
                     if dist < min_dist:
                         min_dist = dist
@@ -224,14 +220,14 @@ class Preprocessor:
 
 
         # Feature TODO
-        feature = np.concatenate(
-            [self.step_no],                 # 1,
-            self.cur_pos_norm.flatten(),    # 2,
-            self.legal_action,              # 16,
-            [self.talent_available],        # 1, 
-            [self.talent_cd / 30.0],        # 1, normalize talent cooldown to [0, 1]     
-            self.global_map.flatten(),      # 128*128,
-        )
+        feature = np.concatenate([
+            [self.step_no],                                      # 1,
+            [self.cur_pos_norm[0], self.cur_pos_norm[1]] ,       # 2,
+            self.legal_action,                                   # 16,
+            [self.talent_available],                             # 1, 
+            [self.talent_cd / 30.0],                             # 1, normalize talent cooldown to [0, 1]     
+            self.global_map.flatten(),                           # 128*128,
+        ])
 
         return (
             feature,
@@ -257,7 +253,7 @@ class Preprocessor:
             ),  
         )
         
-    def _ij2direction(i, j):
+    def _ij2direction(self, i, j):
         """
         Convert vector (i, j) to relative direction.
         """
