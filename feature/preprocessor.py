@@ -455,7 +455,7 @@ class Preprocessor:
                 last_pos=self.last_pos,
                 last_pos_norm=self.last_pos_norm,
 
-                talent_last_action=(self.last_action >= 8), 
+                is_last_action_talent=(self.last_action >= 8), 
 
                 target_pos=self.target_pos,
                 target_rel_pos_norm=self.target_rel_pos_norm,
