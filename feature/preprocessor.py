@@ -19,29 +19,53 @@ def norm(v, max_v, min_v=0):
     v = np.maximum(np.minimum(max_v, v), min_v)
     return (v - min_v) / (max_v - min_v)
 
+T_TREASURE = 1
+T_BUFF = 2
+T_START = 3
+T_DESTINATION = 4
+
+TREASURE = 2
+BUFF = 3
+DESTINATION = 4
 
 class Preprocessor:
     def __init__(self) -> None:
-        self.move_action_num = 8
+        # self.move_action_num = 16
+        # self.move_action_num = 8
         self.reset()
 
     def reset(self):
+        # frame number
         self.step_no = 0
+
+        # position
         self.cur_pos = (0, 0)
         self.cur_pos_norm = np.array((0, 0))
         
         # self.history_pos = []
-        self.bad_move_ids = set()
+        # self.bad_move_ids = set()
 
-        self.global_map = np.full((128, 128), -1, dtype=int)  # 全局地图探索情况
+        # explore and map
+        self.global_map = np.full((128, 128), -1, dtype=int)  
         self.undetected_area = 128 * 128
-        self.treasure_pos_list = []
-        self.buff_pos_list = []
+        self.cnt_new_detected = 0
+        
+        # treasure and buff
+        self.treasure_buf_pos_list = [(-1,-1)] * 14
+        # self.buff_pos = (0,0)  # TODO: should be a list of positions
+
+        # destination
         self.dest_pos = None
         self.is_dest_pos_found = False
 
+        # talent
         self.talent_available = False  # 初始尚未加载穿墙技能
         self.talent_cd = float("inf")  # 剩余冷却时间初始置为无穷大
+
+        # action
+        self.last_action = -1
+        self.legal_action = [True] * 16  # 8 move + 8 talent
+
 
     def _get_pos_feature(self, found, cur_pos, target_pos):
         """
@@ -76,7 +100,7 @@ class Preprocessor:
         # Update current position
         # Update position norm (cur & last)
         
-        self.cur_pos = (hero["pos"]["x"], hero["pos"]["z"])
+        self.cur_pos = hero["pos"]
         self.last_pos_norm = self.cur_pos_norm
         self.cur_pos_norm = norm(self.cur_pos, 127, 0)
 
@@ -99,43 +123,41 @@ class Preprocessor:
         """   
         # update detected area
         map_info = obs["frame_state"]["map"]
-        cnt_new_detected = 0
+        self.cnt_new_detected = 0
         x0, z0 = self.cur_pos
         for i in range(-25, 25):
             for j in range(-25, 25):
                 x, z = x0 + i, z0 + j
                 if 0 <= x < 128 and 0 <= z < 128:                    
                     if self.global_map[x, z] == -1:
-                        cnt_new_detected += 1
-                    self.global_map[x, z] = map_info[x][z] # 0 or 1
+                        self.cnt_new_detected += 1
+                        self.global_map[x, z] = map_info[x][z] # 0 or 1
         
         # self.detected_area = np.argwhere(self.global_map != -1)
-        self.undetected_area -= cnt_new_detected
+        self.undetected_area -= self.cnt_new_detected
         assert self.undetected_area == np.sum(self.global_map == -1), \
             f"undetected_area {self.undetected_area} != np.sum(self.global_map == -1) {np.sum(self.global_map == -1)}"
 
-        # update treasure position list
+        # update treasure_bu list & destination
         organs = obs["frame_state"]["organs"]
         for organ in organs:
-            if organ["sub_type"] == 1 and organ["status"] == 1:  # treasure
+            pos = organ["pos"]
+            if organ["sub_type"] == T_TREASURE and organ["status"] == 1:  # treasure
                 # XXX 我怀疑取过的宝箱，再经过时还是会看到，只不过状态为 0（不可取）。
-                pos = organ["pos"]
-                if pos not in self.treasure_pos_list:
-                    self.treasure_pos_list.append(pos)    
-            elif organ["sub_type"] == 2 and organ["status"] == 1:   # buff
-                pos = organ["pos"]
-                if pos not in self.buff_pos_list:
-                    self.buff_pos_list.append(pos)
+                self.global_map[pos[0], pos[1]] = TREASURE  # mark as treasure
+                config_id = organ["config_id"]
+                self.treasure_buf_pos_list[config_id] = pos 
+            elif organ["sub_type"] == T_BUFF and organ["status"] == 1:   # buff
+                self.global_map[pos[0], pos[1]] = BUFF  # mark as buff
+                config_id = organ["config_id"]
+                self.treasure_buf_pos_list[config_id] = pos 
+            elif organ["sub_type"] == T_DESTINATION and organ["status"] == 1:  # destination
+                self.global_map[pos[0], pos[1]] = DESTINATION  # mark as destination
+                self.dest_pos = pos
+                self.is_dest_pos_found = True
+            else:
+                pass  # ignore other organs
         
-        # TODO 
-
-        # TODO History ?
-        # self.treasure_pos_list = np.argwhere(self.global_map == 2)
-        # if self.treasure_pos_list.size > 0:
-            # self.dest_pos = self.treasure_pos_list[0]
-        # else:
-            # self.dest_pos = None
-
     def process(self, frame_state, last_action):
         obs, _ = frame_state
         hero = obs["frame_state"]["heroes"][0]
@@ -147,7 +169,7 @@ class Preprocessor:
         self.last_action = last_action 
         self.talent_available = hero["talent"]["status"]
         self.talent_cd = hero["talent"]["cooldown"]
-        legal_action = self.get_legal_action(obs) # TODO how to process talent? how to design action space?
+        self.get_legal_action(obs) # TODO how to process talent? how to design action space?
 
         # Process frame state: update self's attributes
         self.update_pos(obs, hero)
@@ -155,54 +177,62 @@ class Preprocessor:
 
 
         # Feature TODO
-
-        # NOTE I think the following should be encoded into feature:
-        # 1. 'detected map' 
-        # 2. current (normalized) position
-        # 3. organ detection status (MAX_TREASURE_NUM bits for treasures + 1 bit for destination + ? bits for buffs + normalized cd for talent)
-        # 4. ?? history position feature (10 steps before) ?? 
-        # 5. legal action (16 bits for 16 actions, 1 bit for move action)
-        feature = np.concatenate([self.cur_pos_norm, self.feature_end_pos , legal_action])
+        feature = np.concatenate(
+            [self.step_no],
+            self.cur_pos_norm.flatten(),
+            self.legal_action,
+            [self.talent_available],
+            [self.talent_cd / 30.0],  # normalize talent cooldown to [0, 1]     
+            self.global_map.flatten(), 
+        )
         # XXX modify conf.py !!
 
         return (
             feature,
-            legal_action,
+            self.legal_action,
             reward_process(
                 step_no=self.step_no,
                 cur_pos=self.cur_pos,
-                detected_area=self.detected_area,
-                treasure_pos_list=self.treasure_pos_list,
-                destination_pos=self.dest_pos
+                cur_pos_norm=self.cur_pos_norm,
+
+                undetected_area=self.undetected_area,
+                cnt_new_detected=self.cnt_new_detected,
+                
+                treasure_buf_pos_list=self.treasure_buf_pos_list,
+                destination_pos=self.dest_pos,
+                has_found_dest=self.is_dest_pos_found,
+                
+                legal_action=self.legal_action,
+                talent_available=self.talent_available,
+                talent_cd=self.talent_cd,
                 # TODO MORE ??
             ),  
         )
         
 
-    def get_legal_action(self):
-        # TODO better legal action design?? talent, action space, conf.py ...
+    def get_legal_action(self, obs):
+        # # TODO better legal action design?? talent, action space, conf.py ...
         
-        # if last_action is move and current position is the same as last position, add this action to bad_move_ids
-        # 如果上一步的动作是移动，且当前位置与上一步位置相同，则将该动作加入到bad_move_ids中
-        if (
-            abs(self.cur_pos_norm[0] - self.last_pos_norm[0]) < 0.001
-            and abs(self.cur_pos_norm[1] - self.last_pos_norm[1]) < 0.001
-            and self.last_action > -1
-        ):
-            self.bad_move_ids.add(self.last_action)
-        else:
-            self.bad_move_ids = set()
+        # # if last_action is move and current position is the same as last position, add this action to bad_move_ids
+        # # 如果上一步的动作是移动，且当前位置与上一步位置相同，则将该动作加入到bad_move_ids中
+        # if (
+        #     abs(self.cur_pos_norm[0] - self.last_pos_norm[0]) < 0.001
+        #     and abs(self.cur_pos_norm[1] - self.last_pos_norm[1]) < 0.001
+        #     and self.last_action > -1
+        # ):
+        #     self.bad_move_ids.add(self.last_action)
+        # else:
+        #     self.bad_move_ids = set()
 
-        # legal_action = [self.move_usable] * self.move_action_num
-        legal_action = [True] * self.move_action_num
-        for move_id in self.bad_move_ids:
-            legal_action[move_id] = 0
+        # legal_action = [True] * self.move_action_num
+        # for move_id in self.bad_move_ids:
+        #     legal_action[move_id] = 0
 
-        # if self.move_usable not in legal_action:
-        if True not in legal_action:
-            # 如果没有可用的移动动作，则将所有移动动作设置为可用
-            self.bad_move_ids = set()
-            # return [self.move_usable] * self.move_action_num
-            return [True] * self.move_action_num
 
-        return legal_action
+        # # if self.move_usable not in legal_action:
+        # if True not in legal_action:
+        #     # 如果没有可用的移动动作，则将所有移动动作设置为可用
+        #     self.bad_move_ids = set()
+        #     # return [self.move_usable] * self.move_action_num
+        #     return [True] * self.move_action_num
+        pass

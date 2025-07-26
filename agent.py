@@ -186,6 +186,7 @@ class Agent(BaseAgent):
         return [ActData(log_probs=log_probs, value=value, action=action, log_prob=log_prob)]
 
     def action_process(self, act_data):
+        self.last_action = act_data.action # Update last action
         return act_data.action
 
     @exploit_wrapper
