@@ -70,9 +70,8 @@ def reward_process(
     # 1. 基础步数惩罚 - 鼓励快速完成
     step_reward = -0.001
 
-
     # 2. 探索奖励 - 鼓励探索未探索区域    
-    explore_reward = 0.0002 * cnt_new_detected
+    explore_reward = 0.005 * cnt_new_detected
 
     # 3.靠近奖励
     dist_reward = -0.001
@@ -101,7 +100,7 @@ def reward_process(
     total_reward = max(-0.1, min(0.1, total_reward))
 
     #调试信息
-    print(f"Reward Components: explore_reward={explore_reward:.3f}, dist_reward={dist_reward:.3f}, talent_reward={talent_reward:.3f}, step_reward={step_reward:.3f}")
+    # print(f"Reward Components: explore_reward={explore_reward:.3f}, dist_reward={dist_reward:.3f}, talent_reward={talent_reward:.3f}, step_reward={step_reward:.3f}")
     return [total_reward]
 
 

@@ -29,6 +29,7 @@ T_FREE2GO = 1
 TREASURE = 2
 BUFF = 3
 DESTINATION = 4
+PLAYER = 10
 
 
 
@@ -62,6 +63,7 @@ class Preprocessor:
 
         # target 
         self.target_distance_norm = None
+        self.target_pos = None
         
         # talent
         self.talent_available = False  # 初始尚未加载穿墙技能
@@ -134,6 +136,8 @@ class Preprocessor:
         """   
 
         ######## update detected area ########
+        self.global_map[self.cur_pos[0], self.cur_pos[1]] = PLAYER
+
         map_info = obs["map_info"]
         self.cnt_new_detected = 0
         x0, z0 = self.cur_pos
@@ -183,6 +187,7 @@ class Preprocessor:
         if self.undetected_area == 0:
             # if exploration finished, then directly set destination as target
             assert self.dest_pos is not None, "Destination should be found if exploration finished."
+            self.target_pos = (self.dest_pos[0], self.dest_pos[1])
             self.target_distance_norm = norm(
                 self._manhattan_distance(self.cur_pos, self.dest_pos), 2 * 128
             )
@@ -194,8 +199,9 @@ class Preprocessor:
                     dist = self._manhattan_distance(self.cur_pos, pos)
                     if dist < min_dist:
                         min_dist = dist
+                        self.target_pos = pos
                         self.target_distance_norm = norm(dist, 2 * 128)  
-        
+
         
         
     
@@ -216,17 +222,23 @@ class Preprocessor:
         self.get_legal_action(obs) # TODO how to process talent? how to design action space?
 
         # Process frame state: update self's attributes
+        if hasattr(self, 'target_distance_norm'):
+            self.last_dist_goal_norm = self.target_distance_norm
+        else:
+            self.last_dist_goal_norm = None
         self.update_view(obs)
+        
 
 
         # Feature TODO
         feature = np.concatenate([
-            [self.step_no],                                      # 1,
+            # [self.step_no],                                      # 1,
             [self.cur_pos_norm[0], self.cur_pos_norm[1]] ,       # 2,
-            self.legal_action,                                   # 16,
-            [self.talent_available],                             # 1, 
-            [self.talent_cd / 30.0],                             # 1, normalize talent cooldown to [0, 1]     
-            self.global_map.flatten(),                           # 128*128,
+            # self.legal_action,                                   # 16,
+            # [self.target_pos[0], self.target_pos[1]] if self.target_pos is not None else [0, 0],  # 2, target pos
+            # [self.talent_available],                             # 1, 
+            # [self.talent_cd / 30.0],                             # 1, normalize talent cooldown to [0, 1]     
+            # self.global_map.flatten(),                           # 128*128,
         ])
 
         return (
@@ -242,6 +254,7 @@ class Preprocessor:
                 is_exploration_finished=self.undetected_area == 0, # XXX
 
                 dist_goal_norm=self.target_distance_norm, # XXX
+                last_dist_goal_norm=self.last_dist_goal_norm, # XXX
                 
                 # destination_pos=self.dest_pos,
                 # has_found_dest=self.is_dest_pos_found,
