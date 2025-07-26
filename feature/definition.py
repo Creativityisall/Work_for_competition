@@ -39,23 +39,23 @@ SampleData = create_cls("SampleData", npdata=None)
 # TODO better reward design ??? Keep it simple.
 
 def reward_process(
-    # step_no,
-    # cur_pos,
-    # cur_pos_norm,
+    step_no,
 
-    # undetected_area,
+    cur_pos,
+    cur_pos_norm,
+    last_pos,
+    last_pos_norm,
+
+    talent_last_action, 
+
+    target_pos,
+    target_rel_pos_norm,
+    target_pos_norm,
+    target_distance_norm,
+    last_target_distance_norm,
+
+    undetected_area,
     cnt_new_detected,
-    is_exploration_finished,
-    dist_goal_norm,
-    is_last_action_talent,
-    
-    # treasure_buf_pos_list,
-    # destination_pos,
-    # has_found_dest,
-
-    # legal_action,
-    # talent_available,
-    # talent_cd
 ):
     """
     改进的奖励函数设计

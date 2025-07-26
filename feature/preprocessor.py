@@ -408,7 +408,7 @@ class Preprocessor:
         self.get_talent_status_and_legal_action(hero, last_action) 
         
         # Process treasure, buff, destination
-        self.record_treasure_and_buff(obs) # NOTE  bookkeeping in here
+        self.record_treasure_and_buff(obs) # NOTE there are bookkeepings in here
         self.record_destination(obs)
 
         # Update target
@@ -448,7 +448,23 @@ class Preprocessor:
             feature,
             self.legal_action,
             reward_process(
-                
+                step_no=self.step_no,
+
+                cur_pos=self.cur_pos,
+                cur_pos_norm=self.cur_pos_norm,
+                last_pos=self.last_pos,
+                last_pos_norm=self.last_pos_norm,
+
+                talent_last_action=(self.last_action >= 8), 
+
+                target_pos=self.target_pos,
+                target_rel_pos_norm=self.target_rel_pos_norm,
+                target_pos_norm=self.target_pos_norm,
+                target_distance_norm=self.target_distance_norm,
+                last_target_distance_norm=self.last_target_distance_norm,
+
+                undetected_area=self.undetected_area,
+                cnt_new_detected=self.cnt_new_detected,
             ),  
         )
     
