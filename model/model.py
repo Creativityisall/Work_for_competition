@@ -29,6 +29,12 @@ else:
     torch.set_num_threads(4)
 
 
+####################################
+from agent_ppo.agent import my_trace
+####################################
+
+
+
 class NetworkModelBase(nn.Module):
     def __init__(self):
         super().__init__()
@@ -50,14 +56,7 @@ class NetworkModelBase(nn.Module):
         # Main MLP network
         # 主MLP网络
         self.main_fc_dim_list = [self.feature_len, 128, 256]
-        # if Config.tanh_mlp:
-        #     self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity=nn.Tanh(), non_linearity_last=True)
-        #     self.label_mlp = MLP([256, 64, self.label_size], "label_mlp", non_linearity=nn.Tanh())
-        #     self.value_mlp = MLP([256, 64, self.value_num], "value_mlp", non_linearity=nn.Tanh())
-        # else:
-        #     self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity_last=True)
-        #     self.label_mlp = MLP([256, 64, self.label_size], "label_mlp")
-        #     self.value_mlp = MLP([256, 64, self.value_num], "value_mlp")
+
         self.main_mlp_net = MLP(self.main_fc_dim_list, "main_mlp_net", non_linearity_last=True)
         self.label_mlp = MLP([256, 64, self.label_size], "label_mlp")
         self.value_mlp = MLP([256, 64, self.value_num], "value_mlp")
@@ -66,7 +65,7 @@ class NetworkModelBase(nn.Module):
         label_max, _ = torch.max(label * legal_action, 1, True)
         label = label - label_max
         label = label * legal_action
-        label = label + 1e5 * (legal_action - 1)
+        label = label + 1e5 * (legal_action - 1) # illegal action will be set to a very large negative value
         return label
 
     def forward(self, feature, legal_action):
@@ -78,15 +77,11 @@ class NetworkModelBase(nn.Module):
         # 处理动作和值
         label_mlp_out = self.label_mlp(fc_mlp_out)
         label_out = self.process_legal_action(label_mlp_out, legal_action)
-        # print("label_out shape: ", label_out.shape)
-        # print("label_out: ", label_out)
 
         log_prob = torch.nn.functional.log_softmax(label_out, dim=1)
-        # print("log_prob:", log_prob)
-
         value = self.value_mlp(fc_mlp_out)
 
-        return log_prob, value # NOTE 自动支持批处理
+        return log_prob, value # 这里自动支持批处理
 
 
 class NetworkModelActor(NetworkModelBase):
@@ -103,12 +98,7 @@ class NetworkModelLearner(NetworkModelBase):
 
     def forward(self, data_list, inference=False):
         feature = data_list[0]
-        legal_action = data_list[-1]
-
-        # print("LEARNER FORWARD: ")
-        # print("legal_action shape: ", legal_action.shape)
-        # print("legal_action: ", legal_action)
-        
+        legal_action = data_list[-1]        
         return super().forward(feature, legal_action)
 
 

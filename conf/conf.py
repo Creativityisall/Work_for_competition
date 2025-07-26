@@ -15,15 +15,18 @@ class Config:
     # actions
     # 动作
     ACTION_LEN = 1
-    ACTION_NUM = 8
+    # ACTION_NUM = 8
+    ACTION_NUM = 16
 
     # features
     # 特征
     FEATURES = [
+        1,
         2,
-        6,
-        6,
-        8,
+        16,
+        1,
+        1,
+        128*128, 
     ]
 
     FEATURE_SPLIT_SHAPE = FEATURES

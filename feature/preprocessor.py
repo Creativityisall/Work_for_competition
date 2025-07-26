@@ -23,15 +23,21 @@ T_TREASURE = 1
 T_BUFF = 2
 T_START = 3
 T_DESTINATION = 4
+T_OBSTICAL = 0
+T_FREE2GO = 1
 
 TREASURE = 2
 BUFF = 3
 DESTINATION = 4
 
+
+
+
+
 class Preprocessor:
     def __init__(self) -> None:
-        # self.move_action_num = 16
-        # self.move_action_num = 8
+        self.move_action_num = 16
+        self.treasure_and_buff_total_cnt = 14
         self.reset()
 
     def reset(self):
@@ -41,9 +47,6 @@ class Preprocessor:
         # position
         self.cur_pos = (0, 0)
         self.cur_pos_norm = np.array((0, 0))
-        
-        # self.history_pos = []
-        # self.bad_move_ids = set()
 
         # explore and map
         self.global_map = np.full((128, 128), -1, dtype=int)  
@@ -51,21 +54,22 @@ class Preprocessor:
         self.cnt_new_detected = 0
         
         # treasure and buff
-        self.treasure_buf_pos_list = [(-1,-1)] * 14
-        # self.buff_pos = (0,0)  # TODO: should be a list of positions
+        self.treasure_buf_list = [None] * self.treasure_and_buff_total_cnt  # treasure and buff positions
 
         # destination
         self.dest_pos = None
         self.is_dest_pos_found = False
 
+        # target 
+        self.target_distance_norm = None
+        
         # talent
         self.talent_available = False  # 初始尚未加载穿墙技能
         self.talent_cd = float("inf")  # 剩余冷却时间初始置为无穷大
 
         # action
         self.last_action = -1
-        self.legal_action = [True] * 16  # 8 move + 8 talent
-
+        self.legal_action = [True] * self.move_action_num
 
     def _get_pos_feature(self, found, cur_pos, target_pos):
         """
@@ -96,32 +100,44 @@ class Preprocessor:
         )
         return pos_feature
     
+    def _manhattan_distance(self, pos1, pos2):
+        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+    
     def update_pos(self, obs, hero):
         # Update current position
         # Update position norm (cur & last)
-        
         self.cur_pos = hero["pos"]
         self.last_pos_norm = self.cur_pos_norm
         self.cur_pos_norm = norm(self.cur_pos, 127, 0)
+    
+    def get_legal_action(self, obs):
+        assert len(self.legal_action) == self.move_action_num and all(self.legal_action), \
+            f"self.legal_action should be {self.move_action_num} Trues (should have been resetted), but got {self.legal_action}"
 
-        # # Update history position feature
-        # # 更新历史位置及其特征
-        # self.history_pos.append(self.cur_pos)
-        # if len(self.history_pos) > 10:
-        #     self.history_pos.pop(0)
-        # self.feature_history_pos = self._get_pos_feature(1, self.cur_pos, self.history_pos[0]) # NOTE history here means 10 steps before
-            
+
+        if not self.talent_available:
+            for i in range(8):
+                self.legal_action[i+8] = False
+
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if i == 0 and j == 0:
+                    continue
+                
+                x, z = self.cur_pos[0] + i, self.cur_pos[1] + j
+                assert 0 <= x < 128 and 0 <= z < 128, \
+                    f"8 grids around cur_pos {self.cur_pos} + ({i}, {j}) should be within the map"
+                
+                map = obs["frame_state"]["map"]
+                if map[x][z] == T_OBSTICAL:
+                    self.legal_action[self._ij2direction(i, j)] = False    
+    
     def update_view(self, obs):
         """
-        Map Protocol:
-        -1 : 未探索
-        0 : 障碍物
-        1 : 空地（见论坛）
-        2 : treasure
-        3 : buff
-        4 : destination
+        Update the map under current view.
         """   
-        # update detected area
+
+        ######## update detected area ########
         map_info = obs["frame_state"]["map"]
         self.cnt_new_detected = 0
         x0, z0 = self.cur_pos
@@ -133,37 +149,69 @@ class Preprocessor:
                         self.cnt_new_detected += 1
                         self.global_map[x, z] = map_info[x][z] # 0 or 1
         
-        # self.detected_area = np.argwhere(self.global_map != -1)
         self.undetected_area -= self.cnt_new_detected
         assert self.undetected_area == np.sum(self.global_map == -1), \
             f"undetected_area {self.undetected_area} != np.sum(self.global_map == -1) {np.sum(self.global_map == -1)}"
 
-        # update treasure_bu list & destination
+        ######## update treasure_bu list & destination ########
         organs = obs["frame_state"]["organs"]
         for organ in organs:
             pos = organ["pos"]
-            if organ["sub_type"] == T_TREASURE and organ["status"] == 1:  # treasure
+            config_id=organ["config_id"]
+            if organ["sub_type"] == T_TREASURE:  # treasure
                 # XXX 我怀疑取过的宝箱，再经过时还是会看到，只不过状态为 0（不可取）。
-                self.global_map[pos[0], pos[1]] = TREASURE  # mark as treasure
-                config_id = organ["config_id"]
-                self.treasure_buf_pos_list[config_id] = pos 
-            elif organ["sub_type"] == T_BUFF and organ["status"] == 1:   # buff
-                self.global_map[pos[0], pos[1]] = BUFF  # mark as buff
-                config_id = organ["config_id"]
-                self.treasure_buf_pos_list[config_id] = pos 
-            elif organ["sub_type"] == T_DESTINATION and organ["status"] == 1:  # destination
+                assert 1 <= config_id <=13 , "Protocol: treasure -> [1, 13]"
+                self.global_map[pos[0], pos[1]] = TREASURE if organ["status"] == 1 else T_FREE2GO  # mark as treasure 
+                self.treasure_buf_list[config_id] = organ
+
+            elif organ["sub_type"] == T_BUFF:   # buff
+                assert config_id == 0, "Protocol: buff -> 0"
+                self.global_map[pos[0], pos[1]] = BUFF if organ["status"] == 1 else T_FREE2GO  # mark as buff
+                self.treasure_buf_list[config_id] = organ
+
+            elif organ["sub_type"] == T_DESTINATION:  # destination
+                assert organ["status"] == 1, "Destination should always be reachable."
                 self.global_map[pos[0], pos[1]] = DESTINATION  # mark as destination
                 self.dest_pos = pos
                 self.is_dest_pos_found = True
             else:
                 pass  # ignore other organs
+
+
+
+        ######## Record target in `self.target_distance_norm` ########
+
+        # During exploration, target <- nearest treasure or buff; 
+        # If exploration finished, target <- destination
+        # if no target currently, target_distance_norm <- None
+        if self.undetected_area == 0:
+            # if exploration finished, then directly set destination as target
+            assert self.dest_pos is not None, "Destination should be found if exploration finished."
+            self.target_distance_norm = norm(
+                self._manhattan_distance(self.cur_pos, self.dest_pos), 2 * 128
+            )
+        else:
+            min_dist = float("inf")
+            for organ in self.treasure_buf_list:
+                if organ is not None and organ["status"] == 1:  # only consider reachable organs
+                    pos = organ["pos"]
+                    dist = self._manhattan_distance(self.cur_pos, pos)
+                    if dist < min_dist:
+                        min_dist = dist
+                        self.target_distance_norm = norm(dist, 2 * 128)  
         
+        
+        
+    
     def process(self, frame_state, last_action):
         obs, _ = frame_state
         hero = obs["frame_state"]["heroes"][0]
         
         # Record step_no
         self.step_no = obs["frame_state"]["step_no"]
+
+        # Update current position
+        self.update_pos(obs, hero)
 
         # Process legal action
         self.last_action = last_action 
@@ -172,67 +220,66 @@ class Preprocessor:
         self.get_legal_action(obs) # TODO how to process talent? how to design action space?
 
         # Process frame state: update self's attributes
-        self.update_pos(obs, hero)
         self.update_view(obs)
 
 
         # Feature TODO
         feature = np.concatenate(
-            [self.step_no],
-            self.cur_pos_norm.flatten(),
-            self.legal_action,
-            [self.talent_available],
-            [self.talent_cd / 30.0],  # normalize talent cooldown to [0, 1]     
-            self.global_map.flatten(), 
+            [self.step_no],                 # 1,
+            self.cur_pos_norm.flatten(),    # 2,
+            self.legal_action,              # 16,
+            [self.talent_available],        # 1, 
+            [self.talent_cd / 30.0],        # 1, normalize talent cooldown to [0, 1]     
+            self.global_map.flatten(),      # 128*128,
         )
-        # XXX modify conf.py !!
 
         return (
             feature,
             self.legal_action,
             reward_process(
-                step_no=self.step_no,
-                cur_pos=self.cur_pos,
-                cur_pos_norm=self.cur_pos_norm,
+                # step_no=self.step_no,
+                # cur_pos=self.cur_pos,
+                # cur_pos_norm=self.cur_pos_norm,
 
-                undetected_area=self.undetected_area,
-                cnt_new_detected=self.cnt_new_detected,
+                # undetected_area=self.undetected_area,
+                cnt_new_detected=self.cnt_new_detected, # XXX
+                is_exploration_finished=self.undetected_area == 0, # XXX
+
+                dist_goal_norm=self.target_distance_norm, # XXX
                 
-                treasure_buf_pos_list=self.treasure_buf_pos_list,
-                destination_pos=self.dest_pos,
-                has_found_dest=self.is_dest_pos_found,
+                # destination_pos=self.dest_pos,
+                # has_found_dest=self.is_dest_pos_found,
                 
-                legal_action=self.legal_action,
-                talent_available=self.talent_available,
-                talent_cd=self.talent_cd,
-                # TODO MORE ??
+                # legal_action=self.legal_action,
+                # talent_available=self.talent_available,
+                # talent_cd=self.talent_cd,
             ),  
         )
         
+    def _ij2direction(i, j):
+        """
+        Convert vector (i, j) to relative direction.
+        """
+        assert abs(i) <= 1 and abs(j) <= 1, f"i={i}, j={j} should be in [-1, 0, 1]"
+        assert i != 0 or j != 0, f"i={i}, j={j} should not be (0, 0)"
 
-    def get_legal_action(self, obs):
-        # # TODO better legal action design?? talent, action space, conf.py ...
-        
-        # # if last_action is move and current position is the same as last position, add this action to bad_move_ids
-        # # 如果上一步的动作是移动，且当前位置与上一步位置相同，则将该动作加入到bad_move_ids中
-        # if (
-        #     abs(self.cur_pos_norm[0] - self.last_pos_norm[0]) < 0.001
-        #     and abs(self.cur_pos_norm[1] - self.last_pos_norm[1]) < 0.001
-        #     and self.last_action > -1
-        # ):
-        #     self.bad_move_ids.add(self.last_action)
-        # else:
-        #     self.bad_move_ids = set()
+        if i == 1 and j == 0:
+            return 0
+        elif i == 1 and j == 1:
+            return 1
+        elif i == 0 and j == 1:
+            return 2
+        elif i == -1 and j == 1:
+            return 3
+        elif i == -1 and j == 0:
+            return 4
+        elif i == -1 and j == -1:
+            return 5
+        elif i == 0 and j == -1:
+            return 6    
+        elif i == 1 and j == -1:
+            return 7
 
-        # legal_action = [True] * self.move_action_num
-        # for move_id in self.bad_move_ids:
-        #     legal_action[move_id] = 0
 
 
-        # # if self.move_usable not in legal_action:
-        # if True not in legal_action:
-        #     # 如果没有可用的移动动作，则将所有移动动作设置为可用
-        #     self.bad_move_ids = set()
-        #     # return [self.move_usable] * self.move_action_num
-        #     return [True] * self.move_action_num
-        pass
+                
